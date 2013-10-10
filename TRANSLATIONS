@@ -1,0 +1,18 @@
+1. To create templates for translation: 
+
+# Get all strings from main.c
+xgettext -d livescore -s -k_ -o po/livescore.pot src/*
+
+2. To add your translation
+
+# Init your translation from template
+msginit -l xx_XX.UTF-8 -o po/xx_XX.po -i po/livescore.pot
+
+# Edit the new .po file and set the desired strings.
+
+3. To compile and install (will be automatically done by the Makefile):
+
+msgfmt -c -v -o po/xx_XX.mo po/xx_XX.po
+
+cp po/xx_XX.mo /usr/share/locale/xx_XX/LC_MESSAGES
+

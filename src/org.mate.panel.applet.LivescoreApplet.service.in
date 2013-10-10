@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.mate.panel.applet.LivescoreAppletFactory
+Exec=@LIBEXECDIR@/streamer_applet
+
