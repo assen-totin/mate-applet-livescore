@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <wait.h>
 #include <gst/gst.h>
-#include <sqlite3.h>
 #include <unistd.h>
 #include <pwd.h>
 #include <fcntl.h>
@@ -46,29 +45,12 @@
 #define _(String) gettext (String)
 #define APPLET_FACTORY "LivescoreAppletFactory"
 #define APPLET_ID "LivescoreApplet"
-#define APPLET_NAME "streamer"
-#define APPLET_ICON_PLAY "applet_streamer_play.png"
-#define APPLET_ICON_PAUSE "applet_streamer_pause.png"
-#define APPLET_VERSION "1"
-#define APPLET_HOME_DIR ".streamer_applet"
-#define APPLET_SQLITE_DB_FILENAME "streamer.sqlite"
-#define APPLET_SQLITE_DB_VERSION "1"
-#define ICECAST_URL_XML "http://dir.xiph.org/yp.xml"
-#define ICECAST_TMP_FILE "icecast_dnld"
+#define APPLET_NAME "livescore"
+#define APPLET_ICON_STATIC "applet_livescore_icon.png"
 
 // Menu strings
 static const gchar *ui1 = 
-"<menu name='SubMenu1' action='Recent'>"
-;
-
-static const gchar *ui2 = 
-"</menu>"
-"<menu name='SubMenu2' action='Favourites'>"
-;
-
-static const gchar *ui3 =
-"</menu>"
-"<menuitem name='MenuItem1' action='All' />"
+"<menuitem name='MenuItem1' action='Settings' />"
 "<menuitem name='MenuItem2' action='About' />"
 ;
 
@@ -79,17 +61,25 @@ enum {
 };
 
 enum {
-        COL_URL2 = 0,
-        COL_NAME2,
-	COL_GENRE2,
-        NUM_COLS2
+	MATCH_NOT_COMMENCED = 0,
+	MATCH_FIRST_TIME,
+	MATCH_HALF_TIME,
+	MATCH_SECOND_TIME,
+	MATCH_EXTRA_TIME,
+	MATCH_FULL_TIME
 };
 
-struct url_hash {
-	char hash[64];
-	char url[1024];
-	char name[1024];
-} url_hash;
+typedef struct {
+	int league = 0;
+	char team_home[64];
+	char team_away[64];
+	int score_home = 0;
+	int score_away = 0;
+	int status = MATCH_NOT_COMMENCED;
+	int start_time;
+	int match_time = 0;
+	gboolean used = TRUE;
+} match_data;
 
 typedef struct {
 	GMainLoop *loop;
@@ -98,88 +88,40 @@ typedef struct {
         GtkWidget *image;
         GtkWidget *event_box;
 	GtkWidget *quitDialog;
-	GtkWidget *progress;
 	GtkWidget *text;
+	match_data *all_matches;
+	int all_matches_counter = 1;
 	char url[1024];
 	char name[1024];
 	char xmlfile[1024];
 	int status;
 	time_t timestamp;
-	sqlite3 *sqlite;
-	GstElement *gstreamer_playbin2;
 	GtkListStore *tree_store;
 	GtkWidget *tree_view;
-        GtkListStore *tree_store2;
-        GtkWidget *tree_view2;
-	char xml_listen_url[1024];
-	char xml_server_name[1024];
-	char xml_bitrate[1024];
-	char xml_genre[1024];
-	int xml_total_entries;
-	int xml_curr_entries;
-	int icecast_total_entries;
-	gdouble progress_ratio;
-	char ui_fav[10240];
-	char ui_recent[1024];
-	struct url_hash hash_fav[10];
-	struct url_hash hash_recent[10];
-} streamer_applet;
+} livescore_applet;
 
 // util.c
 void push_notification (gchar *, gchar *, gchar *);
 gboolean cp(const char *, const char *);
 
-// gstreamer.c
-void gstreamer_pause(streamer_applet *);
-void gstreamer_play(streamer_applet *);
-void gstreamer_init(streamer_applet *);
-
-// sqlite.c
-gboolean sqlite_connect(streamer_applet *);
-gboolean sqlite_insert(streamer_applet *, char *);
-gboolean sqlite_select(streamer_applet *, char *);
-int cb_sql_true(void *, int, char **, char **);
-int cb_sql_recent(void *, int, char **, char **);
-int cb_sql_recent_10(void *, int, char **, char **);
-int cb_sql_fav(void *, int, char **, char **);
-int cb_sql_fav_10(void *, int, char **, char **);
-int cb_sql_icecast(void *, int, char **, char **);
-
-// icecast.c
-gboolean icecast_dnld(streamer_applet *);
-gboolean icecast_xml(streamer_applet *);
-void print_elements(xmlNode *, streamer_applet *);
-int count_elements(xmlNode *, int);
-void save_icecast(streamer_applet *);
-gboolean write_icecast(GtkTreeModel *, GtkTreePath *, GtkTreeIter *, gpointer);
-
 //menu.c
 void quitDialogClose(GtkWidget *, gpointer);
-void menu_cb_all(GtkAction *, streamer_applet *);
-void menu_cb_about(GtkAction *, streamer_applet *);
-void create_view_and_model (streamer_applet *);
-void create_view_and_model2 (streamer_applet *);
+void menu_cb_all(GtkAction *, livescore_applet *);
+void menu_cb_about(GtkAction *, livescore_applet *);
+void create_view_and_model (livescore_applet *);
 void cell_edit_name(GtkCellRendererText *, gchar *, gchar *, gpointer);
 void cell_edit_url(GtkCellRendererText *, gchar *, gchar *, gpointer);
-void clear_store(streamer_applet *);
-void clear_store2(streamer_applet *);
+void clear_store(livescore_applet *);
 void row_down(GtkWidget *, gpointer);
 void row_up(GtkWidget *, gpointer);
-void row_del(GtkWidget *, gpointer);
-void row_add(GtkWidget *, gpointer);
-void row_play(GtkWidget *, gpointer);
-void row_copy(GtkWidget *, gpointer);
-void save_favourites(streamer_applet *);
+void save_favourites(livescore_applet *);
 gboolean write_favourites(GtkTreeModel *, GtkTreePath *, GtkTreeIter *, gpointer);
-void icecast_refresh(GtkWidget *, gpointer);
-void icecast_search(GtkWidget *, gpointer);
-void play_menu (GtkAction *, streamer_applet *);
-void do_play(streamer_applet *);
-gboolean on_left_click (GtkWidget *, GdkEventButton *, streamer_applet *);
+void do_play(livescore_applet *);
+gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 
 // main.c
-void applet_back_change (MatePanelApplet *, MatePanelAppletBackgroundType, GdkColor *, GdkPixmap *, streamer_applet *);
-void applet_destroy(MatePanelApplet *, streamer_applet *);
+void applet_back_change (MatePanelApplet *, MatePanelAppletBackgroundType, GdkColor *, GdkPixmap *, livescore_applet *);
+void applet_destroy(MatePanelApplet *, livescore_applet *);
 
 // Menu skeleton
 static const GtkActionEntry applet_menu_actions[] = {

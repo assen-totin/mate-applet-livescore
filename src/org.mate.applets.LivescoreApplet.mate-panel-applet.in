@@ -1,23 +1,23 @@
 [Applet Factory]
 Id=LivescoreAppletFactory
-Location=@LIBEXECDIR@/streamer_applet
+Location=@LIBEXECDIR@/livescore_applet
 Name=Livescore Applet
 Name[en_GB]=Livescore Applet
-Name[bg_BG]=Радио аплет
-Name[ru_RU]=Радио аплет
-Description=Listen to online streams
-Description[en_GB]=Listen to online streams
-Description[bg_BG]=Слушайте онлайн радио
-Description[ru_RU]=Слушайте радио в сети
+Name[bg_BG]=Футболни резултати
+Name[ru_RU]=Футбольные результаты
+Description=Livescore Applet
+Description[en_GB]=Livescore Applet
+Description[bg_BG]=Футболни резултати
+Description[ru_RU]=Футбольные результаты
 
 [LivescoreApplet]
 Name=Livescore Applet
 Name[en_GB]=Livescore Applet
-Name[bg_BG]=Радио аплет
-Name[ru_RU]=Радио аплет
-Description=Listen to online streams
-Description[en_GB]=Listen to online streams
-Description[bg_BG]=Слушайте онлайн радио
-Description[ru_RU]=Слушайте радио в сети
-Icon=applet_streamer
+Name[bg_BG]=Футболни резултати
+Name[ru_RU]=Футбольные результаты
+Description=Livescore Applet
+Description[en_GB]=Livescore Applet
+Description[bg_BG]=Футболни резултати
+Description[ru_RU]=Футбольные результаты
+Icon=applet_livescore
 MateComponentId=OAFIID:MATE_LivescoreApplet
