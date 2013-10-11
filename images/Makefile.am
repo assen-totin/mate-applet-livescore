@@ -1,4 +1,4 @@
-# This file is a part of mate-applet-streamer
+# This file is a part of mate-applet-livescore
 #  
 # Author: Assen Totin <assen.totin@gmail.com>
 #
@@ -7,10 +7,10 @@
 # for details.
 
 pixmapdir = $(datadir)/pixmaps
-pixmap_DATA = applet_streamer_play.png applet_streamer_pause.png 
+pixmap_DATA = applet_livescore_play.png applet_livescore_pause.png 
 EXTRA_DIST = $(pixmap_DATA)
 
-icons = applet_streamer.16.png applet_streamer.24.png applet_streamer.22.png applet_streamer.32.png
+icons = applet_livescore.16.png applet_livescore.24.png applet_livescore.22.png applet_livescore.32.png
 EXTRA_DIST += $(icons)
 
 gtk_update_icon_cache = gtk-update-icon-cache -f -t $(datadir)/icons
