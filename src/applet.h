@@ -33,8 +33,11 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <time.h>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
+//#include <libxml/parser.h>
+//#include <libxml/tree.h>
+#include <libxml/HTMLparser.h>
+#include <libxml/HTMLtree.h>
+#include <libsoup/soup.h>
 
 #ifdef HAVE_LIBMATENOTIFY
 	#include <libmatenotify/notify.h>
@@ -76,7 +79,7 @@ typedef struct {
 	int score_home = 0;
 	int score_away = 0;
 	int status = MATCH_NOT_COMMENCED;
-	int start_time;
+	int unsigned start_time;
 	int match_time = 0;
 	gboolean used = TRUE;
 } match_data;
@@ -103,6 +106,7 @@ typedef struct {
 // util.c
 void push_notification (gchar *, gchar *, gchar *);
 gboolean cp(const char *, const char *);
+char *trim(char *);
 
 //menu.c
 void quitDialogClose(GtkWidget *, gpointer);
@@ -118,6 +122,15 @@ void save_favourites(livescore_applet *);
 gboolean write_favourites(GtkTreeModel *, GtkTreePath *, GtkTreeIter *, gpointer);
 void do_play(livescore_applet *);
 gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
+
+// manager.c
+manager_main(livescore_applet *, match_data *);
+
+// http.c
+int get_url (char *, char *, char *);
+
+// feed_iddaa.c
+int feed_iddaa_main(struct livescore_applet *applet);
 
 // main.c
 void applet_back_change (MatePanelApplet *, MatePanelAppletBackgroundType, GdkColor *, GdkPixmap *, livescore_applet *);
