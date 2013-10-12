@@ -36,6 +36,7 @@ typedef struct {
 	int score_home = 0;
 	int score_away = 0;
 	int stage = -1;
+	gboolean skip = FALSE;
 } iddaa_match_data;
 
 #define IDDAA_URL "http://localhost/feed_plugin.php.html"

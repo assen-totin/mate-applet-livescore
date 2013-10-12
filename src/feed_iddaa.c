@@ -34,7 +34,7 @@ int feed_iddaa_main(struct livescore_applet *applet) {
 
 	if (!res) {
 	        htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, HTML_PARSE_NOBLANKS | HTML_PARSE_NOIMPLIED | HTML_PARSE_COMPACT);
-	        walkTree(applet, xmlDocGetRootElement(parser), &iddaa_match);
+	        iddaa_walk_tree(applet, xmlDocGetRootElement(parser), &iddaa_match);
         	return 0;
 	}
 
@@ -42,16 +42,57 @@ int feed_iddaa_main(struct livescore_applet *applet) {
 }
 
 
-void split_score(char *s, int *home, int *away) {
+void iddaa_split_score(char *s, int *home, int *away) {
 	if (!strstr(s, "?")) {
 		*home = atoi(trim(strtok(s, "-")));
 		*away = atoi(trim(strtok(NULL, "-")));
 	}
 }
 
-void walkTree(struct livescore_applet *applet, xmlNode * a_node, struct iddaa_match *iddaa_match) {
+gboolean iddaa_is_half_time(char *s) {
+	if (strstr(s, "HT"))
+		return TRUE;
+	return FALSE;
+}
+
+gboolean iddaa_is_full_time(char *s) {
+        if (strstr(s, "FT"))
+                return TRUE;
+        return FALSE;
+}
+
+gboolean iddaa_is_playing(char *s, int *res) {
+	if (strstr(s, "'")) {
+		*res = atoi(strtok(s, "'"));
+		return TRUE;
+	}
+	return FALSE;
+}
+
+gboolean iddaa_is_future(char *s) {
+        if (strstr(s, ":")) {
+                return TRUE;
+        }
+        return FALSE;
+}
+
+time_t iddaa_convert_time(char *s) {
+        struct tm now;
+        struct tm *now_p = &now;
+
+        time_t ts = time(NULL);
+        now_p = gmtime(&ts);
+
+        now.tm_hour = atoi(strtok(s, ":"));
+        now.tm_min = atoi(strtok(NULL, ":" ));
+
+        return mktime(now_p);
+}
+
+void iddaa_walk_tree(struct livescore_applet *applet, xmlNode * a_node, struct iddaa_match *iddaa_match) {
 	xmlNode *cur_node = NULL;
 	xmlAttr *cur_attr = NULL;
+	
 	for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
 		if (cur_node->content && (strlen(cur_node->content) > 1)) {
 			if (iddaa_match->stage == IDDAA_PARSING_LEAGUE)
@@ -76,7 +117,7 @@ void walkTree(struct livescore_applet *applet, xmlNode * a_node, struct iddaa_ma
 					iddaa_match->stage = IDDAA_PARSING_TIME;
 				
 					if(strlen(&iddaa_match->score[0]) > 2) {
-						split_score(&iddaa_match->score[0], &iddaa_match->score_home, &iddaa_match->score_away);
+						iddaa_split_score(&iddaa_match->score[0], &iddaa_match->score_home, &iddaa_match->score_away);
 
 						struct match_data new_match;
 						sprintf(&new_match.league[0], "%s", trim(&iddaa_match->league_name[0])); 
@@ -85,15 +126,30 @@ void walkTree(struct livescore_applet *applet, xmlNode * a_node, struct iddaa_ma
 						new_match.score_home = iddaa_match->score_home;
 						new_match.score_away = iddaa_match->score_away;
 
-						// TODO: add start_time, match_time, status
-						// Match time - 23' or 16:00 or FT or HT
-						
-						// Start time
-
-						// Status
+						if (iddaa_is_half_time(trim(&iddaa_match.match_time[0])))
+							new_match.status = MATCH_HALF_TIME;
+						else if (iddaa_is_full_time(trim(&iddaa_match.match_time[0])))
+							new_match.status = MATCH_FULL_TIME;
+						else if (iddaa_is_future(trim(&iddaa_match.match_time[0]))) {
+							new_match.status = MATCH_NOT_COMMENCED;
+							new_match.start_time = iddaa_convert_time(&iddaa_match.match_time[0]);
+						}
+						else if (iddaa_is_playing(trim(&iddaa_match.match_time[0]), new_match.match_time)) {
+							if (new_match.match_time < 45)
+								new_match.status = MATCH_FIRST_TIME;
+							else if (new_match.match_time < 90)
+								new_match.status = MATCH_SECOND_TIME;
+							else 
+								new_match.status = MATCH_EXTRA_TIME;
+						}
+						else {
+							// Something went wrong... skip this match
+							iddaa_match.skip = TRUE;
+						}
 						
 						// Feed to manager
-						manager_main(applet, &new_match);
+						if (!iddaa_match.skip)
+							manager_main(applet, &new_match);
 
 						memset(&iddaa_match->match_time[0], '\0', 256);
 						memset(&iddaa_match->team_home[0], '\0', 256);
@@ -113,7 +169,7 @@ void walkTree(struct livescore_applet *applet, xmlNode * a_node, struct iddaa_ma
 			}	
 		}
 
-		walkTree(applet, cur_node->children, iddaa_match);
+		iddaa_walk_tree(applet, cur_node->children, iddaa_match);
 	}
 }
 

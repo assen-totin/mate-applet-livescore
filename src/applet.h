@@ -79,7 +79,7 @@ typedef struct {
 	int score_home = 0;
 	int score_away = 0;
 	int status = MATCH_NOT_COMMENCED;
-	int unsigned start_time;
+	time_t start_time;
 	int match_time = 0;
 	gboolean used = TRUE;
 } match_data;
