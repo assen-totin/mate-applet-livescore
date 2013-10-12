@@ -22,26 +22,6 @@
 #include "applet.h"
 #include "feed_iddaa.h"
 
-int feed_iddaa_main(struct livescore_applet *applet) {
-	struct iddaa_match_data iddaa_match;
-
-        memset(&iddaa_match.the_time[0], '\0', sizeof(iddaa_match.the_time));
-        memset(&iddaa_match.team_home[0], '\0', sizeof(iddaa_match.team_home));
-        memset(&iddaa_match.team_away[0], '\0', sizeof(iddaa_match.team_away));
-        memset(&iddaa_match.score[0], '\0', sizeof(iddaa_match.score));
-
-	int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, IDDAA_FILENAME);
-
-	if (!res) {
-	        htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, HTML_PARSE_NOBLANKS | HTML_PARSE_NOIMPLIED | HTML_PARSE_COMPACT);
-	        iddaa_walk_tree(applet, xmlDocGetRootElement(parser), &iddaa_match);
-        	return 0;
-	}
-
-	return 1;
-}
-
-
 void iddaa_split_score(char *s, int *home, int *away) {
 	if (!strstr(s, "?")) {
 		*home = atoi(trim(strtok(s, "-")));
@@ -89,7 +69,7 @@ time_t iddaa_convert_time(char *s) {
         return mktime(now_p);
 }
 
-void iddaa_walk_tree(struct livescore_applet *applet, xmlNode * a_node, struct iddaa_match *iddaa_match) {
+void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_data *iddaa_match) {
 	xmlNode *cur_node = NULL;
 	xmlAttr *cur_attr = NULL;
 	
@@ -119,7 +99,7 @@ void iddaa_walk_tree(struct livescore_applet *applet, xmlNode * a_node, struct i
 					if(strlen(&iddaa_match->score[0]) > 2) {
 						iddaa_split_score(&iddaa_match->score[0], &iddaa_match->score_home, &iddaa_match->score_away);
 
-						struct match_data new_match;
+						match_data new_match;
 						sprintf(&new_match.league[0], "%s", trim(&iddaa_match->league_name[0])); 
 						sprintf(&new_match.team_home[0], "%s", trim(&iddaa_match->team_home[0]));
 						sprintf(&new_match.team_away[0], "%s", trim(&iddaa_match->team_away[0])); 
@@ -173,3 +153,25 @@ void iddaa_walk_tree(struct livescore_applet *applet, xmlNode * a_node, struct i
 	}
 }
 
+int feed_iddaa_main(livescore_applet *applet) {
+        iddaa_match_data iddaa_match;
+
+        memset(&iddaa_match.match_time[0], '\0', sizeof(iddaa_match.match_time));
+        memset(&iddaa_match.team_home[0], '\0', sizeof(iddaa_match.team_home));
+        memset(&iddaa_match.team_away[0], '\0', sizeof(iddaa_match.team_away));
+        memset(&iddaa_match.score[0], '\0', sizeof(iddaa_match.score));
+        iddaa_match.score_home = 0;
+        iddaa_match.score_away = 0;
+        iddaa_match.stage = -1;
+        iddaa_match.skip = FALSE;
+
+        int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, IDDAA_FILENAME);
+
+        if (!res) {
+                htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, HTML_PARSE_NOBLANKS | HTML_PARSE_NOIMPLIED | HTML_PARSE_COMPACT);
+                iddaa_walk_tree(applet, xmlDocGetRootElement(parser), &iddaa_match);
+                return 0;
+        }
+
+        return 1;
+}

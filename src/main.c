@@ -82,8 +82,14 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	// Init 
 	applet = g_malloc0(sizeof(livescore_applet));
 	applet->applet = applet_widget;
+	applet->all_matches_counter = 1;
 	//applet->timestamp = time(NULL);
 	applet->all_matches = g_malloc0(sizeof(match_data));
+	applet->all_matches->league = 0;
+	applet->all_matches->score_home = 0;
+	applet->all_matches->score_away = 0;
+	applet->all_matches->used = FALSE;
+	applet->all_matches->status = MATCH_NOT_COMMENCED;
 
 	// Get an image
 	char image_file[1024];

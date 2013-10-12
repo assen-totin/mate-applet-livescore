@@ -20,21 +20,26 @@
 
 #include "../config.h"
 #include "applet.h"
+#include "http.h"
 
 int get_url (char *url, char *user_agent, char *filename) {
 	SoupMessage *msg;
 	const char *header;
 	FILE *output_file = NULL;
 
-        SoupSession session = g_object_new (SOUP_TYPE_SESSION,
+        SoupSession *session = g_object_new (SOUP_TYPE_SESSION,
                                 SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_CONTENT_DECODER,
                                 SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_COOKIE_JAR,
                                 SOUP_SESSION_ACCEPT_LANGUAGE_AUTO, TRUE,
                                 NULL);
+
 	if (user_agent)
 		g_object_set(session, "user-agent", user_agent);
-	else
-		g_object_set(session, "user-agent", HTTP_USER_AGENT);
+	else {
+		char ua[1024];
+		sprintf(&ua[0], "%s", HTTP_USER_AGENT);
+		g_object_set(session, "user-agent", &ua[0]);
+	}
 
 	msg = soup_message_new ("GET", url);
 	soup_message_set_flags (msg, SOUP_MESSAGE_NO_REDIRECT);

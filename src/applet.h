@@ -27,7 +27,6 @@
 #include <glib.h>
 #include <stdlib.h>
 #include <wait.h>
-#include <gst/gst.h>
 #include <unistd.h>
 #include <pwd.h>
 #include <fcntl.h>
@@ -73,15 +72,15 @@ enum {
 };
 
 typedef struct {
-	int league = 0;
+	int league;
 	char team_home[64];
 	char team_away[64];
-	int score_home = 0;
-	int score_away = 0;
-	int status = MATCH_NOT_COMMENCED;
+	int score_home;
+	int score_away;
+	int status;
 	time_t start_time;
-	int match_time = 0;
-	gboolean used = TRUE;
+	int match_time;
+	gboolean used;
 } match_data;
 
 typedef struct {
@@ -93,7 +92,7 @@ typedef struct {
 	GtkWidget *quitDialog;
 	GtkWidget *text;
 	match_data *all_matches;
-	int all_matches_counter = 1;
+	int all_matches_counter;
 	char url[1024];
 	char name[1024];
 	char xmlfile[1024];
@@ -124,13 +123,13 @@ void do_play(livescore_applet *);
 gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 
 // manager.c
-manager_main(livescore_applet *, match_data *);
+gboolean manager_main(livescore_applet *, match_data *);
 
 // http.c
 int get_url (char *, char *, char *);
 
 // feed_iddaa.c
-int feed_iddaa_main(struct livescore_applet *applet);
+int feed_iddaa_main(livescore_applet *);
 
 // main.c
 void applet_back_change (MatePanelApplet *, MatePanelAppletBackgroundType, GdkColor *, GdkPixmap *, livescore_applet *);

@@ -33,14 +33,14 @@ typedef struct {
 	char team_home[256];
 	char team_away[256];
 	char score[32];
-	int score_home = 0;
-	int score_away = 0;
-	int stage = -1;
-	gboolean skip = FALSE;
+	int score_home;
+	int score_away;
+	int stage;
+	gboolean skip;
 } iddaa_match_data;
 
 #define IDDAA_URL "http://localhost/feed_plugin.php.html"
 #define IDDAA_CHARSET "UTF-8"
-#define IDDAA_USER_AGENT "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)";
-#define IDDAA_FILENAME "/tmp/iddaa.html";
+#define IDDAA_USER_AGENT "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)"
+#define IDDAA_FILENAME "/tmp/iddaa.html"
 
