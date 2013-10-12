@@ -22,22 +22,23 @@
 #include "applet.h"
 
 gboolean manager_main (livescore_applet *applet, struct match_data *new_match) {
-	int i, match_id;
-	gboolean flag_have_it = FALSE;
-	gboolean flag_unused = FALSE:
+	int i, match_id, league_id;
+	gboolean flag_have_match = FALSE;
+	gboolean flag_unused = FALSE;
+	gboolean flag_have_league = FALSE;
 	char ntf_text[128], ntf_title[128];
 
 	// Do we have this match?
 	for (i=0; i < applet->all_matches_counter; i++) {
 		if (!strcmp(&applet->all_matches[i].team_home[0], new_match->team_home) && !strcmp(&applet->all_matches[i].team_away[0], new_match->team_away)) {
-			flag_have_it = TRUE;
+			flag_have_match = TRUE;
 			match_id = i;
 			break;
 		}
 	}
 
 	// If we have it, check events
-	if (flag_have_it) {
+	if (flag_have_match) {
 		// Has score changed?
 		if ((applet->all_matches[match_id].score_home + applet->all_matches[match_id].score_away) != (new_match->score_home + new_match->score_away)) {
 			applet->all_matches[match_id].score_home = new_match->score_home;
@@ -81,6 +82,8 @@ gboolean manager_main (livescore_applet *applet, struct match_data *new_match) {
 	}
 	// If we don't have it, add it
 	else {
+		// TODO: Do we have this league? Check and add if not.
+
 		// Find unused slot
 		for (i=0; i < applet->all_matches_counter; i++) {
 			if (!applet->all_matches[i].used) {
@@ -100,11 +103,12 @@ gboolean manager_main (livescore_applet *applet, struct match_data *new_match) {
 	
 		// Copy values from new match
 		applet->all_matches[match_id].used = TRUE;
-		applet->all_matches[match_id].league = new_match->league;
+		applet->all_matches[match_id].league_id = league_id;
 		applet->all_matches[match_id].score_home = new_match->score_home;
 		applet->all_matches[match_id].score_away = new_match->score_away;
 		sprintf(&applet->all_matches[match_id].team_home[0], "%s", &new_match->team_home[0]);
 		sprintf(&applet->all_matches[match_id].team_away[0], "%s", &new_match->team_away[0]);
+		sprintf(&applet->all_matches[match_id].league_name[0], "%s", &new_match->league_name[0]);
 		applet->all_matches[match_id].status = new_match->status;
 		applet->all_matches[match_id].start_time = new_match->start_time;
 		applet->all_matches[match_id].match_time = new_match->match_time;

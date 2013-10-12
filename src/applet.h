@@ -72,7 +72,14 @@ enum {
 };
 
 typedef struct {
-	int league;
+	int league_id;
+	char league_name[128];
+	gboolean used;
+} league_data;
+
+typedef struct {
+	int league_id;
+	char league_name[128];
 	char team_home[64];
 	char team_away[64];
 	int score_home;
@@ -92,7 +99,9 @@ typedef struct {
 	GtkWidget *quitDialog;
 	GtkWidget *text;
 	match_data *all_matches;
+	league_data *all_leagues;
 	int all_matches_counter;
+	int all_leagues_counter;
 	char url[1024];
 	char name[1024];
 	char xmlfile[1024];

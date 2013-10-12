@@ -100,7 +100,7 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 						iddaa_split_score(&iddaa_match->score[0], &iddaa_match->score_home, &iddaa_match->score_away);
 
 						match_data new_match;
-						sprintf(&new_match.league[0], "%s", trim(&iddaa_match->league_name[0])); 
+						sprintf(&new_match.league_name[0], "%s", trim(&iddaa_match->league_name[0])); 
 						sprintf(&new_match.team_home[0], "%s", trim(&iddaa_match->team_home[0]));
 						sprintf(&new_match.team_away[0], "%s", trim(&iddaa_match->team_away[0])); 
 						new_match.score_home = iddaa_match->score_home;
