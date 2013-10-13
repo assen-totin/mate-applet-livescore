@@ -107,3 +107,9 @@ char *trim(char *s) {
         return s;
 }
 
+void debug(char *s) {
+	FILE *fp = fopen("/tmp/applet", "a");
+	fprintf(fp, s);
+	fflush(fp);
+	fclose(fp);
+}

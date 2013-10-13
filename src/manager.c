@@ -26,6 +26,16 @@ gboolean is_league_subscribed (int league_id) {
 	return TRUE;
 }
 
+void manager_cleanup(livescore_applet *applet) {
+	int i;
+	time_t now = time(NULL);
+
+	for (i=0; i < applet->all_matches_counter; i++) {
+		if ((now - applet->all_matches[i].start_time) > 129600)
+			applet->all_matches[i].used = FALSE;
+	}
+}
+
 gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	int i, match_id, league_id;
 	gboolean flag_have_match = FALSE;
@@ -102,6 +112,14 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			applet->all_leagues = (league_data *) _tmp;
 			applet->all_leagues_counter++;
 			league_id = applet->all_leagues_counter - 1;
+
+			applet->all_leagues[league_id].league_id = league_id;
+			sprintf(&applet->all_leagues[league_id].league_name[0], "%s", &new_match->league_name[0]);
+			applet->all_leagues[league_id].used = TRUE;
+
+			char dbg[1024];
+			sprintf("Registered league: %s", &new_match->league_name[0]);
+			debug(&dbg[0]);
 		}
 
 		// Find unused slot
@@ -132,6 +150,10 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		applet->all_matches[match_id].status = new_match->status;
 		applet->all_matches[match_id].start_time = new_match->start_time;
 		applet->all_matches[match_id].match_time = new_match->match_time;
+
+                char dbg[1024];
+                sprintf("Registered match: %s - %s", &new_match->team_home[0], &new_match->team_away[0]);
+                debug(&dbg[0]);
 	}
 
 	return TRUE;

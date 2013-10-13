@@ -115,6 +115,7 @@ typedef struct {
 void push_notification (gchar *, gchar *, gchar *);
 gboolean cp(const char *, const char *);
 char *trim(char *);
+void debug(char *);
 
 //menu.c
 void quitDialogClose(GtkWidget *, gpointer);
@@ -133,6 +134,7 @@ gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 
 // manager.c
 gboolean manager_main(livescore_applet *, match_data *);
+void manager_cleanup(livescore_applet *applet);
 
 // http.c
 int get_url (char *, char *, char *);

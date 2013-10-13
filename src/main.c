@@ -126,6 +126,10 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
         // Show applet
         gtk_widget_show_all (GTK_WIDGET (applet->applet));
 
+	// Run updates each minute
+	// TODO: write wrapper to read actually selected feed and activate it's main function
+	g_timeout_add(60000, (GSourceFunc)feed_iddaa_main, (gpointer)applet);
+
 	// Run
         applet->loop = g_main_loop_new (NULL, FALSE);
         g_main_loop_run (applet->loop);

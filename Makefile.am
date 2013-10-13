@@ -14,15 +14,15 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
 #  USA.
 #  
-#  MATE Streamer applet written by Assen Totin <assen.totin@gmail.com>
+#  MATE Livescore applet written by Assen Totin <assen.totin@gmail.com>
 #
 
 SUBDIRS = src images po
 
 dist_doc_DATA = AUTHORS BUGS ChangeLog COPYING INSTALL NEWS README TODO
 
-EXTRA_DIST = mate-applet-streamer.spec
+EXTRA_DIST = mate-applet-livescore.spec
 
 rpm:
-	rpmbuild -bb --define "_builddir @TOPLEVELDIR@" mate-applet-streamer.spec
+	rpmbuild -bb --define "_builddir @TOPLEVELDIR@" mate-applet-livescore.spec
 
