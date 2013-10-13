@@ -21,7 +21,12 @@
 #include "../config.h"
 #include "applet.h"
 
-gboolean manager_main (livescore_applet *applet, struct match_data *new_match) {
+gboolean is_league_subscribed (int league_id) {
+	// TODO: Check if league is subscibed
+	return TRUE;
+}
+
+gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	int i, match_id, league_id;
 	gboolean flag_have_match = FALSE;
 	gboolean flag_unused = FALSE;
@@ -54,35 +59,50 @@ gboolean manager_main (livescore_applet *applet, struct match_data *new_match) {
 		}
 
 		// Has status changed?
-		if (applet->all_matches[match_id].status < new_match.status) {
-			applet->all_matches[match_id].status = new_match.status;
+		if (applet->all_matches[match_id].status < new_match->status) {
+			applet->all_matches[match_id].status = new_match->status;
 
 			sprintf(&ntf_title[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
 
-			if (new_match.status == MATCH_FIRST_TIME) 
+			if (new_match->status == MATCH_FIRST_TIME) 
 				sprintf(&ntf_text[0], "%s", _("The game commences."));
-			else if (new_match.status == MATCH_HALF_TIME)
+			else if (new_match->status == MATCH_HALF_TIME)
 				sprintf(&ntf_text[0], "%s %u:%u", _("Half time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-			else if (new_match.status == MATCH_SECOND_TIME)
+			else if (new_match->status == MATCH_SECOND_TIME)
 				sprintf(&ntf_text[0], "%s %u:%u", _("Second time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-			else if (new_match.status == MATCH_EXTRA_TIME)
+			else if (new_match->status == MATCH_EXTRA_TIME)
 				sprintf(&ntf_text[0], "%s %u:%u", _("Extra time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-			else if (new_match.status == MATCH_FULL_TIME)
+			else if (new_match->status == MATCH_FULL_TIME)
 				sprintf(&ntf_text[0], "%s %u:%u", _("Full time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-			push_notification(&ntf_title[0], &ntf_text[0], NULL);
+			if (is_league_subscribed(applet->all_matches[match_id].league_id))
+				push_notification(&ntf_title[0], &ntf_text[0], NULL);
+
 			return TRUE;
 		}
 
 		// Has the time changed?
-		if (applet->all_matches[match_id].match_time < new_match.match_time) {
-			applet->all_matches[match_id].match_time = new_match.match_time;
+		if (applet->all_matches[match_id].match_time < new_match->match_time) {
+			applet->all_matches[match_id].match_time = new_match->match_time;
 		}
 	}
 	// If we don't have it, add it
 	else {
-		// TODO: Do we have this league? Check and add if not.
+		// Do we have this league? Check and add if not.
+		for (i=0; i < applet->all_leagues_counter; i++) {
+			if (!strcmp(&applet->all_leagues[i].league_name[0], &new_match->league_name[0])) {
+				flag_have_league = TRUE;
+				league_id = i;
+				break;
+			}
+		}
+		if (!flag_have_league) {
+			void *_tmp = realloc(applet->all_leagues, (applet->all_leagues_counter + 1) * sizeof(league_data));
+			applet->all_leagues = (league_data *) _tmp;
+			applet->all_leagues_counter++;
+			league_id = applet->all_leagues_counter - 1;
+		}
 
 		// Find unused slot
 		for (i=0; i < applet->all_matches_counter; i++) {
@@ -95,8 +115,8 @@ gboolean manager_main (livescore_applet *applet, struct match_data *new_match) {
 
 		// If no slots, add one
 		if (!flag_unused) {
-			void *_tmp = realloc(applet->all_matches, (applet->all_matches_counter + 1) * sizeof(struct match_data));
-			applet->all_matches = (struct match_data *) _tmp;
+			void *_tmp = realloc(applet->all_matches, (applet->all_matches_counter + 1) * sizeof(match_data));
+			applet->all_matches = (match_data *) _tmp;
 			applet->all_matches_counter++;
 			match_id = applet->all_matches_counter - 1;
 		}

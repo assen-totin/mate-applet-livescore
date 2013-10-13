@@ -118,7 +118,7 @@ char *trim(char *);
 
 //menu.c
 void quitDialogClose(GtkWidget *, gpointer);
-void menu_cb_all(GtkAction *, livescore_applet *);
+void menu_cb_settings(GtkAction *, livescore_applet *);
 void menu_cb_about(GtkAction *, livescore_applet *);
 void create_view_and_model (livescore_applet *);
 void cell_edit_name(GtkCellRendererText *, gchar *, gchar *, gpointer);
@@ -146,8 +146,6 @@ void applet_destroy(MatePanelApplet *, livescore_applet *);
 
 // Menu skeleton
 static const GtkActionEntry applet_menu_actions[] = {
-        { "Favourites", GTK_STOCK_GO_FORWARD, "_Favourites", NULL, NULL, NULL },
-        { "Recent", GTK_STOCK_GO_FORWARD, "_Recent", NULL, NULL, NULL },
-        { "All", GTK_STOCK_EXECUTE, "_All Stations", NULL, NULL, G_CALLBACK (menu_cb_all) },
+        { "All", GTK_STOCK_EXECUTE, "_Settings", NULL, NULL, G_CALLBACK (menu_cb_settings) },
         { "About", GTK_STOCK_ABOUT, "_About", NULL, NULL, G_CALLBACK (menu_cb_about) }
 };

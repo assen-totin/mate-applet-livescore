@@ -106,15 +106,15 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 						new_match.score_home = iddaa_match->score_home;
 						new_match.score_away = iddaa_match->score_away;
 
-						if (iddaa_is_half_time(trim(&iddaa_match.match_time[0])))
+						if (iddaa_is_half_time(trim(&iddaa_match->match_time[0])))
 							new_match.status = MATCH_HALF_TIME;
-						else if (iddaa_is_full_time(trim(&iddaa_match.match_time[0])))
+						else if (iddaa_is_full_time(trim(&iddaa_match->match_time[0])))
 							new_match.status = MATCH_FULL_TIME;
-						else if (iddaa_is_future(trim(&iddaa_match.match_time[0]))) {
+						else if (iddaa_is_future(trim(&iddaa_match->match_time[0]))) {
 							new_match.status = MATCH_NOT_COMMENCED;
-							new_match.start_time = iddaa_convert_time(&iddaa_match.match_time[0]);
+							new_match.start_time = iddaa_convert_time(&iddaa_match->match_time[0]);
 						}
-						else if (iddaa_is_playing(trim(&iddaa_match.match_time[0]), new_match.match_time)) {
+						else if (iddaa_is_playing(trim(&iddaa_match->match_time[0]), &new_match.match_time)) {
 							if (new_match.match_time < 45)
 								new_match.status = MATCH_FIRST_TIME;
 							else if (new_match.match_time < 90)
@@ -124,11 +124,11 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 						}
 						else {
 							// Something went wrong... skip this match
-							iddaa_match.skip = TRUE;
+							iddaa_match->skip = TRUE;
 						}
 						
 						// Feed to manager
-						if (!iddaa_match.skip)
+						if (!iddaa_match->skip)
 							manager_main(applet, &new_match);
 
 						memset(&iddaa_match->match_time[0], '\0', 256);
@@ -138,13 +138,13 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 					}
 				}
 				else if (!strcmp(cur_attr->children->content, "live_home")) {
-					iddaa_match.stage = IDDAA_PARSING_HOME;
+					iddaa_match->stage = IDDAA_PARSING_HOME;
 				}
 				else if (!strcmp(cur_attr->children->content, "live_score")) {
-					iddaa_match.stage = IDDAA_PARSING_SCORE;
+					iddaa_match->stage = IDDAA_PARSING_SCORE;
 				}
 				else if (!strcmp(cur_attr->children->content, "live_away")) {
-					iddaa_match.stage = IDDAA_PARSING_AWAY;
+					iddaa_match->stage = IDDAA_PARSING_AWAY;
 				}
 			}	
 		}
