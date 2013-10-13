@@ -43,6 +43,10 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	gboolean flag_have_league = FALSE;
 	char ntf_text[128], ntf_title[128];
 
+char dbg[1024];
+sprintf(&dbg[0], "Called for match %s - %s", new_match->team_home, new_match->team_away);
+debug(&dbg[0]);
+
 	// Do we have this match?
 	for (i=0; i < applet->all_matches_counter; i++) {
 		if (!strcmp(&applet->all_matches[i].team_home[0], new_match->team_home) && !strcmp(&applet->all_matches[i].team_away[0], new_match->team_away)) {
@@ -117,8 +121,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			sprintf(&applet->all_leagues[league_id].league_name[0], "%s", &new_match->league_name[0]);
 			applet->all_leagues[league_id].used = TRUE;
 
-			char dbg[1024];
-			sprintf("Registered league: %s", &new_match->league_name[0]);
+			sprintf(&dbg[0], "Registered league: %s", &new_match->league_name[0]);
 			debug(&dbg[0]);
 		}
 
@@ -151,8 +154,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		applet->all_matches[match_id].start_time = new_match->start_time;
 		applet->all_matches[match_id].match_time = new_match->match_time;
 
-                char dbg[1024];
-                sprintf("Registered match: %s - %s", &new_match->team_home[0], &new_match->team_away[0]);
+                sprintf(&dbg[0], "Registered match: %s - %s", &new_match->team_home[0], &new_match->team_away[0]);
                 debug(&dbg[0]);
 	}
 

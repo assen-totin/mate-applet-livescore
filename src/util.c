@@ -109,7 +109,7 @@ char *trim(char *s) {
 
 void debug(char *s) {
 	FILE *fp = fopen("/tmp/applet", "a");
-	fprintf(fp, s);
+	fprintf(fp, "%s\n", s);
 	fflush(fp);
 	fclose(fp);
 }
