@@ -14,7 +14,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  *  USA.
  *
- *  MATE Streamer applet written by Assen Totin <assen.totin@gmail.com>
+ *  MATE Livescore applet written by Assen Totin <assen.totin@gmail.com>
  *  
  */
 

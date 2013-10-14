@@ -137,7 +137,9 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 				strcat(&iddaa_match->team_home[0], cur_node->content);
 			}
 			else if (iddaa_match->stage == IDDAA_PARSING_SCORE) {
-				memset(&iddaa_match->score[0], '\0', 256);
+				iddaa_match->score_home = 0;
+				iddaa_match->score_away = 0;
+				memset(&iddaa_match->score[0], '\0', 32);
 				strcat(&iddaa_match->score[0], cur_node->content);
 				if(strlen(&iddaa_match->score[0]) > 2)
 					iddaa_split_score(&iddaa_match->score[0], &iddaa_match->score_home, &iddaa_match->score_away);
@@ -189,10 +191,7 @@ int feed_iddaa_main(livescore_applet *applet) {
         if (!res) {
                 htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, HTML_PARSE_NOBLANKS | HTML_PARSE_NOIMPLIED | HTML_PARSE_COMPACT);
                 iddaa_walk_tree(applet, xmlDocGetRootElement(parser), &iddaa_match);
-                return 0;
         }
-
-debug("Happy End.");
 
         return 1;
 }
