@@ -21,19 +21,8 @@
 #include "../config.h"
 #include "applet.h"
 
-gboolean is_league_subscribed (int league_id) {
-	// TODO: Check if league is subscibed
-	return TRUE;
-}
-
-void manager_cleanup(livescore_applet *applet) {
-	int i;
-	time_t now = time(NULL);
-
-	for (i=0; i < applet->all_matches_counter; i++) {
-		if ((now - applet->all_matches[i].start_time) > 129600)
-			applet->all_matches[i].used = FALSE;
-	}
+gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
+	return applet->all_leagues[league_id].favourite;
 }
 
 gboolean manager_main (livescore_applet *applet, match_data *new_match) {
@@ -46,6 +35,16 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 char dbg[1024];
 sprintf(&dbg[0], "Called for match %s - %s", new_match->team_home, new_match->team_away);
 debug(&dbg[0]);
+
+	// Is it time for clean-up?
+	time_t now = time(NULL);
+	div_t q = div(now, 1000);
+	if (q.rem < 60) {
+		for (i=0; i < applet->all_matches_counter; i++) {
+			if ((now - applet->all_matches[i].start_time) > 129600)
+				applet->all_matches[i].used = FALSE;
+		}
+	}
 
 	// Do we have this match?
 	for (i=0; i < applet->all_matches_counter; i++) {
@@ -90,7 +89,7 @@ debug(&dbg[0]);
 			else if (new_match->status == MATCH_FULL_TIME)
 				sprintf(&ntf_text[0], "%s %u:%u", _("Full time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-			if (is_league_subscribed(applet->all_matches[match_id].league_id))
+			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id))
 				push_notification(&ntf_title[0], &ntf_text[0], NULL);
 
 			return TRUE;
@@ -120,6 +119,7 @@ debug(&dbg[0]);
 			applet->all_leagues[league_id].league_id = league_id;
 			sprintf(&applet->all_leagues[league_id].league_name[0], "%s", &new_match->league_name[0]);
 			applet->all_leagues[league_id].used = TRUE;
+			applet->all_leagues[league_id].favourite = FALSE;
 
 			sprintf(&dbg[0], "Registered league: %s", &new_match->league_name[0]);
 			debug(&dbg[0]);

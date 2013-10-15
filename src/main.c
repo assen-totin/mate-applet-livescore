@@ -68,6 +68,8 @@ void applet_destroy(MatePanelApplet *applet_widget, livescore_applet *applet) {
 
 gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer data) {
 	livescore_applet *applet;
+	int i;
+	char dbg[1024];
 	//char ui[24576];
 
 	if (strcmp (iid, APPLET_ID) != 0)
@@ -94,6 +96,29 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	applet->all_leagues->league_id = 0;
 	applet->all_leagues->used = FALSE;
 	applet->all_leagues_counter = 1;
+
+	// Fvourite leagues - via GSettings
+	applet->gsettings = g_settings_new_with_path(APPLET_GSETTINGS_SCHEMA, APPLET_GSETTINGS_PATH);
+	gchar *fav_leagues = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV);
+	char *fav_leagues_1 = strtok(fav_leagues, ",");
+	i = 0;
+	if (fav_leagues_1) {
+		applet->all_leagues[i].league_id = i;
+		sprintf(&applet->all_leagues[i].league_name[0], "%s", fav_leagues_1);
+		applet->all_leagues[i].used = TRUE;
+		applet->all_leagues[i].favourite = TRUE;
+		while (fav_leagues_1 = strtok(NULL, ",")) {
+			i++;
+			void *_tmp = realloc(applet->all_leagues, i * sizeof(league_data));
+			applet->all_leagues = (league_data *) _tmp;
+
+			applet->all_leagues[i].league_id = i;
+			sprintf(&applet->all_leagues[i].league_name[0], "%s", fav_leagues_1);
+			applet->all_leagues[i].used = TRUE;
+			applet->all_leagues[i].favourite = TRUE;
+		}
+		applet->all_leagues_counter = i;
+	}
 
 	// Get an image
 	char image_file[1024];

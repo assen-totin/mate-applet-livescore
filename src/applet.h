@@ -49,6 +49,10 @@
 #define APPLET_ID "LivescoreApplet"
 #define APPLET_NAME "livescore"
 #define APPLET_ICON_STATIC "applet_livescore_icon.png"
+// GSettings
+#define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
+#define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
+#define APPLET_GSETTINGS_KEY_FAV "leagues-notify"
 
 // Menu strings
 static const gchar *ui1 = 
@@ -75,6 +79,7 @@ typedef struct {
 	int league_id;
 	char league_name[128];
 	gboolean used;
+	gboolean favourite;
 } league_data;
 
 typedef struct {
@@ -109,6 +114,7 @@ typedef struct {
 	time_t timestamp;
 	GtkListStore *tree_store;
 	GtkWidget *tree_view;
+	GSettings *gsettings;
 } livescore_applet;
 
 // util.c
