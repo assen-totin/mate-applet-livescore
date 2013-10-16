@@ -7,7 +7,7 @@
 # for details.
 
 pixmapdir = $(datadir)/pixmaps
-pixmap_DATA = applet_livescore_icon.png 
+pixmap_DATA = applet_livescore_icon.png applet_livescore_running.gif
 EXTRA_DIST = $(pixmap_DATA)
 
 icons = applet_livescore.16.png applet_livescore.24.png applet_livescore.22.png applet_livescore.32.png

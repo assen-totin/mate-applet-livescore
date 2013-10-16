@@ -99,7 +99,7 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 
 	// Fvourite leagues - via GSettings
 	applet->gsettings = g_settings_new_with_path(APPLET_GSETTINGS_SCHEMA, APPLET_GSETTINGS_PATH);
-	gchar *fav_leagues = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV);
+	gchar *fav_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV));
 	char *fav_leagues_1 = strtok(fav_leagues, ",");
 	i = 0;
 	if (fav_leagues_1) {

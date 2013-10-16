@@ -1,0 +1,9 @@
+<schemalist gettext-domain="@GETTEXT_PACKAGE@">
+  <schema id="org.mate.panel.applet.LivescoreApplet">
+    <key name="leagues-notify" type="s">
+      <default>"0"</default>
+      <summary>List of leagues</summary>
+      <description>List of leagues for which notificatins are enabled</description>
+    </key>
+  </schema>
+</schemalist>

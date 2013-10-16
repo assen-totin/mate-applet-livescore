@@ -23,30 +23,35 @@
 
 
 void quitDialogClose(GtkWidget *widget, gpointer data) {
+/*
 	livescore_applet *applet = data;
 
-        gtk_widget_destroy(applet->quitDialog);
+        gtk_widget_destroy(applet->dialog_settings);
+*/
 }
 
 
 void menu_cb_about (GtkAction *action, livescore_applet *applet) {
+/*
         char msg1[1024];
 
         sprintf(&msg1[0], "%s\n\n%s\n\n%s", _("MATE Livescore Applet"), _("An applet which lets you listen to online radio streams."), _("Assen Totin <assen.totin@gmail.com>"));
 
         GtkWidget *label = gtk_label_new (&msg1[0]);
 
-        applet->quitDialog = gtk_dialog_new_with_buttons (_("MATE Livescore Applet"), GTK_WINDOW(applet), GTK_DIALOG_MODAL, NULL);
-        GtkWidget *buttonOK = gtk_dialog_add_button (GTK_DIALOG(applet->quitDialog), GTK_STOCK_OK, GTK_RESPONSE_OK);
+        applet->dialog_settings = gtk_dialog_new_with_buttons (_("MATE Livescore Applet"), GTK_WINDOW(applet), GTK_DIALOG_MODAL, NULL);
+        GtkWidget *buttonOK = gtk_dialog_add_button (GTK_DIALOG(applet->dialog_settings), GTK_STOCK_OK, GTK_RESPONSE_OK);
 
-        gtk_dialog_set_default_response (GTK_DIALOG (applet->quitDialog), GTK_RESPONSE_CANCEL);
-        gtk_container_add (GTK_CONTAINER (GTK_DIALOG(applet->quitDialog)->vbox), label);
+        gtk_dialog_set_default_response (GTK_DIALOG (applet->dialog_settings), GTK_RESPONSE_CANCEL);
+        gtk_container_add (GTK_CONTAINER (GTK_DIALOG(applet->dialog_settings)->vbox), label);
         g_signal_connect (G_OBJECT(buttonOK), "clicked", G_CALLBACK (quitDialogClose), (gpointer) applet);
 
-        gtk_widget_show_all (GTK_WIDGET(applet->quitDialog));
+        gtk_widget_show_all (GTK_WIDGET(applet->dialog_settings));
+*/
 }
 
 void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
+/*
 	GtkTreeIter iter, iter2;
 
 	// Prepare Favourites tab 
@@ -64,13 +69,12 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 	gtk_box_pack_start(GTK_BOX(fav_vbox_1), butt_down, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(fav_vbox_1), butt_play, FALSE, FALSE, 0);
 
-/*
 	g_signal_connect (G_OBJECT(butt_add), "clicked", G_CALLBACK (row_add), (gpointer) applet);
 	g_signal_connect (G_OBJECT(butt_del), "clicked", G_CALLBACK (row_del), (gpointer) applet);
 	g_signal_connect (G_OBJECT(butt_up), "clicked", G_CALLBACK (row_up), (gpointer) applet);
 	g_signal_connect (G_OBJECT(butt_down), "clicked", G_CALLBACK (row_down), (gpointer) applet);
 	g_signal_connect (G_OBJECT(butt_play), "clicked", G_CALLBACK (row_play), (gpointer) applet);
-*/
+
 	create_view_and_model(applet);
 
         GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(applet->tree_view));
@@ -133,15 +137,15 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 	gtk_notebook_append_page (GTK_NOTEBOOK(notebook), icecast_hbox_1, tab_label_2);
 
 	// Assemble window
-        applet->quitDialog = gtk_dialog_new_with_buttons (_("MATE Livescore Applet"), GTK_WINDOW(applet), GTK_DIALOG_MODAL, NULL);
-	GtkWidget *buttonClose = gtk_dialog_add_button (GTK_DIALOG(applet->quitDialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL);
+        applet->dialog_settings = gtk_dialog_new_with_buttons (_("MATE Livescore Applet"), GTK_WINDOW(applet), GTK_DIALOG_MODAL, NULL);
+	GtkWidget *buttonClose = gtk_dialog_add_button (GTK_DIALOG(applet->dialog_settings), GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL);
 
-        gtk_dialog_set_default_response (GTK_DIALOG (applet->quitDialog), GTK_RESPONSE_CANCEL);
-        gtk_container_add (GTK_CONTAINER (GTK_DIALOG(applet->quitDialog)->vbox), notebook);
+        gtk_dialog_set_default_response (GTK_DIALOG (applet->dialog_settings), GTK_RESPONSE_CANCEL);
+        gtk_container_add (GTK_CONTAINER (GTK_DIALOG(applet->dialog_settings)->vbox), notebook);
 	g_signal_connect (G_OBJECT(buttonClose), "clicked", G_CALLBACK (quitDialogClose), (gpointer) applet);
 
-	//gtk_window_set_default(GTK_WINDOW(applet->quitDialog), butt_search);
-        gtk_widget_show_all(GTK_WIDGET(applet->quitDialog));
+	//gtk_window_set_default(GTK_WINDOW(applet->dialog_settings), butt_search);
+        gtk_widget_show_all(GTK_WIDGET(applet->dialog_settings));
 
 	clear_store(applet);
 
@@ -151,10 +155,12 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
         gtk_tree_selection_select_iter(selection, &iter);
 
 	gtk_widget_grab_focus(fav_table);
+*/
 }
 
 
 void create_view_and_model (livescore_applet *applet){
+/*
         GtkCellRenderer *renderer1, *renderer2;
         GtkTreeModel *model;
         GtkTreeIter iter;
@@ -184,10 +190,12 @@ void create_view_and_model (livescore_applet *applet){
         // The tree view has acquired its own reference to the model, so we can drop ours. 
         // That way the model will be freed automatically when the tree view is destroyed 
         g_object_unref (model);
+*/
 }
 
 
 void cell_edit_name(GtkCellRendererText *cell, gchar *path_string, gchar *new_text, gpointer data) {
+/*
         GtkTreeIter iter;
         GtkTreeModel *model;
 	livescore_applet *applet = data;
@@ -200,10 +208,12 @@ void cell_edit_name(GtkCellRendererText *cell, gchar *path_string, gchar *new_te
         }
 
 	save_favourites(applet);
+*/
 }
 
 
 void cell_edit_url(GtkCellRendererText *cell, gchar *path_string, gchar *new_text, gpointer data) {
+/*
         GtkTreeIter iter;
         GtkTreeModel *model;
         livescore_applet *applet = data;
@@ -216,10 +226,12 @@ void cell_edit_url(GtkCellRendererText *cell, gchar *path_string, gchar *new_tex
         }
 
 	save_favourites(applet);
+*/
 }
 
 
 void row_down(GtkWidget *widget, gpointer data) {
+/*
         GtkTreeIter iter1, iter2;
 	gchar *name1, *name2, *url1, *url2;
         livescore_applet *applet = data;
@@ -240,10 +252,12 @@ void row_down(GtkWidget *widget, gpointer data) {
 	}
 
 	save_favourites(applet);
+*/
 }
 
 
 void row_up(GtkWidget *widget, gpointer data) {
+/*
         GtkTreeIter iter0, iter1, iter2;
         gchar *name1, *name2, *url1, *url2;
         livescore_applet *applet = data;
@@ -270,10 +284,12 @@ void row_up(GtkWidget *widget, gpointer data) {
 	}
 
 	save_favourites(applet);
+*/
 }
 
 
 void row_del(GtkWidget *widget, gpointer data) {
+/*
 	GtkTreeIter iter;
 	livescore_applet *applet = data;
 
@@ -283,10 +299,12 @@ void row_del(GtkWidget *widget, gpointer data) {
 	gtk_list_store_remove (applet->tree_store, &iter);
 
 	save_favourites(applet);
+*/
 }
 
 
 void row_add (GtkWidget *widget, gpointer data){
+/*
         GtkTreeIter iter, sibling;
 	livescore_applet *applet = data;
 
@@ -307,10 +325,12 @@ void row_add (GtkWidget *widget, gpointer data){
 	gtk_tree_selection_select_iter(selection, &iter);
 
 	save_favourites(applet);
+*/
 }
 
 
 void row_copy (GtkWidget *widget, gpointer data) {
+/*
 	livescore_applet *applet = data;
 	GtkTreeIter iter, iter2, sibling;
 	gchar *name, *url;
@@ -333,10 +353,12 @@ void row_copy (GtkWidget *widget, gpointer data) {
         gtk_tree_selection_select_iter(selection, &iter);
 
         save_favourites(applet);
+*/
 }
 
 
 void row_play (GtkWidget *widget, gpointer data) {
+/*
         livescore_applet *applet = data;
         gchar *name, *url;
         GtkTreeIter iter;
@@ -351,20 +373,24 @@ void row_play (GtkWidget *widget, gpointer data) {
         }
         //sprintf(&applet->url[0], "%s", url);
         //sprintf(&applet->name[0], "%s", name);
+*/
 }
 
 
 void save_favourites(livescore_applet *applet) {
+/*
         char sql[2048];
         GtkTreeIter iter;
 
         // Get data from widget
         GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view));
         gtk_tree_model_foreach(model, write_favourites, applet);
+*/
 }
 
 
 gboolean write_favourites(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data ){
+/*
         livescore_applet *applet = data;
         char sql[2048];
         gchar *name, *url;
@@ -372,9 +398,11 @@ gboolean write_favourites(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *i
         gtk_tree_model_get(model, iter, COL_NAME, &name, COL_URL, &url, -1);
 
         return FALSE;
+*/
 }
 
 void clear_store(livescore_applet *applet) {
+/*
         GtkTreeIter iter;
         gboolean flag = TRUE;
 
@@ -383,46 +411,6 @@ void clear_store(livescore_applet *applet) {
 
         while (flag)
                 flag = gtk_list_store_remove (applet->tree_store, &iter);
-}
-
-
-gboolean on_left_click (GtkWidget *event_box, GdkEventButton *event, livescore_applet *applet) {
-        static GtkWidget *label;
-        char msg[1024], image_file[1024];
-/*
-        // We only process left clicks here
-        if (event->button != 1)
-                return FALSE;
-
-        // No URL loaded? 
-        if (strlen(applet->url) == 0) {
-                push_notification(_("No stream selected."), _("Right-click to load one."), NULL);
-
-                return TRUE;
-        }
-
-        // If we are playing, then swap icon and pause
-        if (applet->status == 1) {
-                applet->status = 0;
-                sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_ICON_PAUSE);
-                sprintf(&msg[0], "%s%s", _("PAUSED: "), &applet->name[0]);
-                gtk_widget_set_tooltip_text (GTK_WIDGET (applet->applet), &msg[0]);
-                gtk_image_set_from_file(GTK_IMAGE(applet->image), &image_file[0]);
-                applet->timestamp = time(NULL);
-                return TRUE;
-        }
-
-        // If we are paused, then swap icon and pause
-        if (applet->status == 0) {
-                applet->status = 1;
-                sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_ICON_PLAY);
-                sprintf(&msg[0], "%s%s", _("PLAYING: "), &applet->name[0]);
-                gtk_widget_set_tooltip_text (GTK_WIDGET (applet->applet), &msg[0]);
-                gtk_image_set_from_file(GTK_IMAGE(applet->image), &image_file[0]);
-
-                return TRUE;
-        }
 */
-        return FALSE;
 }
 

@@ -49,6 +49,7 @@
 #define APPLET_ID "LivescoreApplet"
 #define APPLET_NAME "livescore"
 #define APPLET_ICON_STATIC "applet_livescore_icon.png"
+#define APPLET_IMAGE_RUNNING "applet_livescore_running.gif"
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
@@ -61,8 +62,11 @@ static const gchar *ui1 =
 ;
 
 enum {
-        COL_URL = 0,
-        COL_NAME,
+        COL_PIC = 0,
+        COL_TIME,
+	COL_HOME,
+	COL_SCORE,
+	COL_AWAY,
         NUM_COLS
 };
 
@@ -101,7 +105,6 @@ typedef struct {
 	GtkActionGroup *action_group;
         GtkWidget *image;
         GtkWidget *event_box;
-	GtkWidget *quitDialog;
 	GtkWidget *text;
 	match_data *all_matches;
 	league_data *all_leagues;
@@ -112,15 +115,18 @@ typedef struct {
 	char xmlfile[1024];
 	int status;
 	time_t timestamp;
-	GtkListStore *tree_store;
-	GtkWidget *tree_view;
 	GSettings *gsettings;
+	GtkTreeStore *tree_store;
+	GtkWidget *tree_view;
+	GtkWidget *dialog_matches;
+	GtkWidget *dialog_settings;
 } livescore_applet;
 
 // util.c
 void push_notification (gchar *, gchar *, gchar *);
 gboolean cp(const char *, const char *);
 char *trim(char *);
+char *trim_quotes(char *);
 void debug(char *);
 
 //menu.c
@@ -130,13 +136,15 @@ void menu_cb_about(GtkAction *, livescore_applet *);
 void create_view_and_model (livescore_applet *);
 void cell_edit_name(GtkCellRendererText *, gchar *, gchar *, gpointer);
 void cell_edit_url(GtkCellRendererText *, gchar *, gchar *, gpointer);
-void clear_store(livescore_applet *);
 void row_down(GtkWidget *, gpointer);
 void row_up(GtkWidget *, gpointer);
 void save_favourites(livescore_applet *);
 gboolean write_favourites(GtkTreeModel *, GtkTreePath *, GtkTreeIter *, gpointer);
 void do_play(livescore_applet *);
 gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
+
+// gui.c
+void clear_store(livescore_applet *);
 
 // manager.c
 gboolean manager_main(livescore_applet *, match_data *);

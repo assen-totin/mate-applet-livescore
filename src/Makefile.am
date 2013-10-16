@@ -25,7 +25,7 @@ LDADD = @GTK_LIBS@ @APPLET_LIBS@
 
 libexec_PROGRAMS = livescore_applet
 
-livescore_applet_SOURCES = applet.h http.h feed_idda.h util.c http.c feed_iddaa.c manager.c menu.c main.c 
+livescore_applet_SOURCES = applet.h http.h feed_idda.h util.c http.c feed_iddaa.c manager.c gui.c menu.c main.c 
 
 appletdir = $(datadir)/mate-panel/applets
 applet_DATA = org.mate.applets.LivescoreApplet.mate-panel-applet
@@ -33,3 +33,8 @@ applet_DATA = org.mate.applets.LivescoreApplet.mate-panel-applet
 servicedir = $(datadir)/dbus-1/services
 service_DATA = org.mate.panel.applet.LivescoreApplet.service
 
+gsettingsdir = $(datadir)/glib-2.0/schemas
+gsettings_DATA = org.mate.panel.applet.LivescoreApplet.gschema.xml
+
+install-data-hook:
+	glib-compile-schemas $(DESTDIR)$(datadir)/glib-2.0/schemas 2>/dev/null

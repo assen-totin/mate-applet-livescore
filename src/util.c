@@ -107,6 +107,21 @@ char *trim(char *s) {
         return s;
 }
 
+
+char *trim_quotes(char *s) {
+        char *ptr;
+        if (!s)
+                return NULL;   // handle NULL string
+        if (!*s)
+                return s;      // handle empty string
+        while ((*s) == '"')    // remove left quotes
+                s++;
+        for (ptr = s + strlen(s) - 1; (ptr >= s) && (*ptr) == '"'; --ptr);
+        ptr[1] = '\0';
+        return s;
+}
+
+
 void debug(char *s) {
 	FILE *fp = fopen("/tmp/applet", "a");
 	fprintf(fp, "%s\n", s);
