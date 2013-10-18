@@ -57,16 +57,17 @@ gboolean iddaa_is_future(char *s) {
 }
 
 time_t iddaa_convert_time(char *s) {
-        struct tm now;
-        struct tm *now_p = &now;
+        struct tm now, *now_p;
 
         time_t ts = time(NULL);
         now_p = gmtime(&ts);
 
+	now = *now_p;
         now.tm_hour = atoi(strtok(s, ":"));
         now.tm_min = atoi(strtok(NULL, ":" ));
+	now.tm_sec = 0;
 
-        return mktime(now_p);
+        return mktime(&now);
 }
 
 void iddaa_build_match(livescore_applet *applet, iddaa_match_data *iddaa_match) {
@@ -125,7 +126,7 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 	for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
 		if (cur_node->content && (strlen(cur_node->content) > 1)) {
 			if (iddaa_match->stage == IDDAA_PARSING_LEAGUE) {
-				memset(&iddaa_match->league_name[0], '\0', 256);
+				//memset(&iddaa_match->league_name[0], '\0', 256);
 				strcat(&iddaa_match->league_name[0], cur_node->content);
 			}
 			else if (iddaa_match->stage == IDDAA_PARSING_TIME) {
@@ -157,8 +158,10 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 		}
 		for (cur_attr = cur_node->properties; cur_attr; cur_attr = cur_attr->next) {
 			if (!strcmp(cur_attr->name, "class")) {
-				if (!strcmp(cur_attr->children->content, "livescore-table")) 
+				if (!strcmp(cur_attr->children->content, "livescore-table")) {
 					iddaa_match->stage = IDDAA_PARSING_LEAGUE;
+					memset(&iddaa_match->league_name[0], '\0', 256);
+				}
 				else if (!strcmp(cur_attr->children->content, "live_time")) 
 					iddaa_match->stage = IDDAA_PARSING_TIME;
 				else if (!strcmp(cur_attr->children->content, "live_home")) 

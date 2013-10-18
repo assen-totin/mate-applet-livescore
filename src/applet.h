@@ -49,8 +49,10 @@
 #define APPLET_ID "LivescoreApplet"
 #define APPLET_NAME "livescore"
 #define APPLET_ICON_STATIC "applet_livescore_icon.png"
-// TODO: Replace with static image, animatin not supported in GtkTreeView
-#define APPLET_IMAGE_RUNNING "applet_livescore_running.gif"
+#define APPLET_IMAGE_RED "applet_livescore_red.png"
+#define APPLET_IMAGE_YELLOW "applet_livescore_yellow.png"
+#define APPLET_IMAGE_GREEN "applet_livescore_green.png"
+#define APPLET_IMAGE_GRAY "applet_livescore_gray.png"
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"

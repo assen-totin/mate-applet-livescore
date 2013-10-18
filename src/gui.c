@@ -27,12 +27,27 @@ void gui_quit(GtkWidget *widget, gpointer data) {
         gtk_widget_destroy(applet->dialog_matches);
 }
 
+
+void format_cell_home(GtkTreeViewColumn *col, GtkCellRenderer *renderer, GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data){
+	char home[256];
+	memset(&home[0], '\0', 256);
+        gtk_tree_model_get(model, iter, COL_HOME, &home[0], -1);
+        //convert_time_to_srt(from, &res[0], TIME_SEC);
+        //g_object_set(renderer, "text", res, NULL);
+        if (strstr(&home[0], "Premier"))
+        	g_object_set(renderer, "weight", PANGO_WEIGHT_BOLD, NULL);
+	//g_object_set(renderer, "text", &home[0], NULL);
+}
+
+
 void gui_matches (livescore_applet *applet) {
         GtkCellRenderer *renderer, *renderer_image;
         GtkTreeModel *model;
         GtkTreeIter child, parent;
         GtkTreeViewColumn *column;
-	char score[16];
+	char score[16], image_file[1024], time_elapsed[32];
+	int i, j;
+	struct tm *ltp, lt;
 
         applet->tree_view = gtk_tree_view_new();
         applet->tree_store = gtk_tree_store_new(NUM_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
@@ -40,18 +55,22 @@ void gui_matches (livescore_applet *applet) {
 	// VIEW and MODEL
         // Column 1 - image
         renderer_image = gtk_cell_renderer_pixbuf_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Now"), renderer_image, "pixbuf", COL_PIC, NULL);
+        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, " ", renderer_image, "pixbuf", COL_PIC, NULL);
 
         // Column 2
         renderer = gtk_cell_renderer_text_new();
+	g_object_set (renderer, "xalign", 1.0, NULL);
         gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Time"), renderer, "text", COL_TIME, NULL);
 
         // Column 3
         renderer = gtk_cell_renderer_text_new();
         gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Home"), renderer, "text", COL_HOME, NULL);
+	column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HOME);
+        gtk_tree_view_column_set_cell_data_func(column, renderer, format_cell_home, NULL, NULL);
 
         // Column 4
         renderer = gtk_cell_renderer_text_new();
+	g_object_set (renderer, "xalign", 0.5, NULL);
         gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Score"), renderer, "text", COL_SCORE, NULL);
 
         // Column 5
@@ -77,7 +96,7 @@ void gui_matches (livescore_applet *applet) {
 
 	// Assemble window
         applet->dialog_matches = gtk_dialog_new_with_buttons (_("MATE Livescore Applet"), GTK_WINDOW(applet), GTK_DIALOG_MODAL, NULL);
-gtk_window_resize(GTK_WINDOW(applet->dialog_matches), 640, 480);
+	gtk_window_resize(GTK_WINDOW(applet->dialog_matches), 640, 480);
 	GtkWidget *button_close = gtk_dialog_add_button (GTK_DIALOG(applet->dialog_matches), GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL);
         gtk_dialog_set_default_response (GTK_DIALOG (applet->dialog_matches), GTK_RESPONSE_CANCEL);
 	gtk_container_add (GTK_CONTAINER(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches))), scrolled_window);
@@ -86,11 +105,18 @@ gtk_window_resize(GTK_WINDOW(applet->dialog_matches), 640, 480);
 	if (applet->all_matches_counter > 1) {
 		gtk_tree_store_clear(applet->tree_store);
 
-	        char image_file[1024];
-		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_RUNNING);
-		GdkPixbuf *running_image = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_RED);
+		GdkPixbuf *running_image_red = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
-		int i, j;
+		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GREEN);
+                GdkPixbuf *running_image_green = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
+		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_YELLOW);
+                GdkPixbuf *running_image_yellow = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
+		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GRAY);
+                GdkPixbuf *running_image_gray = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
 		for (i=0; i < applet->all_leagues_counter; i++) {
 			// Show league
 			gtk_tree_store_append (applet->tree_store, &parent, NULL);
@@ -104,9 +130,38 @@ gtk_window_resize(GTK_WINDOW(applet->dialog_matches), 640, 480);
 					gtk_tree_store_append (applet->tree_store, &child, &parent);
 					gtk_tree_store_set (applet->tree_store, &child, COL_HOME, &applet->all_matches[j].team_home[0], COL_AWAY, &applet->all_matches[j].team_away[0], COL_SCORE, &score[0], -1);
 
-					// TODO: Show pic, time in localtime, score
-					if (running_image)
-						gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image, -1);
+					if (applet->all_matches[j].status == MATCH_FIRST_TIME) {
+						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, &time_elapsed[0], -1);
+						gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_green, -1);
+					}
+					else if (applet->all_matches[j].status == MATCH_HALF_TIME) {
+						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, _("HT"), -1);
+						gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_gray, -1);
+					}
+					else if (applet->all_matches[j].status == MATCH_SECOND_TIME) {
+						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, &time_elapsed[0], -1);
+						if (applet->all_matches[j].match_time < 80)
+							gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_yellow, -1);
+						else
+							gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_red, -1);
+					}
+					else if (applet->all_matches[j].status == MATCH_EXTRA_TIME) {
+						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, &time_elapsed[0], -1);
+						gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_red, -1);
+					}
+					else if (applet->all_matches[j].status == MATCH_FULL_TIME) 
+						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, _("FT"), -1);
+					else {
+						ltp = localtime(&applet->all_matches[j].start_time);
+						//sprintf(&time_elapsed[0], "%u.%u. %u:%u", ltp->tm_mday, ltp->tm_mon + 1, ltp->tm_hour, ltp->tm_min);
+						sprintf(&time_elapsed[0], "%u:%u", ltp->tm_hour, ltp->tm_min);
+						if (ltp->tm_min < 10)
+							strcat(&time_elapsed[0], "0");
+						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, &time_elapsed[0], COL_SCORE, _("vs."), -1);
+					}
 				}
 			}
 		}		
