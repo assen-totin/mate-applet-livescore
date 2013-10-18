@@ -64,12 +64,15 @@ static const gchar *ui1 =
 "<menuitem name='MenuItem2' action='About' />"
 ;
 
+// Two hidden colums will help manage the font weight for some cells
 enum {
         COL_PIC = 0,
         COL_TIME,
 	COL_HOME,
 	COL_SCORE,
 	COL_AWAY,
+	COL_HIDDEN_INT,
+	COL_HIDDEN_BOOLEAN,
         NUM_COLS
 };
 

@@ -28,18 +28,6 @@ void gui_quit(GtkWidget *widget, gpointer data) {
 }
 
 
-void format_cell_home(GtkTreeViewColumn *col, GtkCellRenderer *renderer, GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data){
-	char home[256];
-	memset(&home[0], '\0', 256);
-        gtk_tree_model_get(model, iter, COL_HOME, &home[0], -1);
-        //convert_time_to_srt(from, &res[0], TIME_SEC);
-        //g_object_set(renderer, "text", res, NULL);
-        if (strstr(&home[0], "Premier"))
-        	g_object_set(renderer, "weight", PANGO_WEIGHT_BOLD, NULL);
-	//g_object_set(renderer, "text", &home[0], NULL);
-}
-
-
 void gui_matches (livescore_applet *applet) {
         GtkCellRenderer *renderer, *renderer_image;
         GtkTreeModel *model;
@@ -50,7 +38,7 @@ void gui_matches (livescore_applet *applet) {
 	struct tm *ltp, lt;
 
         applet->tree_view = gtk_tree_view_new();
-        applet->tree_store = gtk_tree_store_new(NUM_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+        applet->tree_store = gtk_tree_store_new(NUM_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_BOOLEAN);
 
 	// VIEW and MODEL
         // Column 1 - image
@@ -64,9 +52,7 @@ void gui_matches (livescore_applet *applet) {
 
         // Column 3
         renderer = gtk_cell_renderer_text_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Home"), renderer, "text", COL_HOME, NULL);
-	column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HOME);
-        gtk_tree_view_column_set_cell_data_func(column, renderer, format_cell_home, NULL, NULL);
+        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Home"), renderer, "text", COL_HOME, "weight", COL_HIDDEN_INT, "weight-set", COL_HIDDEN_BOOLEAN, NULL);
 
         // Column 4
         renderer = gtk_cell_renderer_text_new();
@@ -76,6 +62,19 @@ void gui_matches (livescore_applet *applet) {
         // Column 5
         renderer = gtk_cell_renderer_text_new();
         gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Away"), renderer, "text", COL_AWAY, NULL);
+
+	// Hidden columns for bold font on some rows - for the font weight...
+	renderer = gtk_cell_renderer_text_new();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Hidden"), renderer, "text", COL_HIDDEN_INT, NULL);
+	column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HIDDEN_INT);
+	gtk_tree_view_column_set_visible(column, FALSE);
+
+	// ... and to enable or disable it. 
+        renderer = gtk_cell_renderer_text_new();
+        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Hidden"), renderer, "text", COL_HIDDEN_BOOLEAN, NULL);
+        column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HIDDEN_BOOLEAN);
+        gtk_tree_view_column_set_visible(column, FALSE);
+
 
         gtk_tree_store_append (applet->tree_store, &child, NULL);
         gtk_tree_store_set (applet->tree_store, &child, COL_HOME, _("No data yet."), COL_AWAY, _("Open this window again in a minute."), -1);
@@ -120,7 +119,7 @@ void gui_matches (livescore_applet *applet) {
 		for (i=0; i < applet->all_leagues_counter; i++) {
 			// Show league
 			gtk_tree_store_append (applet->tree_store, &parent, NULL);
-			gtk_tree_store_set (applet->tree_store, &parent, COL_HOME, &applet->all_leagues[i].league_name[0], -1);
+			gtk_tree_store_set (applet->tree_store, &parent, COL_HOME, &applet->all_leagues[i].league_name[0], COL_HIDDEN_INT, PANGO_WEIGHT_BOLD, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
 			for (j=0; j < applet->all_matches_counter; j++) {
 				if (i == applet->all_matches[j].league_id) {
@@ -128,7 +127,7 @@ void gui_matches (livescore_applet *applet) {
 					sprintf(&score[0], "%u : %u", applet->all_matches[j].score_home, applet->all_matches[j].score_away);
 
 					gtk_tree_store_append (applet->tree_store, &child, &parent);
-					gtk_tree_store_set (applet->tree_store, &child, COL_HOME, &applet->all_matches[j].team_home[0], COL_AWAY, &applet->all_matches[j].team_away[0], COL_SCORE, &score[0], -1);
+					gtk_tree_store_set (applet->tree_store, &child, COL_HOME, &applet->all_matches[j].team_home[0], COL_AWAY, &applet->all_matches[j].team_away[0], COL_SCORE, &score[0], COL_HIDDEN_INT, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
 					if (applet->all_matches[j].status == MATCH_FIRST_TIME) {
 						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
