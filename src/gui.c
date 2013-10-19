@@ -33,12 +33,13 @@ void gui_matches (livescore_applet *applet) {
         GtkTreeModel *model;
         GtkTreeIter child, parent;
         GtkTreeViewColumn *column;
-	char score[16], image_file[1024], time_elapsed[32];
+	char all_match[256], score[16], image_file[1024], time_elapsed[32];
 	int i, j;
 	struct tm *ltp, lt;
+	GdkPixbuf *running_image = NULL, *running_image_red, *running_image_green,*running_image_yellow, *running_image_gray;
 
         applet->tree_view = gtk_tree_view_new();
-        applet->tree_store = gtk_tree_store_new(NUM_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_BOOLEAN);
+        applet->tree_store = gtk_tree_store_new(NUM_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_BOOLEAN);
 
 	// VIEW and MODEL
         // Column 1 - image
@@ -52,21 +53,14 @@ void gui_matches (livescore_applet *applet) {
 
         // Column 3
         renderer = gtk_cell_renderer_text_new();
-	//g_object_set (renderer, "xalign", 1.0, NULL);
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Home"), renderer, "text", COL_HOME, "weight", COL_HIDDEN_BOLD, "weight-set", COL_HIDDEN_BOOLEAN, "stretch", COL_HIDDEN_STRETCH, "stretch-set", COL_HIDDEN_BOOLEAN,  NULL);
-	column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HOME);
-	gtk_tree_view_column_set_max_width(column, (int) (0.35 * APPLET_WINDOW_MATCHES_WIDTH));
+        g_object_set (renderer, "xalign", 0.5, NULL);
+        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Score"), renderer, "text", COL_SCORE, NULL);
 
         // Column 4
         renderer = gtk_cell_renderer_text_new();
-	g_object_set (renderer, "xalign", 0.5, NULL);
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Score"), renderer, "text", COL_SCORE, NULL);
-
-        // Column 5
-        renderer = gtk_cell_renderer_text_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Away"), renderer, "text", COL_AWAY, NULL);
-        column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_AWAY);
-        gtk_tree_view_column_set_max_width(column, (int) (0.35 * APPLET_WINDOW_MATCHES_WIDTH));
+        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("League / Match"), renderer, "text", COL_MATCH, "weight", COL_HIDDEN_BOLD, "weight-set", COL_HIDDEN_BOOLEAN, NULL);
+	//column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HOME);
+	//gtk_tree_view_column_set_max_width(column, (int) (0.35 * APPLET_WINDOW_MATCHES_WIDTH));
 
 	// Hidden column for bold font on some rows - for the font weight...
 	renderer = gtk_cell_renderer_text_new();
@@ -74,20 +68,14 @@ void gui_matches (livescore_applet *applet) {
 	column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HIDDEN_BOLD);
 	gtk_tree_view_column_set_visible(column, FALSE);
 
-	// Hidden column for condensed font on some rows - for the font stretch
-        renderer = gtk_cell_renderer_text_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Hidden"), renderer, "text", COL_HIDDEN_STRETCH, NULL);
-        column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HIDDEN_STRETCH);
-        gtk_tree_view_column_set_visible(column, FALSE);
-
-	// Hidden column - control 
+	// ... and to enable or disable them. 
         renderer = gtk_cell_renderer_text_new();
         gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Hidden"), renderer, "text", COL_HIDDEN_BOOLEAN, NULL);
         column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HIDDEN_BOOLEAN);
         gtk_tree_view_column_set_visible(column, FALSE);
 
         gtk_tree_store_append (applet->tree_store, &child, NULL);
-        gtk_tree_store_set (applet->tree_store, &child, COL_HOME, _("No data yet."), COL_AWAY, _("Open this window again in a minute."), COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_STRETCH, PANGO_STRETCH_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
+        gtk_tree_store_set (applet->tree_store, &child, COL_MATCH, _("No data yet. Open this window again in a minute."), COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
         model = GTK_TREE_MODEL(applet->tree_store);
         gtk_tree_view_set_model (GTK_TREE_VIEW (applet->tree_view), model);
@@ -115,62 +103,64 @@ void gui_matches (livescore_applet *applet) {
 		gtk_tree_store_clear(applet->tree_store);
 
 		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_RED);
-		GdkPixbuf *running_image_red = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+		running_image_red = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
 		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GREEN);
-                GdkPixbuf *running_image_green = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+                running_image_green = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
 		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_YELLOW);
-                GdkPixbuf *running_image_yellow = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+                running_image_yellow = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
 		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GRAY);
-                GdkPixbuf *running_image_gray = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+                running_image_gray = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
 		for (i=0; i < applet->all_leagues_counter; i++) {
 			// Show league
 			gtk_tree_store_append (applet->tree_store, &parent, NULL);
-			gtk_tree_store_set (applet->tree_store, &parent, COL_HOME, &applet->all_leagues[i].league_name[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_BOLD, COL_HIDDEN_BOOLEAN, TRUE, COL_HIDDEN_STRETCH, PANGO_STRETCH_CONDENSED, -1);
+			gtk_tree_store_set (applet->tree_store, &parent, COL_MATCH, &applet->all_leagues[i].league_name[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_BOLD, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
 			for (j=0; j < applet->all_matches_counter; j++) {
 				if (i == applet->all_matches[j].league_id) {
 					// Show match
 					sprintf(&score[0], "%u : %u", applet->all_matches[j].score_home, applet->all_matches[j].score_away);
 
-					gtk_tree_store_append (applet->tree_store, &child, &parent);
-					gtk_tree_store_set (applet->tree_store, &child, COL_HOME, &applet->all_matches[j].team_home[0], COL_AWAY, &applet->all_matches[j].team_away[0], COL_SCORE, &score[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_STRETCH, PANGO_STRETCH_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
-
 					if (applet->all_matches[j].status == MATCH_FIRST_TIME) {
 						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
-						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, &time_elapsed[0], -1);
-						gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_green, -1);
+						running_image = running_image_green;
 					}
 					else if (applet->all_matches[j].status == MATCH_HALF_TIME) {
-						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, _("HT"), -1);
-						gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_gray, -1);
+						sprintf(&time_elapsed[0], _("HT"));
+						running_image = running_image_gray;
 					}
 					else if (applet->all_matches[j].status == MATCH_SECOND_TIME) {
 						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
-						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, &time_elapsed[0], -1);
 						if (applet->all_matches[j].match_time < 80)
-							gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_yellow, -1);
+							running_image = running_image_yellow;
 						else
-							gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_red, -1);
+							running_image = running_image_red;
 					}
 					else if (applet->all_matches[j].status == MATCH_EXTRA_TIME) {
 						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
-						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, &time_elapsed[0], -1);
-						gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image_red, -1);
+						running_image = running_image_red;
 					}
-					else if (applet->all_matches[j].status == MATCH_FULL_TIME) 
-						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, _("FT"), -1);
+					else if (applet->all_matches[j].status == MATCH_FULL_TIME) { 
+						sprintf(&time_elapsed[0], _("FT"));
+						running_image = NULL;
+					}
 					else {
+						sprintf(&score[0], " ");
 						ltp = localtime(&applet->all_matches[j].start_time);
-						//sprintf(&time_elapsed[0], "%u.%u. %u:%u", ltp->tm_mday, ltp->tm_mon + 1, ltp->tm_hour, ltp->tm_min);
 						sprintf(&time_elapsed[0], "%u:%u", ltp->tm_hour, ltp->tm_min);
 						if (ltp->tm_min < 10)
 							strcat(&time_elapsed[0], "0");
-						gtk_tree_store_set (applet->tree_store, &child, COL_TIME, &time_elapsed[0], COL_SCORE, _("vs."), -1);
+						running_image = NULL;
 					}
+
+					sprintf(&all_match[0], "%s - %s", &applet->all_matches[j].team_home[0], &applet->all_matches[j].team_away[0]);
+
+					gtk_tree_store_append (applet->tree_store, &child, &parent);
+					gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image, COL_TIME, &time_elapsed[0], COL_SCORE, &score[0], COL_MATCH, &all_match[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
+
 				}
 			}
 		}		

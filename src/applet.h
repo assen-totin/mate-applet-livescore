@@ -70,11 +70,9 @@ static const gchar *ui1 =
 enum {
         COL_PIC = 0,
         COL_TIME,
-	COL_HOME,
 	COL_SCORE,
-	COL_AWAY,
+	COL_MATCH,
 	COL_HIDDEN_BOLD,
-	COL_HIDDEN_STRETCH,
 	COL_HIDDEN_BOOLEAN,
         NUM_COLS
 };
