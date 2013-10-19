@@ -120,6 +120,7 @@ debug(&dbg[0]);
 			sprintf(&applet->all_leagues[league_id].league_name[0], "%s", &new_match->league_name[0]);
 			applet->all_leagues[league_id].used = TRUE;
 			applet->all_leagues[league_id].favourite = FALSE;
+			applet->all_leagues[league_id].expanded = FALSE;
 
 			sprintf(&dbg[0], "Registered league: %s", &new_match->league_name[0]);
 			debug(&dbg[0]);

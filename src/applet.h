@@ -32,8 +32,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <time.h>
-//#include <libxml/parser.h>
-//#include <libxml/tree.h>
 #include <libxml/HTMLparser.h>
 #include <libxml/HTMLtree.h>
 #include <libsoup/soup.h>
@@ -59,6 +57,7 @@
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
 #define APPLET_GSETTINGS_KEY_FAV "leagues-notify"
+#define APPLET_GSETTINGS_KEY_EXP "leagues-expanded"
 
 // Menu strings
 static const gchar *ui1 = 
@@ -91,6 +90,7 @@ typedef struct {
 	char league_name[128];
 	gboolean used;
 	gboolean favourite;
+	gboolean expanded;
 } league_data;
 
 typedef struct {
@@ -127,6 +127,7 @@ typedef struct {
 	GtkWidget *tree_view;
 	GtkWidget *dialog_matches;
 	GtkWidget *dialog_settings;
+	gboolean dialog_matches_is_visible;
 } livescore_applet;
 
 // util.c

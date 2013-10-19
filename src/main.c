@@ -95,29 +95,61 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	applet->all_leagues = g_malloc0(sizeof(league_data));
 	applet->all_leagues->league_id = 0;
 	applet->all_leagues->used = FALSE;
+	applet->all_leagues->expanded = FALSE;
+	applet->all_leagues->favourite = FALSE;
 	applet->all_leagues_counter = 1;
 
 	// Fvourite leagues - via GSettings
 	applet->gsettings = g_settings_new_with_path(APPLET_GSETTINGS_SCHEMA, APPLET_GSETTINGS_PATH);
 	gchar *fav_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV));
+	// First key is always "0" - in GSettings string value cannot be empty
 	char *fav_leagues_1 = strtok(fav_leagues, ",");
 	i = 0;
-	if (fav_leagues_1) {
+	applet->all_leagues[i].league_id = i;
+	sprintf(&applet->all_leagues[i].league_name[0], "%s", fav_leagues_1);
+	applet->all_leagues[i].used = TRUE;
+	applet->all_leagues[i].favourite = TRUE;
+	applet->all_leagues[i].expanded = TRUE;
+	while (fav_leagues_1 = strtok(NULL, ",")) {
+		i++;
+		void *_tmp = realloc(applet->all_leagues, (i + 1) * sizeof(league_data));
+		applet->all_leagues = (league_data *) _tmp;
 		applet->all_leagues[i].league_id = i;
 		sprintf(&applet->all_leagues[i].league_name[0], "%s", fav_leagues_1);
 		applet->all_leagues[i].used = TRUE;
 		applet->all_leagues[i].favourite = TRUE;
-		while (fav_leagues_1 = strtok(NULL, ",")) {
-			i++;
-			void *_tmp = realloc(applet->all_leagues, i * sizeof(league_data));
-			applet->all_leagues = (league_data *) _tmp;
+		applet->all_leagues[i].expanded = FALSE;
+	}
+	applet->all_leagues_counter = i + 1;
 
-			applet->all_leagues[i].league_id = i;
-			sprintf(&applet->all_leagues[i].league_name[0], "%s", fav_leagues_1);
-			applet->all_leagues[i].used = TRUE;
-			applet->all_leagues[i].favourite = TRUE;
+	// Get expanded leagues from GSettings, update the leagues array
+	gboolean flag_have_league = FALSE;
+	gchar *exp_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP));
+printf("COUNTER: %u\n", applet->all_leagues_counter);
+printf("READ: %s\n", exp_leagues);
+	// First key is always "0" - in GSettings string value cannot be empty - so we ignore it
+	char *exp_leagues_1 = strtok(exp_leagues, ",");
+	while (exp_leagues_1 = strtok(NULL, ",")) {
+		flag_have_league = FALSE;
+		for (i=0; i < applet->all_leagues_counter; i++) {
+			if (!strcmp(&applet->all_leagues[i].league_name[0], exp_leagues_1)) {
+				applet->all_leagues[i].expanded = TRUE;
+				flag_have_league = TRUE;
+				break;
+			}
 		}
-		applet->all_leagues_counter = i;
+		// If we don't have this league, add it
+		if (!flag_have_league) {
+printf("Adding: %s\n", exp_leagues_1);
+			applet->all_leagues_counter++;
+			void *_tmp = realloc(applet->all_leagues, applet->all_leagues_counter * sizeof(league_data));
+			applet->all_leagues = (league_data *) _tmp;
+			applet->all_leagues[applet->all_leagues_counter - 1].league_id = applet->all_leagues_counter - 1;
+			applet->all_leagues[applet->all_leagues_counter - 1].used = TRUE;
+			applet->all_leagues[applet->all_leagues_counter - 1].favourite = FALSE;
+			applet->all_leagues[applet->all_leagues_counter - 1].expanded = TRUE;
+			sprintf(&applet->all_leagues[applet->all_leagues_counter - 1].league_name[0], "%s", exp_leagues_1);
+		}
 	}
 
 	// Get an image
@@ -136,7 +168,7 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	applet->action_group = gtk_action_group_new ("Livescore_Applet_Actions");
 	gtk_action_group_add_actions (applet->action_group, applet_menu_actions, G_N_ELEMENTS (applet_menu_actions), applet);
 
-	// Build menu
+	// TODO: Build menu
 	//sprintf(&ui[0], "%s %s %s %s %s", ui1, &applet->ui_recent[0], ui2, &applet->ui_fav[0], ui3);
 	//mate_panel_applet_setup_menu(applet->applet, &ui[0], applet->action_group);
 
