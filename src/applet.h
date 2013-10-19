@@ -53,6 +53,8 @@
 #define APPLET_IMAGE_YELLOW "applet_livescore_yellow.png"
 #define APPLET_IMAGE_GREEN "applet_livescore_green.png"
 #define APPLET_IMAGE_GRAY "applet_livescore_gray.png"
+#define APPLET_WINDOW_MATCHES_WIDTH 640
+#define APPLET_WINDOW_MATCHES_HEIGHT 480
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
@@ -71,7 +73,8 @@ enum {
 	COL_HOME,
 	COL_SCORE,
 	COL_AWAY,
-	COL_HIDDEN_INT,
+	COL_HIDDEN_BOLD,
+	COL_HIDDEN_STRETCH,
 	COL_HIDDEN_BOOLEAN,
         NUM_COLS
 };
