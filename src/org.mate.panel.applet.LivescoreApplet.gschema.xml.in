@@ -10,5 +10,10 @@
       <summary>List of leagues to show expanded</summary>
       <description>List of leagues for which all matches are show expanded in the GUI</description>
     </key>
+    <key name="feed" type="i">
+      <default>0</default>
+      <summary>ID of the selected feed provider</summary>
+      <description>ID of the selected matches feed provider</description>
+    </key>
   </schema>
 </schemalist>

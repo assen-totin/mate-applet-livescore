@@ -53,14 +53,17 @@
 #define APPLET_IMAGE_GRAY "applet_livescore_gray.png"
 #define APPLET_WINDOW_MATCHES_WIDTH 640
 #define APPLET_WINDOW_MATCHES_HEIGHT 480
+#define APPLET_WINDOW_SETTINGS_WIDTH 640
+#define APPLET_WINDOW_SETTINGS_HEIGHT 480
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
 #define APPLET_GSETTINGS_KEY_FAV "leagues-notify"
 #define APPLET_GSETTINGS_KEY_EXP "leagues-expanded"
+#define APPLET_GSETTINGS_KEY_FEED "feed"
 
 // Menu strings
-static const gchar *ui1 = 
+static const gchar *ui = 
 "<menuitem name='MenuItem1' action='Settings' />"
 "<menuitem name='MenuItem2' action='About' />"
 ;
@@ -86,8 +89,15 @@ enum {
 };
 
 typedef struct {
+	int feed_id;
+	char feed_name[256];
+	gboolean enabled;
+	gboolean selected;
+} feed_data;
+
+typedef struct {
 	int league_id;
-	char league_name[128];
+	char league_name[256];
 	gboolean used;
 	gboolean favourite;
 	gboolean expanded;
@@ -95,7 +105,7 @@ typedef struct {
 
 typedef struct {
 	int league_id;
-	char league_name[128];
+	char league_name[256];
 	char team_home[64];
 	char team_away[64];
 	int score_home;
@@ -112,22 +122,23 @@ typedef struct {
 	GtkActionGroup *action_group;
         GtkWidget *image;
         GtkWidget *event_box;
-	GtkWidget *text;
+	//GtkWidget *text;
 	match_data *all_matches;
 	league_data *all_leagues;
+	feed_data *all_feeds;
 	int all_matches_counter;
 	int all_leagues_counter;
-	char url[1024];
-	char name[1024];
-	char xmlfile[1024];
-	int status;
-	time_t timestamp;
+	int all_feeds_counter;
+	//char url[1024];
+	//char name[1024];
+	//char xmlfile[1024];
+	//int status;
+	gboolean dialog_matches_is_visible;
 	GSettings *gsettings;
 	GtkTreeStore *tree_store;
 	GtkWidget *tree_view;
 	GtkWidget *dialog_matches;
 	GtkWidget *dialog_settings;
-	gboolean dialog_matches_is_visible;
 	GdkPixbuf *running_image_red;
 	GdkPixbuf *running_image_green;
 	GdkPixbuf *running_image_yellow;
@@ -145,18 +156,10 @@ void debug(char *);
 void quitDialogClose(GtkWidget *, gpointer);
 void menu_cb_settings(GtkAction *, livescore_applet *);
 void menu_cb_about(GtkAction *, livescore_applet *);
-void create_view_and_model (livescore_applet *);
-void cell_edit_name(GtkCellRendererText *, gchar *, gchar *, gpointer);
-void cell_edit_url(GtkCellRendererText *, gchar *, gchar *, gpointer);
-void row_down(GtkWidget *, gpointer);
-void row_up(GtkWidget *, gpointer);
-void save_favourites(livescore_applet *);
-gboolean write_favourites(GtkTreeModel *, GtkTreePath *, GtkTreeIter *, gpointer);
-void do_play(livescore_applet *);
-gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 
 // gui.c
 void gui_update_model(livescore_applet * applet);
+gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 
 // manager.c
 gboolean manager_main(livescore_applet *, match_data *);
@@ -174,6 +177,6 @@ void applet_destroy(MatePanelApplet *, livescore_applet *);
 
 // Menu skeleton
 static const GtkActionEntry applet_menu_actions[] = {
-        { "All", GTK_STOCK_EXECUTE, "_Settings", NULL, NULL, G_CALLBACK (menu_cb_settings) },
+        { "Settings", GTK_STOCK_EXECUTE, "_Settings", NULL, NULL, G_CALLBACK (menu_cb_settings) },
         { "About", GTK_STOCK_ABOUT, "_About", NULL, NULL, G_CALLBACK (menu_cb_about) }
 };

@@ -26,6 +26,20 @@ gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
 }
 
 
+void manager_populate_feed(livescore_applet *applet, int selected_feed) {
+	applet->all_feeds = g_malloc0(sizeof(feed_data));
+	applet->all_feeds[0].feed_id = 0;
+	applet->all_feeds[0].enabled = TRUE;
+	sprintf(&applet->all_feeds[0].feed_name[0], "Default");
+
+	if (applet->all_feeds[selected_feed].enabled)
+		applet->all_feeds[selected_feed].selected = TRUE;
+
+	// TODO: If more than one feed is available and the selected one is no longer used,
+	// chose another one to use
+}
+
+
 int manager_timer(livescore_applet *applet) {
 	int i;
 	time_t now;
@@ -42,7 +56,8 @@ int manager_timer(livescore_applet *applet) {
         }
 	
 	// Call parser
-	feed_iddaa_main(applet);
+	if (applet->all_feeds[0].selected)
+		feed_iddaa_main(applet);
 
 	// Rebuild model for GUI
 	gui_update_model(applet);

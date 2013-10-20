@@ -150,6 +150,10 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 		}
 	}
 
+	// Populate feeds and get selected one to use
+	int selected_feed = g_settings_get_int(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
+	manager_populate_feed(applet, selected_feed);
+
 	// View and model
 	gui_create_view_and_model(applet);
 
@@ -182,9 +186,8 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	applet->action_group = gtk_action_group_new ("Livescore_Applet_Actions");
 	gtk_action_group_add_actions (applet->action_group, applet_menu_actions, G_N_ELEMENTS (applet_menu_actions), applet);
 
-	// TODO: Build menu
-	//sprintf(&ui[0], "%s %s %s %s %s", ui1, &applet->ui_recent[0], ui2, &applet->ui_fav[0], ui3);
-	//mate_panel_applet_setup_menu(applet->applet, &ui[0], applet->action_group);
+	// Build menu
+	mate_panel_applet_setup_menu(applet->applet, ui, applet->action_group);
 
 	// Signals
         g_signal_connect(G_OBJECT(applet->event_box), "button_press_event", G_CALLBACK (on_left_click), (gpointer)applet);
@@ -198,7 +201,6 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
         gtk_widget_show_all (GTK_WIDGET (applet->applet));
 
 	// Run updates each minute
-	// TODO: write wrapper to read actually selected feed and activate it's main function
 	g_timeout_add(60000, (GSourceFunc) manager_timer, (gpointer)applet);
 
 	// Run
