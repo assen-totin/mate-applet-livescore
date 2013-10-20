@@ -151,7 +151,7 @@ void gui_create_view_and_model(livescore_applet *applet) {
         gtk_tree_view_column_set_visible(column, FALSE);
 
 	gtk_tree_store_append (applet->tree_store, &iter, NULL);
-	gtk_tree_store_set (applet->tree_store, &iter, COL_MATCH, _("No data yet. Wait util we gather some."), COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
+	gtk_tree_store_set (applet->tree_store, &iter, COL_MATCH, _("No data yet. Wait until we gather some."), COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
         model = GTK_TREE_MODEL(applet->tree_store);
         gtk_tree_view_set_model (GTK_TREE_VIEW (applet->tree_view), model);
@@ -200,13 +200,24 @@ void gui_update_model(livescore_applet * applet) {
 	int i, j;
 	char all_match[256], score[16], image_file[1024], time_elapsed[32];
 	struct tm *ltp, lt;
+	gboolean league_has_matches = FALSE;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view));
 
 	if (applet->all_matches_counter > 1) {
 		gtk_tree_store_clear(applet->tree_store);
 
 		for (i=0; i < applet->all_leagues_counter; i++) {
-			// "0" is a service record only needed for GSettings - skip it
-			if (!strcmp(&applet->all_leagues[i].league_name[0], "0"))
+			league_has_matches = FALSE;
+
+			// Skip leagues which have no matches (e.g. loaded from GSettings)
+			for (j=0; j < applet->all_matches_counter; j++) {
+				if (i == applet->all_matches[j].league_id) {
+					league_has_matches = TRUE;
+					break;
+				}
+			}
+			if (!league_has_matches)
 				continue;
 
 			// Show league
@@ -262,7 +273,6 @@ void gui_update_model(livescore_applet * applet) {
 
 	// Expand rows
 	// Termporarily block visibility in order not to trigget the 'row-expanded' callback function
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view));
 	applet->dialog_matches_is_visible = FALSE;
         gtk_tree_model_foreach(model, gui_expand_row, applet);
 	applet->dialog_matches_is_visible = TRUE;
