@@ -273,9 +273,11 @@ void gui_update_model(livescore_applet * applet) {
 
 	// Expand rows
 	// Termporarily block visibility in order not to trigget the 'row-expanded' callback function
+	gboolean _tmp = applet->dialog_matches_is_visible;
 	applet->dialog_matches_is_visible = FALSE;
         gtk_tree_model_foreach(model, gui_expand_row, applet);
-	applet->dialog_matches_is_visible = TRUE;
+	if (_tmp)
+		applet->dialog_matches_is_visible = TRUE;
 }
 
 
