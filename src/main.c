@@ -84,6 +84,7 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	// Init 
 	applet = g_malloc0(sizeof(livescore_applet));
 	applet->applet = applet_widget;
+	applet->dialog_matches_is_visible = FALSE;
 	//applet->timestamp = time(NULL);
 	applet->all_matches = g_malloc0(sizeof(match_data));
 	applet->all_matches->league_id = -1;
@@ -125,8 +126,6 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	// Get expanded leagues from GSettings, update the leagues array
 	gboolean flag_have_league = FALSE;
 	gchar *exp_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP));
-printf("COUNTER: %u\n", applet->all_leagues_counter);
-printf("READ: %s\n", exp_leagues);
 	// First key is always "0" - in GSettings string value cannot be empty - so we ignore it
 	char *exp_leagues_1 = strtok(exp_leagues, ",");
 	while (exp_leagues_1 = strtok(NULL, ",")) {
@@ -140,7 +139,6 @@ printf("READ: %s\n", exp_leagues);
 		}
 		// If we don't have this league, add it
 		if (!flag_have_league) {
-printf("Adding: %s\n", exp_leagues_1);
 			applet->all_leagues_counter++;
 			void *_tmp = realloc(applet->all_leagues, applet->all_leagues_counter * sizeof(league_data));
 			applet->all_leagues = (league_data *) _tmp;
@@ -152,12 +150,28 @@ printf("Adding: %s\n", exp_leagues_1);
 		}
 	}
 
-	// Get an image
+	// View and model
+	gui_create_view_and_model(applet);
+
+	// Get images for matches dialog
 	char image_file[1024];
+        sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_RED);
+        applet->running_image_red = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
+        sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GREEN);
+        applet->running_image_green = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
+        sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_YELLOW);
+        applet->running_image_yellow = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
+        sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GRAY);
+        applet->running_image_gray = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
+	// Get main icon
 	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_ICON_STATIC);
 	applet->image = gtk_image_new_from_file (&image_file[0]);
 
-	// Put the image into a container (it needs to receive actions)
+	// Put main icon into a container (it needs to receive actions)
 	applet->event_box = gtk_event_box_new();
 	gtk_container_add (GTK_CONTAINER (applet->event_box), applet->image);
 
@@ -185,7 +199,7 @@ printf("Adding: %s\n", exp_leagues_1);
 
 	// Run updates each minute
 	// TODO: write wrapper to read actually selected feed and activate it's main function
-	g_timeout_add(60000, (GSourceFunc)feed_iddaa_main, (gpointer)applet);
+	g_timeout_add(60000, (GSourceFunc) manager_timer, (gpointer)applet);
 
 	// Run
         applet->loop = g_main_loop_new (NULL, FALSE);

@@ -128,6 +128,10 @@ typedef struct {
 	GtkWidget *dialog_matches;
 	GtkWidget *dialog_settings;
 	gboolean dialog_matches_is_visible;
+	GdkPixbuf *running_image_red;
+	GdkPixbuf *running_image_green;
+	GdkPixbuf *running_image_yellow;
+	GdkPixbuf *running_image_gray;
 } livescore_applet;
 
 // util.c
@@ -152,11 +156,11 @@ void do_play(livescore_applet *);
 gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 
 // gui.c
-void clear_store(livescore_applet *);
+void gui_update_model(livescore_applet * applet);
 
 // manager.c
 gboolean manager_main(livescore_applet *, match_data *);
-void manager_cleanup(livescore_applet *applet);
+int manager_timer(livescore_applet *);
 
 // http.c
 int get_url (char *, char *, char *);

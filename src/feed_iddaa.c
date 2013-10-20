@@ -67,7 +67,11 @@ time_t iddaa_convert_time(char *s) {
         now.tm_min = atoi(strtok(NULL, ":" ));
 	now.tm_sec = 0;
 
-        return mktime(&now);
+	// mktime treats 'now' as localtime, but we need it UTC.
+	// NOTE: timegm() is not POSIX-compliant, hence not portable!
+	// See 'man timegm' for POSIX-compliant replacecement function.
+        //return mktime(&now);
+        return timegm(&now);
 }
 
 void iddaa_build_match(livescore_applet *applet, iddaa_match_data *iddaa_match) {

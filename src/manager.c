@@ -25,6 +25,32 @@ gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
 	return applet->all_leagues[league_id].favourite;
 }
 
+
+int manager_timer(livescore_applet *applet) {
+	int i;
+	time_t now;
+	div_t q;
+
+	// Is it time for clean-up?
+        now = time(NULL);
+        q = div(now, 1000);
+        if (q.rem < 60) {
+                for (i=0; i < applet->all_matches_counter; i++) {
+                        if ((now - applet->all_matches[i].start_time) > 129600)
+                                applet->all_matches[i].used = FALSE;
+                }
+        }
+	
+	// Call parser
+	feed_iddaa_main(applet);
+
+	// Rebuild model for GUI
+	gui_update_model(applet);
+
+	return 1;
+}
+
+
 gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	int i, match_id, league_id;
 	gboolean flag_have_match = FALSE;
@@ -35,16 +61,6 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 char dbg[1024];
 sprintf(&dbg[0], "Called for match %s - %s", new_match->team_home, new_match->team_away);
 debug(&dbg[0]);
-
-	// Is it time for clean-up?
-	time_t now = time(NULL);
-	div_t q = div(now, 1000);
-	if (q.rem < 60) {
-		for (i=0; i < applet->all_matches_counter; i++) {
-			if ((now - applet->all_matches[i].start_time) > 129600)
-				applet->all_matches[i].used = FALSE;
-		}
-	}
 
 	// Do we have this match?
 	for (i=0; i < applet->all_matches_counter; i++) {
