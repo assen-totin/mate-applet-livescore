@@ -47,6 +47,8 @@ void menu_cb_about (GtkAction *action, livescore_applet *applet) {
 
 
 void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
+	int i;
+
 	// Prepare Notifications tab 
 /*	
 	GtkWidget *butt_play = gtk_button_new_from_stock(GTK_STOCK_MEDIA_PLAY);
@@ -71,8 +73,16 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 	// Prepare Feed tab
 	GtkWidget *feed_label = gtk_label_new(_("Choose which feed provider to use:"));
 
+        GtkWidget *feed_combo = gtk_combo_box_text_new();
+        for (i=0; i < applet->all_feeds_counter; i++) {
+                gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT(feed_combo), &applet->all_feeds[i].feed_name[0]);
+                if (applet->all_feeds[i].selected)
+                        gtk_combo_box_set_active(GTK_COMBO_BOX(feed_combo), i);
+        }
+
 	GtkWidget *feed_vbox_1 = gtk_vbox_new (FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(feed_vbox_1), feed_label, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(feed_vbox_1), feed_combo, FALSE, FALSE, 0);
 
 
 	// Create notebook widget

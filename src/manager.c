@@ -32,6 +32,8 @@ void manager_populate_feed(livescore_applet *applet, int selected_feed) {
 	applet->all_feeds[0].enabled = TRUE;
 	sprintf(&applet->all_feeds[0].feed_name[0], "Default");
 
+	applet->all_feeds_counter = 1;
+
 	if (applet->all_feeds[selected_feed].enabled)
 		applet->all_feeds[selected_feed].selected = TRUE;
 
