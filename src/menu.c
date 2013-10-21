@@ -46,29 +46,86 @@ void menu_cb_about (GtkAction *action, livescore_applet *applet) {
 }
 
 
-void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
+void menu_cb_feed_combo(GtkWidget *widget, gpointer data) {
+        livescore_applet *applet = data;
+	int i, feed_id = -1;
+	gchar *feed_name = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(widget));
+
+	for (i=0; i < applet->all_feeds_counter; i++) {
+		if (!strcmp(&applet->all_feeds[i].feed_name[0], feed_name)) {
+			feed_id = 1;
+			break;
+		}
+	}
+
+	if (feed_id > -1)
+		g_settings_set_int(applet->gsettings, APPLET_GSETTINGS_KEY_FEED, feed_id);
+
+	free(feed_name);
+}
+
+
+void menu_cb_notif_checkbox(GtkWidget *widget, gpointer data) {
+        livescore_applet *applet = data;
+	char value[10240];
 	int i;
 
+	int league_id = atoi(gtk_widget_get_name(widget));
+
+	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)))
+		applet->all_leagues[league_id].favourite = TRUE;
+	else
+		applet->all_leagues[league_id].favourite = FALSE; 
+
+        // Save favourite leagues in GSettings
+        sprintf(&value[0], "\"0");
+        for (i=0; i < applet->all_leagues_counter; i++) {
+                if (applet->all_leagues[i].favourite) {
+                        strcat(&value[0], ",");
+                        strcat(&value[0], &applet->all_leagues[i].league_name[0]);
+                }
+        }
+        strcat(&value[0], "\"");
+
+	g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV, &value[0]);
+}
+
+
+void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
+	int i;
+	char n[8];
+
 	// Prepare Notifications tab 
-/*	
-	GtkWidget *butt_play = gtk_button_new_from_stock(GTK_STOCK_MEDIA_PLAY);
-	gtk_widget_set_name(butt_play, "play_favourites");
-
-	GtkWidget *notif_vbox_1 = gtk_vbox_new (FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(notif_vbox_1), butt_play, FALSE, FALSE, 0);
-
-	g_signal_connect (G_OBJECT(butt_play), "clicked", G_CALLBACK (row_play), (gpointer) applet);
-*/
 	GtkWidget *notif_label = gtk_label_new(_("Choose which leagues you want to be notified about:"));
 
-	//GtkWidget *notif_table = gtk_scrolled_window_new(NULL,NULL);
-	//gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(notif_table), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-	////gtk_container_add (GTK_CONTAINER (notif_table), applet->tree_view);
+	GtkWidget *notif_table = gtk_scrolled_window_new(NULL,NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(notif_table), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+	GtkWidget *viewport = gtk_viewport_new (NULL, NULL);
+
+	GtkWidget *notif_vbox_2 = gtk_vbox_new (FALSE, 0);
+	for (i=0; i < applet->all_leagues_counter; i++) {
+		// Skip league with name '0' - a servie one
+		if (!strcmp(&applet->all_leagues[i].league_name[0], "0"))
+			continue;
+		GtkWidget *_tmp_check_button = gtk_check_button_new_with_label(&applet->all_leagues[i].league_name[0]);
+		sprintf(&n[0], "%u", i);
+		gtk_widget_set_name(_tmp_check_button, &n[0]);
+
+		if (applet->all_leagues[i].favourite)
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_tmp_check_button), TRUE);
+
+		g_signal_connect (G_OBJECT(_tmp_check_button), "toggled", G_CALLBACK (menu_cb_notif_checkbox), (gpointer) applet);
+
+		gtk_box_pack_start(GTK_BOX(notif_vbox_2), _tmp_check_button, FALSE, FALSE, 0);
+	}
+	gtk_container_add (GTK_CONTAINER (viewport), notif_vbox_2);
+	gtk_container_add (GTK_CONTAINER (notif_table), viewport);
 
 	GtkWidget *notif_vbox_1 = gtk_vbox_new (FALSE, 0);
 
         gtk_box_pack_start(GTK_BOX(notif_vbox_1), notif_label, FALSE, FALSE, 0);
-
+	gtk_box_pack_start(GTK_BOX(notif_vbox_1), notif_table, TRUE, TRUE, 0);
 
 	// Prepare Feed tab
 	GtkWidget *feed_label = gtk_label_new(_("Choose which feed provider to use:"));
@@ -79,6 +136,7 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
                 if (applet->all_feeds[i].selected)
                         gtk_combo_box_set_active(GTK_COMBO_BOX(feed_combo), i);
         }
+	g_signal_connect (G_OBJECT(feed_combo), "changed", G_CALLBACK (menu_cb_feed_combo), (gpointer) applet);
 
 	GtkWidget *feed_vbox_1 = gtk_vbox_new (FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(feed_vbox_1), feed_label, FALSE, FALSE, 0);

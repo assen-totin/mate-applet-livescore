@@ -53,8 +53,8 @@
 #define APPLET_IMAGE_GRAY "applet_livescore_gray.png"
 #define APPLET_WINDOW_MATCHES_WIDTH 640
 #define APPLET_WINDOW_MATCHES_HEIGHT 480
-#define APPLET_WINDOW_SETTINGS_WIDTH 640
-#define APPLET_WINDOW_SETTINGS_HEIGHT 480
+#define APPLET_WINDOW_SETTINGS_WIDTH 480
+#define APPLET_WINDOW_SETTINGS_HEIGHT 320
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
