@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-01 18:17+0300\n"
+"POT-Creation-Date: 2013-10-24 20:19+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,142 +17,88 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/menu.c:389
-msgid "<enter name>"
-msgstr ""
-
-#: src/menu.c:389
-msgid "<enter url>"
-msgstr ""
-
 #: src/menu.c:35
-msgid "An applet which lets you listen to online radio streams."
+msgid "An applet which lets you get football live scores."
 msgstr ""
 
 #: src/menu.c:35
 msgid "Assen Totin <assen.totin@gmail.com>"
 msgstr ""
 
-#: src/main.c:122
-msgid "Cannot access configuration directory. Exiting."
+#: src/menu.c:131
+msgid "Choose which feed provider to use:"
 msgstr ""
 
-#: src/main.c:148
-msgid "Cannot copy database file to configuration directory. Exiting."
+#: src/menu.c:99
+msgid "Choose which leagues you want to be notified about:"
 msgstr ""
 
-#: src/main.c:129
-msgid "Cannot create configuration directory. Exiting."
+#: src/manager.c:120
+msgid "Extra time commences at"
 msgstr ""
 
-#: src/main.c:134
-msgid "Cannot verify configuration directory. Exiting."
-msgstr ""
-
-#: src/main.c:153
-msgid "Cannot verify database file. Exiting."
-msgstr ""
-
-#: src/main.c:143
-msgid "Database file is not a regular file. Exiting."
-msgstr ""
-
-#: src/menu.c:566
+#: src/gui.c:252
 #, c-format
-msgid "Downloading directory..."
+msgid "FT"
 msgstr ""
 
-#: src/menu.c:142
-msgid "Favourites"
+#: src/menu.c:155
+msgid "Feeds"
 msgstr ""
 
-#: src/menu.c:257
-msgid "Genre"
+#: src/manager.c:123
+msgid "Full time at"
 msgstr ""
 
-#: src/menu.c:146
-msgid "Icecast"
+#: src/manager.c:100
+msgid "GOAL! Score now is "
 msgstr ""
 
-#: src/menu.c:35 src/menu.c:39 src/menu.c:150
-msgid "MATE Streamer Applet"
-msgstr ""
-
-#: src/menu.c:210 src/menu.c:243
-msgid "Name"
-msgstr ""
-
-#: src/menu.c:193
+#: src/gui.c:237
 #, c-format
-msgid "No stations found. Press Refresh button to download stations."
+msgid "HT"
 msgstr ""
 
-#: src/menu.c:629
-msgid "No stream selected."
+#: src/manager.c:116
+msgid "Half time at"
 msgstr ""
 
-#: src/main.c:228
-msgid "No stream selected. Right-click to load one."
+#: src/gui.c:143 src/gui.c:149
+msgid "Hidden"
 msgstr ""
 
-#: src/gstreamer.c:29 src/menu.c:638 src/sqlite.c:78
-msgid "PAUSED: "
+#: src/gui.c:139
+msgid "League / Match"
 msgstr ""
 
-#: src/gstreamer.c:41 src/menu.c:650
-msgid "PLAYING: "
+#: src/main.c:198
+msgid "Livescore: click to view, right-click to change settings."
 msgstr ""
 
-#: src/menu.c:573
-#, c-format
-msgid "Processing directory..."
+#: src/gui.c:176 src/menu.c:35 src/menu.c:38 src/menu.c:159
+msgid "MATE Livescore Applet"
 msgstr ""
 
-#: src/menu.c:115 src/menu.c:586
-#, c-format
-msgid "Ready"
+#: src/gui.c:154
+msgid "No data yet. Wait until we gather some."
 msgstr ""
 
-#: src/menu.c:629
-msgid "Right-click to load one."
+#: src/menu.c:151
+msgid "Notifications"
 msgstr ""
 
-#: src/menu.c:580
-#, c-format
-msgid "Saving entries..."
+#: src/gui.c:135
+msgid "Score"
 msgstr ""
 
-#: src/icecast.c:35 src/icecast.c:45 src/icecast.c:108 src/main.c:122
-#: src/main.c:129 src/main.c:134 src/main.c:143 src/main.c:148 src/main.c:153
-#: src/main.c:160 src/main.c:190 src/main.c:197 src/main.c:204 src/menu.c:169
-#: src/menu.c:184 src/menu.c:607 src/sqlite.c:33
-msgid "Streamer Applet Error"
+#: src/manager.c:118
+msgid "Second time commences at"
 msgstr ""
 
-#: src/menu.c:216 src/menu.c:251
-msgid "URL"
+#: src/manager.c:114
+msgid "The game commences."
 msgstr ""
 
-#: src/sqlite.c:33
-msgid "Unable to connect to DB."
-msgstr ""
-
-#: src/main.c:160
-msgid "Unable to connect to DB. Exiting."
-msgstr ""
-
-#: src/icecast.c:45
-msgid "Unable to create temporary file."
-msgstr ""
-
-#: src/icecast.c:108
-msgid "Unable to parse XML file."
-msgstr ""
-
-#: src/menu.c:169 src/menu.c:184 src/menu.c:607
-msgid "Unable to read DB."
-msgstr ""
-
-#: src/icecast.c:35
-msgid "Unable to read remote XML file."
+#: src/gui.c:130
+msgid "Time"
 msgstr ""
