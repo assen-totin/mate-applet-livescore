@@ -80,7 +80,7 @@ void menu_cb_notif_checkbox(GtkWidget *widget, gpointer data) {
         // Save favourite leagues in GSettings
         sprintf(&value[0], "\"0");
         for (i=0; i < applet->all_leagues_counter; i++) {
-                if (applet->all_leagues[i].favourite) {
+                if (applet->all_leagues[i].favourite && applet->all_leagues[i].used) {
                         strcat(&value[0], ",");
                         strcat(&value[0], &applet->all_leagues[i].league_name[0]);
                 }

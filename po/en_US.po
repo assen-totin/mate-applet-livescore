@@ -51,8 +51,8 @@ msgid "Full time at"
 msgstr "Full time at"
 
 #: src/manager.c:100
-msgid "GOAL! Score now is "
-msgstr "GOAL! Score now is "
+msgid "GOAL! Score now is"
+msgstr "GOAL! Score now is"
 
 #: src/gui.c:237
 #, c-format

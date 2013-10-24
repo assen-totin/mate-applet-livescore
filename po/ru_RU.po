@@ -53,8 +53,8 @@ msgid "Full time at"
 msgstr "Матч окончен при счете"
 
 #: src/manager.c:100
-msgid "GOAL! Score now is "
-msgstr "ГОЛ! Счет теперь "
+msgid "GOAL! Score now is"
+msgstr "ГОЛ! Счет теперь"
 
 #: src/gui.c:237
 #, c-format

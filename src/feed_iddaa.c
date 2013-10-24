@@ -76,10 +76,10 @@ time_t iddaa_convert_time(char *s) {
 
 void iddaa_build_match(livescore_applet *applet, iddaa_match_data *iddaa_match) {
 	match_data new_match;
-	char dbg[1024];
 
-sprintf(&dbg[0], "Called build for match %s - %s, league %s", &iddaa_match->team_home[0], &iddaa_match->team_away[0], &iddaa_match->league_name[0]);
-debug(&dbg[0]);
+//char dbg[1024];
+//sprintf(&dbg[0], "Called build for match %s - %s, league %s", &iddaa_match->team_home[0], &iddaa_match->team_away[0], &iddaa_match->league_name[0]);
+//debug(&dbg[0]);
 
 	if (strlen(&iddaa_match->team_home[0]) < 2)
 		return;
@@ -113,8 +113,8 @@ debug(&dbg[0]);
 
 	// Feed to manager
         if (!iddaa_match->skip) {
-sprintf(&dbg[0], "Calling manager for match %s - %s, league %s", &iddaa_match->team_home[0], &iddaa_match->team_away[0], &iddaa_match->league_name[0]);
-debug(&dbg[0]);
+//sprintf(&dbg[0], "Calling manager for match %s - %s, league %s", &iddaa_match->team_home[0], &iddaa_match->team_away[0], &iddaa_match->league_name[0]);
+//debug(&dbg[0]);
                  manager_main(applet, &new_match);
         }
  
@@ -125,7 +125,6 @@ debug(&dbg[0]);
 void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_data *iddaa_match) {
 	xmlNode *cur_node = NULL;
 	xmlAttr *cur_attr = NULL;
-	char dbg[1024];
 
 	for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
 		if (cur_node->content && (strlen(cur_node->content) > 1)) {

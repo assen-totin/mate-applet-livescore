@@ -52,8 +52,8 @@ msgid "Full time at"
 msgstr "Край на мача"
 
 #: src/manager.c:100
-msgid "GOAL! Score now is "
-msgstr "ГОЛ! Резултатът е "
+msgid "GOAL! Score now is"
+msgstr "ГОЛ! Резултатът е"
 
 #: src/gui.c:237
 #, c-format

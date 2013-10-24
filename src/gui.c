@@ -83,7 +83,7 @@ void gui_rows_expand_collapse(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTree
 	// Save expanded leagues in GSettings
 	sprintf(&value[0], "\"0");
 	for (i=0; i < applet->all_leagues_counter; i++) {
-		if (applet->all_leagues[i].expanded) {
+		if (applet->all_leagues[i].expanded && applet->all_leagues[i].used) {
 			strcat(&value[0], ",");
 			strcat(&value[0], &applet->all_leagues[i].league_name[0]);
 		}

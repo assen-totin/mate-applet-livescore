@@ -69,8 +69,6 @@ void applet_destroy(MatePanelApplet *applet_widget, livescore_applet *applet) {
 gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer data) {
 	livescore_applet *applet;
 	int i;
-	char dbg[1024];
-	//char ui[24576];
 
 	if (strcmp (iid, APPLET_ID) != 0)
 		return FALSE;
