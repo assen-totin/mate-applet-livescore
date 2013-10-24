@@ -40,8 +40,8 @@ typedef struct {
 	gboolean skip;
 } iddaa_match_data;
 
-// TODO: Change URL with real one
-#define IDDAA_URL "http://localhost/feed_plugin.php.html"
+//#define IDDAA_URL "http://localhost/feed_plugin.php.html"
+#define IDDAA_URL http://www.iddaamerkezi.com/feed_plugin.php
 #define IDDAA_CHARSET "UTF-8"
 #define IDDAA_USER_AGENT "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)"
 #define IDDAA_FILENAME "/tmp/iddaa.html"

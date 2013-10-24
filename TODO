@@ -1,4 +1,4 @@
 PENDING:
 
- 
+1. Make the providers separate shared libraries to load at runtime.  
 
