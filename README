@@ -1,6 +1,8 @@
 This is a MATE panel applet which allows you to enjoy football live scores
 feed. 
 
+USAGE
+
 You can select one or more leagues to check. The applet will notify you on each
 of the following events: commenicing of a game, half time, game's end and goal
 scored. To select which leagues to follow, right-click the applet.
@@ -18,6 +20,17 @@ minute and red means after 80th minute (and extra time).
 
 Past games will be stored in the list for 16 hours after their original start
 time. Future games will appear on the list up to 16 fours before they begin.
+
+DATA SOURCES
+
+Real time sports scores are big business, so nobody is willing to give out his
+data. Ideally, the applet should use a source of data in machine-readable
+format (JSON, RSS, XML...). Unfortunately, I was not able to find any service
+which will provie such data free of charge. The applet now has to parse web
+pages, which inevitably makes it susceptible to errors on every change of the
+page layout. If you know of any good source of machibe-readable live score 
+that is available for free (even in the expense of viewing ads), please, let
+me know (see AUTHORS for contact info).
 
 
 

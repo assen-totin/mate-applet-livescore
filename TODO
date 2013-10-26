@@ -1,5 +1,5 @@
 PENDING:
 
-1. Limit the number of notifications to 3 a time (make a queue)
+1. Find more feed providers
 2. Make the providers separate shared libraries to load at runtime.  
 
