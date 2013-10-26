@@ -170,6 +170,13 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
         sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GRAY);
         applet->running_image_gray = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
+	// Get images for notifications
+	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_NOTIF_WHISTLE);
+	applet->notif_image_whistle = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
+	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_NOTIF_GOAL);
+	applet->notif_image_goal = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
 	// Get main icon
 	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_ICON_STATIC);
 	applet->image = gtk_image_new_from_file (&image_file[0]);

@@ -22,19 +22,20 @@
 #include "applet.h"
 
 
-void show_notification (gchar *title, gchar *body, gchar *icon) {
+void show_notification (gchar *title, gchar *body, GdkPixbuf *icon) {
         NotifyNotification* notification;
         GError* error = NULL;
 
         notify_init(PACKAGE_NAME);
 
 #ifdef HAVE_LIBMATENOTIFY
-        notification = notify_notification_new (title, body, icon, NULL);
+        notification = notify_notification_new (title, body, NULL, NULL);
 #elif HAVE_LIBNOTIFY
-        notification = notify_notification_new (title, body, icon);
+        notification = notify_notification_new (title, body, NULL);
 #endif
 
         notify_notification_set_timeout (notification, 5000);
+	notify_notification_set_image_from_pixbuf(notification, icon);
 
         notify_notification_show (notification, &error);
 

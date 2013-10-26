@@ -21,10 +21,11 @@
 #include "../config.h"
 #include "applet.h"
 
-void queue_notification (livescore_applet *applet, gchar *title, gchar *body) {
+void queue_notification (livescore_applet *applet, gchar *title, gchar *body, int image) {
 	notif_data *notification = malloc(sizeof(notif_data));
 	sprintf(notification->title, "%s", title);
 	sprintf(notification->body, "%s", body);
+	notification->image = image;
 	fifo_add(applet->notif_queue, notification);
 }
 
@@ -61,7 +62,12 @@ int manager_timer(livescore_applet *applet) {
 		if (!fifo_is_empty(applet->notif_queue)) {
 			notif_data *notification = fifo_remove(applet->notif_queue);
 			if (notification) {
-				show_notification(notification->title, notification->body, NULL);
+				if (notification->image == NOTIF_SHOW_IMAGE_GOAL)
+					show_notification(notification->title, notification->body, applet->notif_image_goal);
+				else if (notification->image == NOTIF_SHOW_IMAGE_WHISTLE)
+					show_notification(notification->title, notification->body, applet->notif_image_whistle);
+				else
+					show_notification(notification->title, notification->body, NULL);
 				free(notification);
 			}
 		}
@@ -144,7 +150,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 				sprintf(&ntf_title[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
 				sprintf(&ntf_text[0], "%s %u:%u", _("GOAL! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-				queue_notification(applet, &ntf_title[0], &ntf_text[0]);
+				queue_notification(applet, &ntf_title[0], &ntf_text[0], NOTIF_SHOW_IMAGE_GOAL);
 			}
 
 			return TRUE;
@@ -170,7 +176,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 				else if (new_match->status == MATCH_FULL_TIME)
 					sprintf(&ntf_text[0], "%s %u:%u", _("Full time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-				queue_notification(applet, &ntf_title[0], &ntf_text[0]);
+				queue_notification(applet, &ntf_title[0], &ntf_text[0], NOTIF_SHOW_IMAGE_WHISTLE);
 			}
 
 			return TRUE;
@@ -185,7 +191,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	// If we don't have it, add it
 	else {
 		// If it is too far in the future, skip it
-		if ((new_match->start_time - now) > APPLET_KEEP_TIME)
+		if (((new_match->start_time - now) > APPLET_KEEP_TIME) && (new_match->status == MATCH_NOT_COMMENCED))
 			return TRUE;
 
 		// League: do we have it; add if not

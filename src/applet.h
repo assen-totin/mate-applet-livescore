@@ -51,6 +51,8 @@
 #define APPLET_IMAGE_YELLOW "applet_livescore_yellow.png"
 #define APPLET_IMAGE_GREEN "applet_livescore_green.png"
 #define APPLET_IMAGE_GRAY "applet_livescore_gray.png"
+#define APPLET_IMAGE_NOTIF_GOAL "applet_livescore_goal.png"
+#define APPLET_IMAGE_NOTIF_WHISTLE "applet_livescore_whistle.png"
 #define APPLET_WINDOW_MATCHES_WIDTH 640
 #define APPLET_WINDOW_MATCHES_HEIGHT 480
 #define APPLET_WINDOW_SETTINGS_WIDTH 480
@@ -89,6 +91,11 @@ enum {
 	MATCH_FULL_TIME
 };
 
+enum {
+	NOTIF_SHOW_IMAGE_WHISTLE = 0,
+	NOTIF_SHOW_IMAGE_GOAL
+};
+
 typedef struct f_data {
         void *node_data;
         struct f_data *node_next;
@@ -102,6 +109,7 @@ typedef struct {
 typedef struct {
 	char title[256];
 	char body[256];
+	int image;
 } notif_data;
 
 typedef struct {
@@ -156,10 +164,12 @@ typedef struct {
 	GdkPixbuf *running_image_green;
 	GdkPixbuf *running_image_yellow;
 	GdkPixbuf *running_image_gray;
+	GdkPixbuf *notif_image_goal;
+	GdkPixbuf *notif_image_whistle;
 } livescore_applet;
 
 // util.c
-void show_notification (gchar *, gchar *, gchar *);
+void show_notification (gchar *, gchar *, GdkPixbuf *);
 gboolean cp(const char *, const char *);
 char *trim(char *);
 char *trim_quotes(char *);
