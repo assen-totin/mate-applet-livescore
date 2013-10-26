@@ -19,7 +19,7 @@
  */
 
 enum {
-	IDDAA_PARSING_UNKNOWN = 0,
+	IDDAA_PARSING_SKIP = 0,
 	IDDAA_PARSING_LEAGUE,
 	IDDAA_PARSING_TIME,
 	IDDAA_PARSING_HOME,
@@ -41,7 +41,7 @@ typedef struct {
 } iddaa_match_data;
 
 //#define IDDAA_URL "http://localhost/feed_plugin.php.html"
-#define IDDAA_URL http://www.iddaamerkezi.com/feed_plugin.php
+#define IDDAA_URL "http://www.iddaamerkezi.com/feed_plugin.php"
 #define IDDAA_CHARSET "UTF-8"
 #define IDDAA_USER_AGENT "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)"
 #define IDDAA_FILENAME "/tmp/iddaa.html"

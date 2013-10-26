@@ -119,7 +119,8 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 
 			sprintf(&ntf_text[0], "%s %u:%u", _("GOAL! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-			push_notification(&ntf_title[0], &ntf_text[0], NULL);
+			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id))
+				push_notification(&ntf_title[0], &ntf_text[0], NULL);
 
 			return TRUE;
 		}
@@ -149,9 +150,10 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		}
 
 		// Has the time changed?
-		if (applet->all_matches[match_id].match_time < new_match->match_time) {
+		if (applet->all_matches[match_id].match_time < new_match->match_time) 
 			applet->all_matches[match_id].match_time = new_match->match_time;
-		}
+		if (applet->all_matches[match_id].match_time_added < new_match->match_time_added)
+			 applet->all_matches[match_id].match_time_added = new_match->match_time_added;
 	}
 	// If we don't have it, add it
 	else {

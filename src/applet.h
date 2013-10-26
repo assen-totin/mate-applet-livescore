@@ -113,6 +113,7 @@ typedef struct {
 	int status;
 	time_t start_time;
 	int match_time;
+	int match_time_added;
 	gboolean used;
 } match_data;
 

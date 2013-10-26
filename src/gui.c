@@ -230,7 +230,10 @@ void gui_update_model(livescore_applet * applet) {
 					sprintf(&score[0], "%u : %u", applet->all_matches[j].score_home, applet->all_matches[j].score_away);
 
 					if (applet->all_matches[j].status == MATCH_FIRST_TIME) {
-						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+						if (applet->all_matches[j].match_time_added == 0)
+							sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+						else
+							sprintf(&time_elapsed[0], "%u+%u'", applet->all_matches[j].match_time, applet->all_matches[j].match_time_added);
 						running_image = applet->running_image_green;
 					}
 					else if (applet->all_matches[j].status == MATCH_HALF_TIME) {
@@ -238,14 +241,20 @@ void gui_update_model(livescore_applet * applet) {
 						running_image = applet->running_image_gray;
 					}
 					else if (applet->all_matches[j].status == MATCH_SECOND_TIME) {
-						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+						if (applet->all_matches[j].match_time_added == 0)
+							sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+						else
+							sprintf(&time_elapsed[0], "%u+%u'", applet->all_matches[j].match_time, applet->all_matches[j].match_time_added);
 						if (applet->all_matches[j].match_time < 80)
 							running_image = applet->running_image_yellow;
 						else
 							running_image = applet->running_image_red;
 					}
 					else if (applet->all_matches[j].status == MATCH_EXTRA_TIME) {
-						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+						if (applet->all_matches[j].match_time_added == 0)
+							sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+						else
+							sprintf(&time_elapsed[0], "%u+%u'", applet->all_matches[j].match_time, applet->all_matches[j].match_time_added);
 						running_image = applet->running_image_red;
 					}
 					else if (applet->all_matches[j].status == MATCH_FULL_TIME) { 

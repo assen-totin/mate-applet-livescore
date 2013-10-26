@@ -1,4 +1,5 @@
 PENDING:
 
-1. Make the providers separate shared libraries to load at runtime.  
+1. Limit the number of notifications to 3 a time (make a queue)
+2. Make the providers separate shared libraries to load at runtime.  
 

@@ -41,9 +41,17 @@ gboolean iddaa_is_full_time(char *s) {
         return FALSE;
 }
 
-gboolean iddaa_is_playing(char *s, int *res) {
+gboolean iddaa_is_playing(char *s, int *match_time, int *match_time_added) {
 	if (strstr(s, "'")) {
-		*res = atoi(strtok(s, "'"));
+		char *tmp = strtok(s, "'");
+		if (strstr(tmp, "+")) {
+			*match_time = atoi(trim(strtok(tmp, "+")));
+			*match_time_added = atoi(trim(strtok(NULL, "+")));
+		}
+		else {
+			*match_time = atoi(strtok(s, "'"));
+			*match_time_added = 0;
+		}
 		return TRUE;
 	}
 	return FALSE;
@@ -98,10 +106,10 @@ void iddaa_build_match(livescore_applet *applet, iddaa_match_data *iddaa_match) 
 		new_match.status = MATCH_NOT_COMMENCED;
 		new_match.start_time = iddaa_convert_time(&iddaa_match->match_time[0]);
 	}
-        else if (iddaa_is_playing(trim(&iddaa_match->match_time[0]), &new_match.match_time)) {
-                if (new_match.match_time < 45)
+        else if (iddaa_is_playing(trim(&iddaa_match->match_time[0]), &new_match.match_time, &new_match.match_time_added)) {
+                if (new_match.match_time < 46)
                 	new_match.status = MATCH_FIRST_TIME;
-                else if (new_match.match_time < 90)
+                else if (new_match.match_time < 91)
                         new_match.status = MATCH_SECOND_TIME;
                 else
                         new_match.status = MATCH_EXTRA_TIME;
@@ -153,10 +161,10 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 				strcat(&iddaa_match->team_away[0], cur_node->content);
 				// Flush last match
 				iddaa_build_match(applet, iddaa_match);
-				iddaa_match->stage = IDDAA_PARSING_UNKNOWN;
+				iddaa_match->stage = IDDAA_PARSING_SKIP;
 			}
-			else
-				debug(cur_node->content);
+//			else
+//				debug(cur_node->content);
 
 		}
 		for (cur_attr = cur_node->properties; cur_attr; cur_attr = cur_attr->next) {
@@ -165,6 +173,8 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 					iddaa_match->stage = IDDAA_PARSING_LEAGUE;
 					memset(&iddaa_match->league_name[0], '\0', 256);
 				}
+				else if (!strcmp(cur_attr->children->content, "date"))
+					iddaa_match->stage = IDDAA_PARSING_SKIP;
 				else if (!strcmp(cur_attr->children->content, "live_time")) 
 					iddaa_match->stage = IDDAA_PARSING_TIME;
 				else if (!strcmp(cur_attr->children->content, "live_home")) 
@@ -173,6 +183,8 @@ void iddaa_walk_tree(livescore_applet *applet, xmlNode * a_node, iddaa_match_dat
 					iddaa_match->stage = IDDAA_PARSING_SCORE;
 				else if (!strcmp(cur_attr->children->content, "live_away")) 
 					iddaa_match->stage = IDDAA_PARSING_AWAY;
+//				else
+//					iddaa_match->stage = IDDAA_PARSING_SKIP;
 			}
 		}
 
