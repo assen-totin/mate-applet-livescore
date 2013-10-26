@@ -21,7 +21,8 @@
 #include "../config.h"
 #include "applet.h"
 
-void push_notification (gchar *title, gchar *body, gchar *icon) {
+
+void show_notification (gchar *title, gchar *body, gchar *icon) {
         NotifyNotification* notification;
         GError* error = NULL;
 

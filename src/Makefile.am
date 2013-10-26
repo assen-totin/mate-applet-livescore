@@ -25,7 +25,7 @@ LDADD = @GTK_LIBS@ @APPLET_LIBS@
 
 libexec_PROGRAMS = livescore_applet
 
-livescore_applet_SOURCES = applet.h http.h feed_idda.h util.c http.c feed_iddaa.c manager.c gui.c menu.c main.c 
+livescore_applet_SOURCES = applet.h http.h feed_idda.h util.c http.c feed_iddaa.c fifo.c manager.c gui.c menu.c main.c 
 
 appletdir = $(datadir)/mate-panel/applets
 applet_DATA = org.mate.applets.LivescoreApplet.mate-panel-applet

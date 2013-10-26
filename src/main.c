@@ -60,6 +60,7 @@ void applet_back_change (MatePanelApplet *a, MatePanelAppletBackgroundType type,
 void applet_destroy(MatePanelApplet *applet_widget, livescore_applet *applet) {
 	g_main_loop_quit(applet->loop);
         g_assert(applet);
+	fifo_free(applet->notif_queue);
 	g_free(applet->all_matches);
         g_free(applet);
         return;
@@ -83,7 +84,7 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	applet = g_malloc0(sizeof(livescore_applet));
 	applet->applet = applet_widget;
 	applet->dialog_matches_is_visible = FALSE;
-	//applet->timestamp = time(NULL);
+	applet->notif_queue = fifo_new();
 	applet->all_matches = g_malloc0(sizeof(match_data));
 	applet->all_matches->league_id = -1;
 	applet->all_matches->score_home = 0;
@@ -198,8 +199,8 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
         // Show applet
         gtk_widget_show_all (GTK_WIDGET (applet->applet));
 
-	// Run updates each minute
-	g_timeout_add(60000, (GSourceFunc) manager_timer, (gpointer)applet);
+	// Run timer each 10 seconds
+	g_timeout_add(10000, (GSourceFunc) manager_timer, (gpointer)applet);
 
 	// Run
         applet->loop = g_main_loop_new (NULL, FALSE);

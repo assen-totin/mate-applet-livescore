@@ -3,13 +3,22 @@ feed.
 
 You can select one or more leagues to check. The applet will notify you on each
 of the following events: commenicing of a game, half time, game's end and goal
-scored. To select which leagues to follow, right-click the applet. 
+scored. To select which leagues to follow, right-click the applet.
+Notifications will be shown up to 3 a time. 
 
-You can also view all the currents cores. To do so, left-click the applet.
-The window will refresh each minute. If you expand one or more leagues, this
-will be rememered between window closured and also between applet restarts.
-When applet is restarted, the previously expanded leagues will be on top of
-the list. 
+You can also view all the currents scores. To do so, left-click the applet.
+The window will refresh each time an update is received. If you expand one or 
+more leagues, this will be rememered between window closures and also between 
+applet restarts. When applet is restarted, the previously expanded leagues 
+will be on top of the list. 
+
+When a game is in progress, a coloured dot will let you quickly check its
+status: green means first half, yellow means second half before the 80th 
+minute and red means after 80th minute (and extra time).
+
+Past games will be stored in the list for 16 hours after their original start
+time. Future games will appear on the list up to 16 fours before they begin.
+
 
 
 IMPORTANT! This free softwarte is released with hope that it will be useful, 

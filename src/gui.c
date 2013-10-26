@@ -25,6 +25,11 @@
 void gui_quit(GtkWidget *widget, gpointer data) {
 	livescore_applet *applet = data;
 
+	if (!applet->dialog_matches_is_visible)
+		return;
+
+	applet->dialog_matches_is_visible = FALSE;
+
 	// Get the VBox out of the dialog
 	gpointer *gp_vbox = g_object_ref(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
 	gtk_container_remove (GTK_CONTAINER(applet->dialog_matches), gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
@@ -39,9 +44,8 @@ void gui_quit(GtkWidget *widget, gpointer data) {
 
 	g_object_unref(gp_vbox);
 	g_object_unref(gp_scrolled_window);
-        gtk_widget_destroy(applet->dialog_matches);
 
-	applet->dialog_matches_is_visible = FALSE;
+        gtk_widget_destroy(applet->dialog_matches);
 }
 
 
@@ -183,6 +187,7 @@ void gui_matches_dialog (livescore_applet *applet) {
 	g_signal_connect (G_OBJECT(button_close), "clicked", G_CALLBACK (gui_quit), (gpointer) applet);
 	g_signal_connect(G_OBJECT(applet->tree_view), "row-expanded", G_CALLBACK (gui_rows_expand_collapse), (gpointer) applet);
 	g_signal_connect(G_OBJECT(applet->tree_view), "row-collapsed", G_CALLBACK (gui_rows_expand_collapse), (gpointer) applet);
+	g_signal_connect(G_OBJECT(applet->dialog_matches), "destroy", G_CALLBACK(gui_quit), (gpointer)applet);
 
         // Expand rows
         model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view));

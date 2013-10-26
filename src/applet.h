@@ -55,6 +55,7 @@
 #define APPLET_WINDOW_MATCHES_HEIGHT 480
 #define APPLET_WINDOW_SETTINGS_WIDTH 480
 #define APPLET_WINDOW_SETTINGS_HEIGHT 320
+#define APPLET_KEEP_TIME 57600	// 16 hours
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
@@ -87,6 +88,21 @@ enum {
 	MATCH_EXTRA_TIME,
 	MATCH_FULL_TIME
 };
+
+typedef struct f_data {
+        void *node_data;
+        struct f_data *node_next;
+} fifo_data;
+
+typedef struct {
+        fifo_data *fifo_head;
+        fifo_data *fifo_tail;
+} fifo;
+
+typedef struct {
+	char title[256];
+	char body[256];
+} notif_data;
 
 typedef struct {
 	int feed_id;
@@ -123,18 +139,14 @@ typedef struct {
 	GtkActionGroup *action_group;
         GtkWidget *image;
         GtkWidget *event_box;
-	//GtkWidget *text;
 	match_data *all_matches;
 	league_data *all_leagues;
 	feed_data *all_feeds;
 	int all_matches_counter;
 	int all_leagues_counter;
 	int all_feeds_counter;
-	//char url[1024];
-	//char name[1024];
-	//char xmlfile[1024];
-	//int status;
 	gboolean dialog_matches_is_visible;
+	fifo *notif_queue;
 	GSettings *gsettings;
 	GtkTreeStore *tree_store;
 	GtkWidget *tree_view;
@@ -147,7 +159,7 @@ typedef struct {
 } livescore_applet;
 
 // util.c
-void push_notification (gchar *, gchar *, gchar *);
+void show_notification (gchar *, gchar *, gchar *);
 gboolean cp(const char *, const char *);
 char *trim(char *);
 char *trim_quotes(char *);
@@ -168,6 +180,13 @@ int manager_timer(livescore_applet *);
 
 // http.c
 int get_url (char *, char *, char *);
+
+// fifo.c
+fifo *fifo_new(void);
+void fifo_add(fifo *, void *);
+void *fifo_remove(fifo *);
+void fifo_free(fifo *);
+gboolean fifo_is_empty(fifo *);
 
 // feed_iddaa.c
 int feed_iddaa_main(livescore_applet *);

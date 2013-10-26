@@ -21,6 +21,14 @@
 #include "../config.h"
 #include "applet.h"
 
+void queue_notification (livescore_applet *applet, gchar *title, gchar *body) {
+	notif_data *notification = malloc(sizeof(notif_data));
+	sprintf(notification->title, "%s", title);
+	sprintf(notification->body, "%s", body);
+	fifo_add(applet->notif_queue, notification);
+}
+
+
 gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
 	return applet->all_leagues[league_id].favourite;
 }
@@ -45,16 +53,28 @@ void manager_populate_feed(livescore_applet *applet, int selected_feed) {
 int manager_timer(livescore_applet *applet) {
 	int i, j;
 	gboolean league_has_matches = FALSE;
-	time_t now;
+	time_t now = time(NULL);
 	div_t q;
 
+	// Show pending notifications
+	for (i=0; i<3; i++) {
+		if (!fifo_is_empty(applet->notif_queue)) {
+			notif_data *notification = fifo_remove(applet->notif_queue);
+			if (notification) {
+				show_notification(notification->title, notification->body, NULL);
+				free(notification);
+			}
+		}
+		else
+			break;
+	}
+
 	// Is it time for clean-up?
-        now = time(NULL);
         q = div(now, 1000);
-        if (q.rem < 60) {
+        if (q.rem < 10) {
 		// Remove all matches older than 36 hours
                 for (i=0; i < applet->all_matches_counter; i++) {
-                        if ((now - applet->all_matches[i].start_time) > 129600)
+                        if ((now - applet->all_matches[i].start_time) > APPLET_KEEP_TIME)
                                 applet->all_matches[i].used = FALSE;
                 }
 		// Check all leagues which are not selected for notifications and have no matches
@@ -76,13 +96,17 @@ int manager_timer(livescore_applet *applet) {
 				applet->all_leagues[i].expanded = FALSE;
 		}
         }
-	
-	// Call parser
-	if (applet->all_feeds[0].selected)
-		feed_iddaa_main(applet);
 
-	// Rebuild model for GUI
-	gui_update_model(applet);
+	// Is it time to call parser?
+	q = div(now, 60);
+	if (q.rem < 10) {
+		// Call parser
+		if (applet->all_feeds[0].selected)
+			feed_iddaa_main(applet);
+
+		// Rebuild model for GUI
+		gui_update_model(applet);
+	}
 
 	return 1;
 }
@@ -93,7 +117,8 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	gboolean flag_have_match = FALSE;
 	gboolean flag_unused = FALSE;
 	gboolean flag_have_league = FALSE;
-	char ntf_text[128], ntf_title[128];
+	time_t now = time(NULL);
+	char ntf_text[256], ntf_title[256];
 
 //char dbg[1024];
 //sprintf(&dbg[0], "Called for match %s - %s", new_match->team_home, new_match->team_away);
@@ -115,12 +140,12 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			applet->all_matches[match_id].score_home = new_match->score_home;
 			applet->all_matches[match_id].score_away = new_match->score_away;
 
-			sprintf(&ntf_title[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id)) {
+				sprintf(&ntf_title[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+				sprintf(&ntf_text[0], "%s %u:%u", _("GOAL! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-			sprintf(&ntf_text[0], "%s %u:%u", _("GOAL! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-
-			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id))
-				push_notification(&ntf_title[0], &ntf_text[0], NULL);
+				queue_notification(applet, &ntf_title[0], &ntf_text[0]);
+			}
 
 			return TRUE;
 		}
@@ -129,34 +154,40 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		if (applet->all_matches[match_id].status < new_match->status) {
 			applet->all_matches[match_id].status = new_match->status;
 
-			sprintf(&ntf_title[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id)) {
+				sprintf(&ntf_title[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
 
-			if (new_match->status == MATCH_FIRST_TIME) 
-				sprintf(&ntf_text[0], "%s", _("The game commences."));
-			else if (new_match->status == MATCH_HALF_TIME)
-				sprintf(&ntf_text[0], "%s %u:%u", _("Half time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-			else if (new_match->status == MATCH_SECOND_TIME)
-				sprintf(&ntf_text[0], "%s %u:%u", _("Second time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-			else if (new_match->status == MATCH_EXTRA_TIME)
-				sprintf(&ntf_text[0], "%s %u:%u", _("Extra time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+				if (new_match->status == MATCH_FIRST_TIME) 
+					sprintf(&ntf_text[0], "%s", _("The game commences."));
+				else if (new_match->status == MATCH_HALF_TIME) 
+					sprintf(&ntf_text[0], "%s %u:%u", _("Half time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+				
+				else if (new_match->status == MATCH_SECOND_TIME)
+					sprintf(&ntf_text[0], "%s %u:%u", _("Second time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+				else if (new_match->status == MATCH_EXTRA_TIME)
+					sprintf(&ntf_text[0], "%s %u:%u", _("Extra time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-			else if (new_match->status == MATCH_FULL_TIME)
-				sprintf(&ntf_text[0], "%s %u:%u", _("Full time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+				else if (new_match->status == MATCH_FULL_TIME)
+					sprintf(&ntf_text[0], "%s %u:%u", _("Full time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id))
-				push_notification(&ntf_title[0], &ntf_text[0], NULL);
+				queue_notification(applet, &ntf_title[0], &ntf_text[0]);
+			}
 
 			return TRUE;
 		}
 
 		// Has the time changed?
-		if (applet->all_matches[match_id].match_time < new_match->match_time) 
+		if (applet->all_matches[match_id].match_time != new_match->match_time) 
 			applet->all_matches[match_id].match_time = new_match->match_time;
-		if (applet->all_matches[match_id].match_time_added < new_match->match_time_added)
+		if (applet->all_matches[match_id].match_time_added != new_match->match_time_added)
 			 applet->all_matches[match_id].match_time_added = new_match->match_time_added;
 	}
 	// If we don't have it, add it
 	else {
+		// If it is too far in the future, skip it
+		if ((new_match->start_time - now) > APPLET_KEEP_TIME)
+			return TRUE;
+
 		// League: do we have it; add if not
 		for (i=0; i < applet->all_leagues_counter; i++) {
 			if (!strcmp(&applet->all_leagues[i].league_name[0], &new_match->league_name[0])) {
@@ -223,6 +254,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		applet->all_matches[match_id].status = new_match->status;
 		applet->all_matches[match_id].start_time = new_match->start_time;
 		applet->all_matches[match_id].match_time = new_match->match_time;
+		applet->all_matches[match_id].match_time_added = new_match->match_time_added;
 
 //sprintf(&dbg[0], "Registered match: %s - %s", &new_match->team_home[0], &new_match->team_away[0]);
 //debug(&dbg[0]);
