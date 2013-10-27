@@ -108,12 +108,12 @@ int manager_timer(livescore_applet *applet) {
 	if (q.rem < 10) {
 		// Call feed
 		if (applet->feed_main) {
-			applet->feed_matches = malloc(sizeof(match_data));
-			applet->feed_matches_counter = 0;
-			(void) applet->feed_main(applet->feed_matches, &applet->feed_matches_counter);
-			for (i=0; i < applet->feed_matches_counter; i++)
-				manager_main(applet, &applet->feed_matches[i]);
-			free(applet->feed_matches);
+			match_data *feed_matches = malloc(sizeof(match_data));
+			int feed_matches_counter = 0;
+			(void) applet->feed_main(&feed_matches, &feed_matches_counter);
+			for (i=0; i < feed_matches_counter; i++)
+				manager_main(applet, &feed_matches[i]);
+			free(feed_matches);
 
 			// Rebuild model for GUI
 			gui_update_model(applet);

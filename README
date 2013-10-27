@@ -41,13 +41,14 @@ should be named lib_feed_XYZ.so.0 where XYZ is whatever string you like.
 The entry point of your library should be named "feed_main" and should look
 like this:
 
-	int feed_main(match_data *, int *);
+	int feed_main(match_data **, int *);
 
 For the "match_data" structure, see applet.h.
 
-The function should point the first pointer to the first element of an array
-of "match_data" structures. When invoked it will be supplied a valid pointer
-(no need to malloc() anything, just realloc() to expand).
+The function should dereference the first pointer and point it to the first 
+element of an array of "match_data" structures. When invoked, the function 
+will be supplied a valid pointer - just realloc() to expand it, one array 
+element for each match.
 
 The function should dereference the second pointer and set it to the size of
 the array that the first pointer points to.  When invoked, the pointer will
@@ -58,6 +59,13 @@ Function "feed_main" should return 1 on success or 0 on failure.
 If you need to fetch something over HTTP, you can use the get_url() function
 from http.c. It will get the URL for you and place it in the file you
 specified.
+
+You can also make use of the trimming functions to remove spaces or quotes 
+before and after a string:
+
+	char *trim(char *s)
+	char *trim_quotes(char *s)
+
 
 
 IMPORTANT! This free softwarte is released with hope that it will be useful, 

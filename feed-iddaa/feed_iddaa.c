@@ -82,7 +82,7 @@ time_t iddaa_convert_time(char *s) {
         return timegm(&now);
 }
 
-void iddaa_build_match(iddaa_match_data *iddaa_match, match_data *feed_matches, int *feed_matches_counter) {
+void iddaa_build_match(iddaa_match_data *iddaa_match, match_data **feed_matches, int *feed_matches_counter) {
 	int match_status, match_time, match_time_added;
 	time_t start_time;
 
@@ -106,33 +106,32 @@ void iddaa_build_match(iddaa_match_data *iddaa_match, match_data *feed_matches, 
 			match_status = MATCH_EXTRA_TIME;
 	}
 	else {
-			// Something went wrong... skip this match
-			iddaa_match->skip = TRUE;
+		// Something went wrong... skip this match
+		iddaa_match->skip = TRUE;
 	}
 
 	// Add match to list
 	if (!iddaa_match->skip) {
 		int index = *feed_matches_counter;
-		void *_tmp = realloc(feed_matches, (index + 1) * sizeof(match_data));
-		feed_matches = (match_data *) _tmp;
-
-		sprintf(&feed_matches[index].league_name[0], "%s", trim(&iddaa_match->league_name[0]));
-		sprintf(&feed_matches[index].team_home[0], "%s", trim(&iddaa_match->team_home[0]));
-		sprintf(&feed_matches[index].team_away[0], "%s", trim(&iddaa_match->team_away[0]));
-		feed_matches[index].score_home = iddaa_match->score_home;
-		feed_matches[index].score_away = iddaa_match->score_away;
-		feed_matches[index].status = match_status;
-		feed_matches[index].match_time = match_time;
-		feed_matches[index].match_time_added = match_time_added;
-		feed_matches[index].start_time = start_time;
-
-		*feed_matches_counter++;
+		void *_tmp = realloc(*feed_matches, (index + 1) * sizeof(match_data));
+		*feed_matches = (match_data *) _tmp;
+		match_data *tmp_matches = *feed_matches;
+		sprintf(&tmp_matches[index].league_name[0], "%s", trim(&iddaa_match->league_name[0]));
+		sprintf(&tmp_matches[index].team_home[0], "%s", trim(&iddaa_match->team_home[0]));
+		sprintf(&tmp_matches[index].team_away[0], "%s", trim(&iddaa_match->team_away[0]));
+		tmp_matches[index].score_home = iddaa_match->score_home;
+		tmp_matches[index].score_away = iddaa_match->score_away;
+		tmp_matches[index].status = match_status;
+		tmp_matches[index].match_time = match_time;
+		tmp_matches[index].match_time_added = match_time_added;
+		tmp_matches[index].start_time = start_time;
+		(*feed_matches_counter)++;
 	}
  
 	iddaa_match->skip = FALSE;
 }
 
-void iddaa_walk_tree(xmlNode * a_node, iddaa_match_data *iddaa_match, match_data *feed_matches, int *feed_matches_counter) {
+void iddaa_walk_tree(xmlNode * a_node, iddaa_match_data *iddaa_match, match_data **feed_matches, int *feed_matches_counter) {
 	xmlNode *cur_node = NULL;
 	xmlAttr *cur_attr = NULL;
 
@@ -195,7 +194,7 @@ void iddaa_walk_tree(xmlNode * a_node, iddaa_match_data *iddaa_match, match_data
 }
 
 
-int feed_main(match_data *feed_matches, int *feed_matches_counter) {
+int feed_main(match_data **feed_matches, int *feed_matches_counter) {
         iddaa_match_data iddaa_match;
 
         memset(&iddaa_match.match_time[0], '\0', sizeof(iddaa_match.match_time));
