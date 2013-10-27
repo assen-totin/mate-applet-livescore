@@ -107,15 +107,17 @@ int manager_timer(livescore_applet *applet) {
 	q = div(now, 60);
 	if (q.rem < 10) {
 		// Call feed
-		applet->feed_matches = malloc(sizeof(match_data));
-		applet->feed_matches_counter = 0;
-		(void) applet->feed_main(applet->feed_matches, &applet->feed_matches_counter);
-		for (i=0; i < applet->feed_matches_counter; i++)
-			manager_main(applet, &applet->feed_matches[i]);
-		free(applet->feed_matches);
+		if (applet->feed_main) {
+			applet->feed_matches = malloc(sizeof(match_data));
+			applet->feed_matches_counter = 0;
+			(void) applet->feed_main(applet->feed_matches, &applet->feed_matches_counter);
+			for (i=0; i < applet->feed_matches_counter; i++)
+				manager_main(applet, &applet->feed_matches[i]);
+			free(applet->feed_matches);
 
-		// Rebuild model for GUI
-		gui_update_model(applet);
+			// Rebuild model for GUI
+			gui_update_model(applet);
+		}
 	}
 
 	return 1;

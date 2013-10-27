@@ -50,6 +50,9 @@ void menu_cb_feed_combo(GtkWidget *widget, gpointer data) {
 	livescore_applet *applet = data;
 	gchar *feed_name = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(widget));
 	g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED, feed_name);
+	applet->feed_main = NULL;
+	dlclose(applet->feed_handle);
+	populate_feed(applet, feed_name);
 	free(feed_name);
 }
 
