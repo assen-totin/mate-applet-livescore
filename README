@@ -32,6 +32,32 @@ page layout. If you know of any good source of machibe-readable live score
 that is available for free (even in the expense of viewing ads), please, let
 me know (see AUTHORS for contact info).
 
+HACKING
+
+Yes, you can write your very own data (feed) provider. You need to compile it
+as shared library and put it in LIBEXEC/livescore_applet_feeds directory.
+
+The entry point of your library should be named "feed_main" and should look
+like this:
+
+	int feed_main(match_data *, int *);
+
+For the "match_data" structure, see applet.h.
+
+The function should point the first pointer to the first element of an array
+of "match_data" structures. When invoked it will be supplied a valid pointer
+(no need to malloc() anything, just realloc() to expand).
+
+The function should dereference the second pointer and set it to the size of
+the array that the first pointer points to.  When invoked, the pointer will
+point to a value of 0.
+
+Function "feed_main" should return 1 on success or 0 on failure. 
+
+If you need to fetch something over HTTP, you can use the get_url() function
+from http.c. It will get the URL for you and place it in the file you
+specified.
+
 
 
 IMPORTANT! This free softwarte is released with hope that it will be useful, 
