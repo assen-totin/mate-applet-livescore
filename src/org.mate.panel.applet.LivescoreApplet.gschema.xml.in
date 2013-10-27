@@ -3,7 +3,7 @@
     <key name="leagues-notify" type="s">
       <default>"0"</default>
       <summary>List of leagues to notify about</summary>
-      <description>List of leagues for which notificatins are enabled</description>
+      <description>List of leagues for which notifications are enabled</description>
     </key>
     <key name="leagues-expanded" type="s">
       <default>"0"</default>
@@ -11,7 +11,7 @@
       <description>List of leagues for which all matches are show expanded in the GUI</description>
     </key>
     <key name="feed" type="s">
-      <default>"feed_iddaa.so"</default>
+      <default>"lib_feed_iddaa.so.0"</default>
       <summary>Name of the selected feed provider</summary>
       <description>Name of the selected matches feed provider</description>
     </key>

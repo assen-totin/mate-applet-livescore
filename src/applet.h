@@ -59,8 +59,7 @@
 #define APPLET_WINDOW_SETTINGS_WIDTH 480
 #define APPLET_WINDOW_SETTINGS_HEIGHT 320
 #define APPLET_KEEP_TIME 57600	// 16 hours
-//#define APPLET_DIR_FEEDS "livescore_applet_feeds"
-#define APPLET_SO_PREFIX "lsa_feed_"
+#define APPLET_FEED_DEFAULT "lib_feed_iddaa.so.0"
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
@@ -158,7 +157,7 @@ typedef struct {
 	int all_matches_counter;
 	int all_leagues_counter;
 	int all_feeds_counter;
-	void *feed_handler;
+	void *feed_handle;
 	arbitrary feed_main;
 	match_data *feed_matches;
 	int feed_matches_counter;
@@ -194,8 +193,9 @@ void gui_update_model(livescore_applet * applet);
 gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 
 // manager.c
-gboolean manager_main(livescore_applet *, match_data *);
+//gboolean manager_main(livescore_applet *, match_data *);
 int manager_timer(livescore_applet *);
+gboolean manager_populate_feed(livescore_applet *, gchar *);
 
 // http.c
 int get_url (char *, char *, char *);

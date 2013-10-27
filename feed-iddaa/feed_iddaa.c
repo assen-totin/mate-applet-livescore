@@ -19,7 +19,7 @@
  */
 
 #include "../config.h"
-#include "applet.h"
+#include "../src/applet.h"
 #include "feed_iddaa.h"
 
 void iddaa_split_score(char *s, int *home, int *away) {
@@ -116,15 +116,15 @@ void iddaa_build_match(iddaa_match_data *iddaa_match, match_data *feed_matches, 
 		void *_tmp = realloc(feed_matches, (index + 1) * sizeof(match_data));
 		feed_matches = (match_data *) _tmp;
 
-		sprintf(feed_matches[index]->league_name, "%s", trim(&iddaa_match->league_name[0]));
-		sprintf(feed_matches[index]->team_home, "%s", trim(&iddaa_match->team_home[0]));
-		sprintf(feed_matches[index]->team_away, "%s", trim(&iddaa_match->team_away[0]));
-		feed_matches[index]->score_home = iddaa_match->score_home;
-		feed_matches[index]->score_away = iddaa_match->score_away;
-		feed_matches[index]->status = match_status;
-		feed_matches[index]->match_time = match_time;
-		feed_matches[index]->match_time_added = match_time_added;
-		feed_matches[index]->start_time = start_time;
+		sprintf(&feed_matches[index].league_name[0], "%s", trim(&iddaa_match->league_name[0]));
+		sprintf(&feed_matches[index].team_home[0], "%s", trim(&iddaa_match->team_home[0]));
+		sprintf(&feed_matches[index].team_away[0], "%s", trim(&iddaa_match->team_away[0]));
+		feed_matches[index].score_home = iddaa_match->score_home;
+		feed_matches[index].score_away = iddaa_match->score_away;
+		feed_matches[index].status = match_status;
+		feed_matches[index].match_time = match_time;
+		feed_matches[index].match_time_added = match_time_added;
+		feed_matches[index].start_time = start_time;
 
 		*feed_matches_counter++;
 	}

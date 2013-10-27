@@ -38,12 +38,12 @@ gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
 gboolean manager_populate_feed(livescore_applet *applet, gchar *selected_feed) {
 	char selected_feed_so[1024];
 
-	sprintf(&selected_feed_so[0], "%s/%s", LIBEXECDIR, selected_feed);
-	applet->feed_handle = dlopen(selected_feed, RTLD_NOW|RTLD_GLOBAL);
+	sprintf(&selected_feed_so[0], "%s/%s/%s", LIBDIR, PACKAGE, selected_feed);
+	applet->feed_handle = dlopen(&selected_feed_so[0], RTLD_NOW|RTLD_GLOBAL);
 	if (!applet->feed_handle)
 		return FALSE;
 
-	*(void**)(applet->feed_main) = dlsym(handle,"feed_main");
+	*(void**)(applet->feed_main) = dlsym(applet->feed_handle,"feed_main");
 	if (!applet->feed_main)
 		return FALSE;
 

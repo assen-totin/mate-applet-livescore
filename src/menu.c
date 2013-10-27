@@ -52,7 +52,7 @@ void menu_cb_feed_combo(GtkWidget *widget, gpointer data) {
 	g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED, feed_name);
 	applet->feed_main = NULL;
 	dlclose(applet->feed_handle);
-	populate_feed(applet, feed_name);
+	manager_populate_feed(applet, feed_name);
 	free(feed_name);
 }
 
@@ -126,18 +126,17 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 
 // TODO: read LIBEXECDIR/APPLET_DIR_FEEDS, list all files
 	i = 0;
-	gchar *selected_feed = g_settings_get_int(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
+	const gchar *file_name;
+	gchar *selected_feed = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
 	GError *error;
-	//char so_dir_name[1024];
-	//sprintf(&so_dir_name[0], "%s/%s", LIBEXECDIR, APPLET_DIR_FEEDS);
-	GDir *so_dir = g_dir_open(LIBEXECDIR, 0, &error);
-	while (gchar *file_name = g_dir_read_name(so_dir)) {
-		if (strstr(file_name, APPLET_SO_PREFIX)) {
-			gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT(feed_combo), file_name);
-			if (!strcmp(selected_feed, file_name))
-				gtk_combo_box_set_active(GTK_COMBO_BOX(feed_combo), i);
-			i++;
-		}
+	char so_dir_name[1024];
+	sprintf(&so_dir_name[0], "%s/%s", LIBDIR, PACKAGE);
+	GDir *so_dir = g_dir_open(&so_dir_name[0], 0, &error);
+	while (file_name = g_dir_read_name(so_dir)) {
+		gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT(feed_combo), file_name);
+		if (!strcmp(selected_feed, file_name))
+			gtk_combo_box_set_active(GTK_COMBO_BOX(feed_combo), i);
+		i++;
 	}
 	g_dir_close(so_dir);
 
