@@ -38,7 +38,7 @@ gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
 gboolean manager_populate_feed(livescore_applet *applet, gchar *selected_feed) {
 	char selected_feed_so[1024];
 
-	sprintf(&selected_feed_so[0], "%s/%s/%s", LIBEXECDIR, APPLET_DIR_FEEDS, selected_feed);
+	sprintf(&selected_feed_so[0], "%s/%s", LIBEXECDIR, selected_feed);
 	applet->feed_handle = dlopen(selected_feed, RTLD_NOW|RTLD_GLOBAL);
 	if (!applet->feed_handle)
 		return FALSE;

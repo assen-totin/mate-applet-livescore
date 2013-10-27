@@ -3,7 +3,7 @@
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation; either version 2 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -13,16 +13,16 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
 #  USA.
-#  
+#
 #  MATE Livescore applet written by Assen Totin <assen.totin@gmail.com>
 #
 
-SUBDIRS = src feed-iddaa images po
+APPLET_FLAGS=@APPLET_FLAGS@
+APPLET_LIBS=@APPLET_LIBS@
 
-dist_doc_DATA = AUTHORS BUGS ChangeLog COPYING INSTALL NEWS README TODO
+AM_CPPFLAGS = @GTK_CFLAGS@ @APPLET_FLAGS@
+LDADD = @GTK_LIBS@ @APPLET_LIBS@
 
-EXTRA_DIST = mate-applet-livescore.spec
-
-rpm:
-	rpmbuild -bb --define "_builddir @TOPLEVELDIR@" mate-applet-livescore.spec
+libexec_LIBRARIES = lsa_feed_iddaa
+lsa_feed_iddaa_SOURCES = feed_iddaa.h feed_iddaa.c 
 

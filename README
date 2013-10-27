@@ -35,7 +35,8 @@ me know (see AUTHORS for contact info).
 HACKING
 
 Yes, you can write your very own data (feed) provider. You need to compile it
-as shared library and put it in LIBEXEC/livescore_applet_feeds directory.
+as shared library and put it in LIBEXEC directory. It should be named 
+lsa_feed_XYZ.so where XYZ is whatever string you like.
 
 The entry point of your library should be named "feed_main" and should look
 like this:
@@ -57,7 +58,6 @@ Function "feed_main" should return 1 on success or 0 on failure.
 If you need to fetch something over HTTP, you can use the get_url() function
 from http.c. It will get the URL for you and place it in the file you
 specified.
-
 
 
 IMPORTANT! This free softwarte is released with hope that it will be useful, 

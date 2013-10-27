@@ -128,14 +128,16 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 	i = 0;
 	gchar *selected_feed = g_settings_get_int(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
 	GError *error;
-	char so_dir_name[1024];
-	sprintf(&so_dir_name[0], "%s/%s", LIBEXECDIR, APPLET_DIR_FEEDS);
-	GDir *so_dir = g_dir_open(&so_dir_name[0] ,0, &error);
+	//char so_dir_name[1024];
+	//sprintf(&so_dir_name[0], "%s/%s", LIBEXECDIR, APPLET_DIR_FEEDS);
+	GDir *so_dir = g_dir_open(LIBEXECDIR, 0, &error);
 	while (gchar *file_name = g_dir_read_name(so_dir)) {
-		gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT(feed_combo), file_name);
-		if (!strcmp(selected_feed, file_name))
-			gtk_combo_box_set_active(GTK_COMBO_BOX(feed_combo), i);
-		i++;
+		if (strstr(file_name, APPLET_SO_PREFIX)) {
+			gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT(feed_combo), file_name);
+			if (!strcmp(selected_feed, file_name))
+				gtk_combo_box_set_active(GTK_COMBO_BOX(feed_combo), i);
+			i++;
+		}
 	}
 	g_dir_close(so_dir);
 
