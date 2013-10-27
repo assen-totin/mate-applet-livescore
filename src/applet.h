@@ -98,8 +98,6 @@ enum {
 	NOTIF_SHOW_IMAGE_GOAL
 };
 
-typedef void* (*arbitrary)();
-
 typedef struct f_data {
         void *node_data;
         struct f_data *node_next;
@@ -158,7 +156,7 @@ typedef struct {
 	int all_leagues_counter;
 	int all_feeds_counter;
 	void *feed_handle;
-	arbitrary feed_main;
+	void (*feed_main)(match_data *, int *);
 	match_data *feed_matches;
 	int feed_matches_counter;
 	gboolean dialog_matches_is_visible;

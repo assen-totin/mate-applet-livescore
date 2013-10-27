@@ -36,7 +36,7 @@ HACKING
 
 Yes, you can write your very own data (feed) provider. You need to compile it
 as shared library and put it in LIBDIR/mate-applet-livescore directory. It 
-should be named lsa_feed_XYZ.so where XYZ is whatever string you like.
+should be named lib_feed_XYZ.so.0 where XYZ is whatever string you like.
 
 The entry point of your library should be named "feed_main" and should look
 like this:

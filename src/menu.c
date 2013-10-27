@@ -124,7 +124,7 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 
 	GtkWidget *feed_combo = gtk_combo_box_text_new();
 
-// TODO: read LIBEXECDIR/APPLET_DIR_FEEDS, list all files
+	// TODO: read LIBEXECDIR/APPLET_DIR_FEEDS, list all files
 	i = 0;
 	const gchar *file_name;
 	gchar *selected_feed = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);

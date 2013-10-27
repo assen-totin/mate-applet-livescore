@@ -43,7 +43,7 @@ gboolean manager_populate_feed(livescore_applet *applet, gchar *selected_feed) {
 	if (!applet->feed_handle)
 		return FALSE;
 
-	*(void**)(applet->feed_main) = dlsym(applet->feed_handle,"feed_main");
+	*(void**)(&applet->feed_main) = dlsym(applet->feed_handle,"feed_main");
 	if (!applet->feed_main)
 		return FALSE;
 
