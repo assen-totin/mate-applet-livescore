@@ -149,9 +149,12 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 		}
 	}
 
-	// Populate feeds and get selected one to use
-	int selected_feed = g_settings_get_int(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
-	manager_populate_feed(applet, selected_feed);
+	// Populate feeds and get selected one to use - exit on failure
+	gchar *selected_feed = g_settings_get_int(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
+	if (!manager_populate_feed(applet, selected_feed)) {
+		push_notification(_("MATE Livescore Applet"), _("Error: failed to load selected feed provider. Exiting."), NULL);
+		return FALSE;
+	}
 
 	// View and model
 	gui_create_view_and_model(applet);

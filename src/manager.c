@@ -35,19 +35,19 @@ gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
 }
 
 
-void manager_populate_feed(livescore_applet *applet, int selected_feed) {
-	applet->all_feeds = g_malloc0(sizeof(feed_data));
-	applet->all_feeds[0].feed_id = 0;
-	applet->all_feeds[0].enabled = TRUE;
-	sprintf(&applet->all_feeds[0].feed_name[0], "Default");
+gboolean manager_populate_feed(livescore_applet *applet, gchar *selected_feed) {
+	char selected_feed_so[1024];
 
-	applet->all_feeds_counter = 1;
+	sprintf(&selected_feed_so[0], "%s/%s/%s", LIBEXECDIR, APPLET_DIR_FEEDS, selected_feed);
+	applet->feed_handle = dlopen(selected_feed, RTLD_NOW|RTLD_GLOBAL);
+	if (!applet->feed_handle)
+		return FALSE;
 
-	if (applet->all_feeds[selected_feed].enabled)
-		applet->all_feeds[selected_feed].selected = TRUE;
+	*(void**)(applet->feed_main) = dlsym(handle,"feed_main");
+	if (!applet->feed_main)
+		return FALSE;
 
-	// TODO: If more than one feed is available and the selected one is no longer used,
-	// chose another one to use
+	return TRUE;
 }
 
 
@@ -106,9 +106,13 @@ int manager_timer(livescore_applet *applet) {
 	// Is it time to call parser?
 	q = div(now, 60);
 	if (q.rem < 10) {
-		// Call parser
-		if (applet->all_feeds[0].selected)
-			feed_iddaa_main(applet);
+		// Call feed
+		applet->feed_matches = malloc(sizeof(match_data));
+		applet->feed_matches_counter = 0;
+		(void) applet->feed_main(applet->feed_matches, &applet->feed_matches_counter);
+		for (i=0; i < applet->feed_matches_counter; i++)
+			manager_main(applet, &applet->feed_matches[i]);
+		free(applet->feed_matches);
 
 		// Rebuild model for GUI
 		gui_update_model(applet);

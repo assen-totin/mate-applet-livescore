@@ -35,6 +35,7 @@
 #include <libxml/HTMLparser.h>
 #include <libxml/HTMLtree.h>
 #include <libsoup/soup.h>
+#include <dlfcn.h>
 
 #ifdef HAVE_LIBMATENOTIFY
 	#include <libmatenotify/notify.h>
@@ -58,6 +59,7 @@
 #define APPLET_WINDOW_SETTINGS_WIDTH 480
 #define APPLET_WINDOW_SETTINGS_HEIGHT 320
 #define APPLET_KEEP_TIME 57600	// 16 hours
+#define APPLET_DIR_FEEDS "livescore_applet_feeds"
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
@@ -95,6 +97,8 @@ enum {
 	NOTIF_SHOW_IMAGE_WHISTLE = 0,
 	NOTIF_SHOW_IMAGE_GOAL
 };
+
+typedef void* (*arbitrary)();
 
 typedef struct f_data {
         void *node_data;
@@ -145,14 +149,18 @@ typedef struct {
 	GMainLoop *loop;
 	MatePanelApplet *applet;
 	GtkActionGroup *action_group;
-        GtkWidget *image;
-        GtkWidget *event_box;
+	GtkWidget *image;
+	GtkWidget *event_box;
 	match_data *all_matches;
 	league_data *all_leagues;
 	feed_data *all_feeds;
 	int all_matches_counter;
 	int all_leagues_counter;
 	int all_feeds_counter;
+	void *feed_handler;
+	arbitrary feed_main;
+	match_data *feed_matches;
+	int feed_matches_counter;
 	gboolean dialog_matches_is_visible;
 	fifo *notif_queue;
 	GSettings *gsettings;
