@@ -99,7 +99,7 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	applet->all_leagues->favourite = FALSE;
 	applet->all_leagues_counter = 1;
 
-	// Fvourite leagues - via GSettings
+	// Favourite leagues - via GSettings
 	applet->gsettings = g_settings_new_with_path(APPLET_GSETTINGS_SCHEMA, APPLET_GSETTINGS_PATH);
 	gchar *fav_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV));
 	// First key is always "0" - in GSettings string value cannot be empty
@@ -117,7 +117,7 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 		applet->all_leagues[i].league_id = i;
 		sprintf(&applet->all_leagues[i].league_name[0], "%s", fav_leagues_1);
 		applet->all_leagues[i].used = TRUE;
-		applet->all_leagues[i].favourite = TRUE;
+		applet->all_leagues[i].favourite = FALSE;
 		applet->all_leagues[i].expanded = FALSE;
 	}
 	applet->all_leagues_counter = i + 1;
