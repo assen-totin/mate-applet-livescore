@@ -108,8 +108,8 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	applet->all_leagues[i].league_id = i;
 	sprintf(&applet->all_leagues[i].league_name[0], "%s", fav_leagues_1);
 	applet->all_leagues[i].used = TRUE;
-	applet->all_leagues[i].favourite = TRUE;
-	applet->all_leagues[i].expanded = TRUE;
+	applet->all_leagues[i].favourite = FALSE;
+	applet->all_leagues[i].expanded = FALSE;
 	while (fav_leagues_1 = strtok(NULL, ",")) {
 		i++;
 		void *_tmp = realloc(applet->all_leagues, (i + 1) * sizeof(league_data));
@@ -117,7 +117,7 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 		applet->all_leagues[i].league_id = i;
 		sprintf(&applet->all_leagues[i].league_name[0], "%s", fav_leagues_1);
 		applet->all_leagues[i].used = TRUE;
-		applet->all_leagues[i].favourite = FALSE;
+		applet->all_leagues[i].favourite = TRUE;
 		applet->all_leagues[i].expanded = FALSE;
 	}
 	applet->all_leagues_counter = i + 1;
