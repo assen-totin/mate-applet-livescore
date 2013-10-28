@@ -124,7 +124,7 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 
 	GtkWidget *feed_combo = gtk_combo_box_text_new();
 
-	// TODO: read LIBEXECDIR/APPLET_DIR_FEEDS, list all files
+	// Read LIBDIR/PACKAGE, list all files ending with '.so'
 	i = 0;
 	const gchar *file_name;
 	gchar *selected_feed = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
@@ -133,10 +133,12 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 	sprintf(&so_dir_name[0], "%s/%s", LIBDIR, PACKAGE);
 	GDir *so_dir = g_dir_open(&so_dir_name[0], 0, &error);
 	while (file_name = g_dir_read_name(so_dir)) {
-		gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT(feed_combo), file_name);
-		if (!strcmp(selected_feed, file_name))
-			gtk_combo_box_set_active(GTK_COMBO_BOX(feed_combo), i);
-		i++;
+		if (!strcmp(string_ends((char *) file_name, 3), ".so")) {
+			gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT(feed_combo), file_name);
+			if (!strcmp(selected_feed, file_name))
+				gtk_combo_box_set_active(GTK_COMBO_BOX(feed_combo), i);
+			i++;
+		}
 	}
 	g_dir_close(so_dir);
 
