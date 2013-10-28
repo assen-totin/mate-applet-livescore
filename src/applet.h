@@ -59,7 +59,7 @@
 #define APPLET_WINDOW_SETTINGS_WIDTH 480
 #define APPLET_WINDOW_SETTINGS_HEIGHT 320
 #define APPLET_KEEP_TIME 57600	// 16 hours
-#define APPLET_FEED_DEFAULT "lib_feed_iddaa.so.0"
+#define APPLET_FEED_DEFAULT "lib_feed_iddaa.so"
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
