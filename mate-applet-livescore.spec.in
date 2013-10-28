@@ -28,11 +28,11 @@ Live scores notification applet for the MATE desktop environment.
 
 %prep
 # If you want to build the RPM in-tree (make rpm), comment out next line
-%setup -q
+#%setup -q
 
 %build
 # If you want to build the RPM in-tree (make rpm), comment out next line
-%configure
+#%configure
 make %{?_smp_mflags} CFLAGS="${CFLAGS}"
 
 %install
@@ -42,6 +42,11 @@ rm -rf "${RPM_BUILD_ROOT}"
 make install DESTDIR="${RPM_BUILD_ROOT}"
 
 rm -f $RPM_BUILD_ROOT@DATAROOTDIR@/glib-2.0/schemas/gschemas.compiled
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so
+mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so.0
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.la
 
 # Do not install doc files: they are handled as rpm doc files.
 rm -rf "${RPM_BUILD_ROOT}%{_docdir}"
@@ -62,6 +67,7 @@ rm -rf "${RPM_BUILD_ROOT}"
 %defattr(-, root, root, -)
 %doc AUTHORS BUGS COPYING ChangeLog NEWS README TODO
 %{_libexecdir}/livescore_applet
+%{_libdir}/%{name}/lib_feed_iddaa.so
 %{pixmapdir}/applet_livescore_icon.png
 %{pixmapdir}/applet_livescore_gray.png
 %{pixmapdir}/applet_livescore_green.png
