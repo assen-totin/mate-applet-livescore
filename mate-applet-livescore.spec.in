@@ -16,7 +16,9 @@ BuildRequires:  gettext-devel
 BuildRequires:  automake
 BuildRequires:  autoconf
 BuildRequires:	libxml2-devel
+BuildRequires:  libsoup-devel
 Requires:	libxml2
+Requires:       libsoup
 # Requires: and BuildRequires: for chosen notification library
 @RPM_BUILDREQUIRES_NOTIFY@
 @RPM_REQUIRES_NOTIFY@

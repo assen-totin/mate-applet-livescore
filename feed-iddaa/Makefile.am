@@ -23,6 +23,6 @@ APPLET_LIBS=@APPLET_LIBS@
 AM_CPPFLAGS = @GTK_CFLAGS@ @APPLET_FLAGS@
 LDADD = @GTK_LIBS@ @APPLET_LIBS@
 
-pkglib_LIBRARIES = lib_feed_iddaa.la
+pkglib_LTLIBRARIES = lib_feed_iddaa.la
 lib_feed_iddaa_la_SOURCES = feed_iddaa.h feed_iddaa.c 
 
