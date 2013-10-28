@@ -75,13 +75,13 @@ static const gchar *ui =
 
 // Two hidden colums will help manage the font weight for some cells
 enum {
-        COL_PIC = 0,
-        COL_TIME,
+	COL_PIC = 0,
+	COL_TIME,
 	COL_SCORE,
 	COL_MATCH,
 	COL_HIDDEN_BOLD,
 	COL_HIDDEN_BOOLEAN,
-        NUM_COLS
+	NUM_COLS
 };
 
 enum {
@@ -98,30 +98,30 @@ enum {
 	NOTIF_SHOW_IMAGE_GOAL
 };
 
-typedef struct f_data {
-        void *node_data;
-        struct f_data *node_next;
+	ypedef struct f_data {
+	void *node_data;
+	struct f_data *node_next;
 } fifo_data;
 
-typedef struct {
-        fifo_data *fifo_head;
-        fifo_data *fifo_tail;
+	ypedef struct {
+	fifo_data *fifo_head;
+	fifo_data *fifo_tail;
 } fifo;
 
-typedef struct {
+	ypedef struct {
 	char title[256];
 	char body[256];
 	int image;
 } notif_data;
 
-typedef struct {
+	ypedef struct {
 	int feed_id;
 	char feed_name[256];
 	gboolean enabled;
 	gboolean selected;
 } feed_data;
 
-typedef struct {
+	ypedef struct {
 	int league_id;
 	char league_name[256];
 	gboolean used;
@@ -129,7 +129,7 @@ typedef struct {
 	gboolean expanded;
 } league_data;
 
-typedef struct {
+	ypedef struct {
 	int league_id;
 	char league_name[256];
 	char team_home[64];
@@ -143,7 +143,7 @@ typedef struct {
 	gboolean used;
 } match_data;
 
-typedef struct {
+	ypedef struct {
 	GMainLoop *loop;
 	MatePanelApplet *applet;
 	GtkActionGroup *action_group;
@@ -213,6 +213,6 @@ void applet_destroy(MatePanelApplet *, livescore_applet *);
 
 // Menu skeleton
 static const GtkActionEntry applet_menu_actions[] = {
-        { "Settings", GTK_STOCK_EXECUTE, "_Settings", NULL, NULL, G_CALLBACK (menu_cb_settings) },
-        { "About", GTK_STOCK_ABOUT, "_About", NULL, NULL, G_CALLBACK (menu_cb_about) }
+	{ "Settings", GTK_STOCK_EXECUTE, "_Settings", NULL, NULL, G_CALLBACK (menu_cb_settings) },
+	{ "About", GTK_STOCK_ABOUT, "_About", NULL, NULL, G_CALLBACK (menu_cb_about) }
 };

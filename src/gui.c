@@ -45,7 +45,7 @@ void gui_quit(GtkWidget *widget, gpointer data) {
 	g_object_unref(gp_vbox);
 	g_object_unref(gp_scrolled_window);
 
-        gtk_widget_destroy(applet->dialog_matches);
+	gtk_widget_destroy(applet->dialog_matches);
 }
 
 
@@ -124,47 +124,47 @@ void gui_create_view_and_model(livescore_applet *applet) {
 	applet->tree_view = gtk_tree_view_new();
 	applet->tree_store = gtk_tree_store_new(NUM_COLS, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_BOOLEAN);
 
-        // Column 1 - image
-        renderer_image = gtk_cell_renderer_pixbuf_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, " ", renderer_image, "pixbuf", COL_PIC, NULL);
+	// Column 1 - image
+	renderer_image = gtk_cell_renderer_pixbuf_new();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, " ", renderer_image, "pixbuf", COL_PIC, NULL);
 
-        // Column 2
-        renderer = gtk_cell_renderer_text_new();
-        g_object_set (renderer, "xalign", 1.0, NULL);
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Time"), renderer, "text", COL_TIME, NULL);
+	// Column 2
+	renderer = gtk_cell_renderer_text_new();
+	g_object_set (renderer, "xalign", 1.0, NULL);
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Time"), renderer, "text", COL_TIME, NULL);
 
-        // Column 3
-        renderer = gtk_cell_renderer_text_new();
-        g_object_set (renderer, "xalign", 0.5, NULL);
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Score"), renderer, "text", COL_SCORE, NULL);
+	// Column 3
+	renderer = gtk_cell_renderer_text_new();
+	g_object_set (renderer, "xalign", 0.5, NULL);
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Score"), renderer, "text", COL_SCORE, NULL);
 
-        // Column 4
-        renderer = gtk_cell_renderer_text_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("League / Match"), renderer, "text", COL_MATCH, "weight", COL_HIDDEN_BOLD, "weight-set", COL_HIDDEN_BOOLEAN, NULL);
+	// Column 4
+	renderer = gtk_cell_renderer_text_new();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("League / Match"), renderer, "text", COL_MATCH, "weight", COL_HIDDEN_BOLD, "weight-set", COL_HIDDEN_BOOLEAN, NULL);
 
-        // Hidden column for bold font on some rows - for the font weight...
-        renderer = gtk_cell_renderer_text_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Hidden"), renderer, "text", COL_HIDDEN_BOLD, NULL);
-        column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HIDDEN_BOLD);
-        gtk_tree_view_column_set_visible(column, FALSE);
+	// Hidden column for bold font on some rows - for the font weight...
+	renderer = gtk_cell_renderer_text_new();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Hidden"), renderer, "text", COL_HIDDEN_BOLD, NULL);
+	column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HIDDEN_BOLD);
+	gtk_tree_view_column_set_visible(column, FALSE);
 
-        // ... and to enable or disable them. 
-        renderer = gtk_cell_renderer_text_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Hidden"), renderer, "text", COL_HIDDEN_BOOLEAN, NULL);
-        column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HIDDEN_BOOLEAN);
-        gtk_tree_view_column_set_visible(column, FALSE);
+	// ... and to enable or disable them. 
+	renderer = gtk_cell_renderer_text_new();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view), -1, _("Hidden"), renderer, "text", COL_HIDDEN_BOOLEAN, NULL);
+	column = gtk_tree_view_get_column (GTK_TREE_VIEW (applet->tree_view), COL_HIDDEN_BOOLEAN);
+	gtk_tree_view_column_set_visible(column, FALSE);
 
 	gtk_tree_store_append (applet->tree_store, &iter, NULL);
 	gtk_tree_store_set (applet->tree_store, &iter, COL_MATCH, _("No data yet. Wait until we gather some."), COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
-        model = GTK_TREE_MODEL(applet->tree_store);
-        gtk_tree_view_set_model (GTK_TREE_VIEW (applet->tree_view), model);
-        // The tree view has acquired its own reference to the model, so we can drop ours. 
-        // That way the model will be freed automatically when the tree view is destroyed 
-        g_object_unref (model);
+	model = GTK_TREE_MODEL(applet->tree_store);
+	gtk_tree_view_set_model (GTK_TREE_VIEW (applet->tree_view), model);
+	// The tree view has acquired its own reference to the model, so we can drop ours. 
+	// That way the model will be freed automatically when the tree view is destroyed 
+	g_object_unref (model);
 
-        GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(applet->tree_view));
-        gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(applet->tree_view));
+	gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
 }
 
 
@@ -177,10 +177,10 @@ void gui_matches_dialog (livescore_applet *applet) {
 	gtk_container_add (GTK_CONTAINER (scrolled_window), applet->tree_view);
 
 	// Assemble window
-        applet->dialog_matches = gtk_dialog_new_with_buttons (_("MATE Livescore Applet"), GTK_WINDOW(applet), GTK_DIALOG_MODAL, NULL);
+	applet->dialog_matches = gtk_dialog_new_with_buttons (_("MATE Livescore Applet"), GTK_WINDOW(applet), GTK_DIALOG_MODAL, NULL);
 	gtk_window_resize(GTK_WINDOW(applet->dialog_matches), APPLET_WINDOW_MATCHES_WIDTH, APPLET_WINDOW_MATCHES_HEIGHT);
 	button_close = gtk_dialog_add_button (GTK_DIALOG(applet->dialog_matches), GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL);
-        gtk_dialog_set_default_response (GTK_DIALOG (applet->dialog_matches), GTK_RESPONSE_CANCEL);
+	gtk_dialog_set_default_response (GTK_DIALOG (applet->dialog_matches), GTK_RESPONSE_CANCEL);
 	gtk_container_add (GTK_CONTAINER(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches))), scrolled_window);
 
 	// Signals
@@ -189,12 +189,12 @@ void gui_matches_dialog (livescore_applet *applet) {
 	g_signal_connect(G_OBJECT(applet->tree_view), "row-collapsed", G_CALLBACK (gui_rows_expand_collapse), (gpointer) applet);
 	g_signal_connect(G_OBJECT(applet->dialog_matches), "destroy", G_CALLBACK(gui_quit), (gpointer)applet);
 
-        // Expand rows
-        model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view));
-        gtk_tree_model_foreach(model, gui_expand_row, applet);
+	// Expand rows
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view));
+	gtk_tree_model_foreach(model, gui_expand_row, applet);
 
-        gtk_widget_show_all(GTK_WIDGET(applet->dialog_matches));
-        applet->dialog_matches_is_visible = TRUE;
+	gtk_widget_show_all(GTK_WIDGET(applet->dialog_matches));
+	applet->dialog_matches_is_visible = TRUE;
 }
 
 
@@ -289,36 +289,36 @@ void gui_update_model(livescore_applet * applet) {
 	// Termporarily block visibility in order not to trigget the 'row-expanded' callback function
 	gboolean _tmp = applet->dialog_matches_is_visible;
 	applet->dialog_matches_is_visible = FALSE;
-        gtk_tree_model_foreach(model, gui_expand_row, applet);
+	gtk_tree_model_foreach(model, gui_expand_row, applet);
 	if (_tmp)
 		applet->dialog_matches_is_visible = TRUE;
 }
 
 
 gboolean on_left_click (GtkWidget *event_box, GdkEventButton *event, livescore_applet *applet) {
-        static GtkWidget *label;
-        char msg[1024], image_file[1024];
+	static GtkWidget *label;
+	char msg[1024], image_file[1024];
 
-        // We only process left clicks here
-        if (event->button != 1)
-                return FALSE;
+	// We only process left clicks here
+	if (event->button != 1)
+		return FALSE;
 
-        // Open the matches window
-        if (!applet->dialog_matches_is_visible)
+	// Open the matches window
+	if (!applet->dialog_matches_is_visible)
 		gui_matches_dialog(applet);
 
 /*
-        // TODO: Use this code for some animated GIF when goal is scored 
-        if (applet->status == 0) {
-                applet->status = 1;
-                sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_ICON_PLAY);
-                sprintf(&msg[0], "%s%s", _("PLAYING: "), &applet->name[0]);
-                gtk_widget_set_tooltip_text (GTK_WIDGET (applet->applet), &msg[0]);
-                gtk_image_set_from_file(GTK_IMAGE(applet->image), &image_file[0]);
+	// TODO: Use this code for some animated GIF when goal is scored 
+	if (applet->status == 0) {
+		applet->status = 1;
+		sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_ICON_PLAY);
+		sprintf(&msg[0], "%s%s", _("PLAYING: "), &applet->name[0]);
+		gtk_widget_set_tooltip_text (GTK_WIDGET (applet->applet), &msg[0]);
+		gtk_image_set_from_file(GTK_IMAGE(applet->image), &image_file[0]);
 
-                return TRUE;
-        }
+		return TRUE;
+	}
 */
-        return FALSE;
+	return FALSE;
 }
 

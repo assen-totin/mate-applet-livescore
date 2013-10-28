@@ -76,13 +76,13 @@ int manager_timer(livescore_applet *applet) {
 	}
 
 	// Is it time for clean-up?
-        q = div(now, 1000);
-        if (q.rem < 10) {
+	q = div(now, 1000);
+	if (q.rem < 10) {
 		// Remove all matches older than 36 hours
-                for (i=0; i < applet->all_matches_counter; i++) {
-                        if ((now - applet->all_matches[i].start_time) > APPLET_KEEP_TIME)
-                                applet->all_matches[i].used = FALSE;
-                }
+		for (i=0; i < applet->all_matches_counter; i++) {
+			if ((now - applet->all_matches[i].start_time) > APPLET_KEEP_TIME)
+				applet->all_matches[i].used = FALSE;
+		}
 		// Check all leagues which are not selected for notifications and have no matches
 		for (i=0; i < applet->all_leagues_counter; i++) {
 			if (!applet->all_leagues[i].used)
@@ -101,7 +101,7 @@ int manager_timer(livescore_applet *applet) {
 			if (!league_has_matches && applet->all_leagues[i].expanded)
 				applet->all_leagues[i].expanded = FALSE;
 		}
-        }
+	}
 
 	// Is it time to call parser?
 	q = div(now, 60);

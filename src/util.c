@@ -23,24 +23,24 @@
 
 
 void show_notification (gchar *title, gchar *body, GdkPixbuf *icon) {
-        NotifyNotification* notification;
-        GError* error = NULL;
+	NotifyNotification* notification;
+	GError* error = NULL;
 
-        notify_init(PACKAGE_NAME);
+	notify_init(PACKAGE_NAME);
 
 #ifdef HAVE_LIBMATENOTIFY
-        notification = notify_notification_new (title, body, NULL, NULL);
+	notification = notify_notification_new (title, body, NULL, NULL);
 #elif HAVE_LIBNOTIFY
-        notification = notify_notification_new (title, body, NULL);
+	notification = notify_notification_new (title, body, NULL);
 #endif
 
-        notify_notification_set_timeout (notification, 5000);
+	notify_notification_set_timeout (notification, 5000);
 	notify_notification_set_image_from_pixbuf(notification, icon);
 
-        notify_notification_show (notification, &error);
+	notify_notification_show (notification, &error);
 
-        g_object_unref (G_OBJECT (notification));
-        notify_uninit ();
+	g_object_unref (G_OBJECT (notification));
+	notify_uninit ();
 }
 
 
@@ -52,11 +52,11 @@ gboolean cp(const char *to, const char *from) {
 
 	fd_from = open(from, O_RDONLY);
 	if (fd_from < 0)
-        	return FALSE;
+		return FALSE;
 
 	fd_to = open(to, O_WRONLY | O_CREAT | O_EXCL, 0666);
 	if (fd_to < 0)
-        	goto out_error;
+		goto out_error;
 
 	while (nread = read(fd_from, buf, sizeof buf), nread > 0) {
 		char *out_ptr = buf;
@@ -97,42 +97,42 @@ gboolean cp(const char *to, const char *from) {
 }
 
 char *trim(char *s) {
-        char *ptr;
-        if (!s)
-                return NULL;   // handle NULL string
-        if (!*s)
-                return s;      // handle empty string
-        while (isspace (*s))    // remove left spaces
-                s++;
-        for (ptr = s + strlen(s) - 1; (ptr >= s) && isspace(*ptr); --ptr);
-        ptr[1] = '\0';
-        return s;
+	char *ptr;
+	if (!s)
+		return NULL;   // handle NULL string
+	if (!*s)
+		return s;      // handle empty string
+	while (isspace (*s))    // remove left spaces
+		s++;
+	for (ptr = s + strlen(s) - 1; (ptr >= s) && isspace(*ptr); --ptr);
+	ptr[1] = '\0';
+	return s;
 }
 
 
 char *trim_quotes(char *s) {
-        char *ptr;
-        if (!s)
-                return NULL;   // handle NULL string
-        if (!*s)
-                return s;      // handle empty string
-        while ((*s) == '"')    // remove left quotes
-                s++;
-        for (ptr = s + strlen(s) - 1; (ptr >= s) && (*ptr) == '"'; --ptr);
-        ptr[1] = '\0';
-        return s;
+	char *ptr;
+	if (!s)
+		return NULL;   // handle NULL string
+	if (!*s)
+		return s;      // handle empty string
+	while ((*s) == '"')    // remove left quotes
+		s++;
+	for (ptr = s + strlen(s) - 1; (ptr >= s) && (*ptr) == '"'; --ptr);
+	ptr[1] = '\0';
+	return s;
 }
 
 char *string_ends(char *s, int count) {
-        if (!s)
-                return NULL;   // handle NULL string
-        if (!*s)
-                return s;      // handle empty string
-        while (count > strlen(s))
-                count -= strlen(s);     // wrap around
+	if (!s)
+		return NULL;   // handle NULL string
+	if (!*s)
+		return s;      // handle empty string
+	while (count > strlen(s))
+		count -= strlen(s);     // wrap around
 
-        s += (strlen(s) - count);
-        return s;
+	s += (strlen(s) - count);
+	return s;
 }
 
 

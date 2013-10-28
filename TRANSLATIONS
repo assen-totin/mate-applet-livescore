@@ -1,7 +1,7 @@
 1. To create templates for translation: 
 
 # Get all strings from main.c
-xgettext -d livescore -s -k_ -o po/livescore.pot src/*
+xgettext -d livescore -s -k_ -o po/livescore.pot src/*.c
 
 2. To add your translation
 

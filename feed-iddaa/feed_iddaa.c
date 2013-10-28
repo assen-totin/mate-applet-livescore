@@ -36,9 +36,9 @@ gboolean iddaa_is_half_time(char *s) {
 }
 
 gboolean iddaa_is_full_time(char *s) {
-        if (strstr(s, "FT"))
-                return TRUE;
-        return FALSE;
+	if (strstr(s, "FT"))
+		return TRUE;
+	return FALSE;
 }
 
 gboolean iddaa_is_playing(char *s, int *match_time, int *match_time_added) {
@@ -58,28 +58,28 @@ gboolean iddaa_is_playing(char *s, int *match_time, int *match_time_added) {
 }
 
 gboolean iddaa_is_future(char *s) {
-        if (strstr(s, ":")) {
-                return TRUE;
-        }
-        return FALSE;
+	if (strstr(s, ":")) {
+		return TRUE;
+	}
+	return FALSE;
 }
 
-time_t iddaa_convert_time(char *s) {
-        struct tm now, *now_p;
+	ime_t iddaa_convert_time(char *s) {
+	struct tm now, *now_p;
 
-        time_t ts = time(NULL);
-        now_p = gmtime(&ts);
+		ime_t ts = time(NULL);
+	now_p = gmtime(&ts);
 
 	now = *now_p;
-        now.tm_hour = atoi(strtok(s, ":"));
-        now.tm_min = atoi(strtok(NULL, ":" ));
+	now.tm_hour = atoi(strtok(s, ":"));
+	now.tm_min = atoi(strtok(NULL, ":" ));
 	now.tm_sec = 0;
 
 	// mktime treats 'now' as localtime, but we need it UTC.
 	// NOTE: timegm() is not POSIX-compliant, hence not portable!
 	// See 'man timegm' for POSIX-compliant replacecement function.
-        //return mktime(&now);
-        return timegm(&now);
+	//return mktime(&now);
+	return timegm(&now);
 }
 
 void iddaa_build_match(iddaa_match_data *iddaa_match, match_data **feed_matches, int *feed_matches_counter) {
@@ -195,24 +195,24 @@ void iddaa_walk_tree(xmlNode * a_node, iddaa_match_data *iddaa_match, match_data
 
 
 int feed_main(match_data **feed_matches, int *feed_matches_counter) {
-        iddaa_match_data iddaa_match;
+	iddaa_match_data iddaa_match;
 
-        memset(&iddaa_match.match_time[0], '\0', sizeof(iddaa_match.match_time));
-        memset(&iddaa_match.team_home[0], '\0', sizeof(iddaa_match.team_home));
-        memset(&iddaa_match.team_away[0], '\0', sizeof(iddaa_match.team_away));
-        memset(&iddaa_match.score[0], '\0', sizeof(iddaa_match.score));
-        iddaa_match.score_home = 0;
-        iddaa_match.score_away = 0;
-        iddaa_match.stage = -1;
-        iddaa_match.skip = FALSE;
+	memset(&iddaa_match.match_time[0], '\0', sizeof(iddaa_match.match_time));
+	memset(&iddaa_match.team_home[0], '\0', sizeof(iddaa_match.team_home));
+	memset(&iddaa_match.team_away[0], '\0', sizeof(iddaa_match.team_away));
+	memset(&iddaa_match.score[0], '\0', sizeof(iddaa_match.score));
+	iddaa_match.score_home = 0;
+	iddaa_match.score_away = 0;
+	iddaa_match.stage = -1;
+	iddaa_match.skip = FALSE;
 
-        int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, IDDAA_FILENAME);
+	int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, IDDAA_FILENAME);
 
-        if (!res) {
-                htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, HTML_PARSE_NOBLANKS | HTML_PARSE_NOIMPLIED | HTML_PARSE_COMPACT);
+	if (!res) {
+		htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, HTML_PARSE_NOBLANKS | HTML_PARSE_NOIMPLIED | HTML_PARSE_COMPACT);
 				iddaa_walk_tree(xmlDocGetRootElement(parser), &iddaa_match, feed_matches, feed_matches_counter);
-        }
+	}
 
-        return 1;
+	return 1;
 }
 

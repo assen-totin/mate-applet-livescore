@@ -22,48 +22,48 @@
 #include "applet.h"
 
 void applet_back_change (MatePanelApplet *a, MatePanelAppletBackgroundType type, GdkColor *color, GdkPixmap *pixmap, livescore_applet *applet) {
-        /* taken from the TrashApplet */
-        GtkRcStyle *rc_style;
-        GtkStyle *style;
+	/* taken from the TrashApplet */
+	GtkRcStyle *rc_style;
+	GtkStyle *style;
 
-        /* reset style */
-        gtk_widget_set_style (GTK_WIDGET(applet->applet), NULL);
+	/* reset style */
+	gtk_widget_set_style (GTK_WIDGET(applet->applet), NULL);
 	gtk_widget_set_style (GTK_WIDGET(applet->event_box), NULL);
-        rc_style = gtk_rc_style_new ();
-        gtk_widget_modify_style (GTK_WIDGET(applet->applet), rc_style);
+	rc_style = gtk_rc_style_new ();
+	gtk_widget_modify_style (GTK_WIDGET(applet->applet), rc_style);
 	gtk_widget_modify_style (GTK_WIDGET(applet->event_box), rc_style);
-        g_object_unref (rc_style);
+	g_object_unref (rc_style);
 
-        switch (type) {
-                case PANEL_COLOR_BACKGROUND:
-                        gtk_widget_modify_bg (GTK_WIDGET(applet->applet), GTK_STATE_NORMAL, color);
+	switch (type) {
+		case PANEL_COLOR_BACKGROUND:
+			gtk_widget_modify_bg (GTK_WIDGET(applet->applet), GTK_STATE_NORMAL, color);
 			gtk_widget_modify_bg (GTK_WIDGET(applet->event_box), GTK_STATE_NORMAL, color);
-                        break;
+			break;
 
-                case PANEL_PIXMAP_BACKGROUND:
-                        style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET(applet->applet)));
-                        if (style->bg_pixmap[GTK_STATE_NORMAL])
-                                g_object_unref (style->bg_pixmap[GTK_STATE_NORMAL]);
-                        style->bg_pixmap[GTK_STATE_NORMAL] = g_object_ref(pixmap);
-                        gtk_widget_set_style (GTK_WIDGET(applet->applet), style);
+		case PANEL_PIXMAP_BACKGROUND:
+			style = gtk_style_copy (gtk_widget_get_style (GTK_WIDGET(applet->applet)));
+			if (style->bg_pixmap[GTK_STATE_NORMAL])
+				g_object_unref (style->bg_pixmap[GTK_STATE_NORMAL]);
+			style->bg_pixmap[GTK_STATE_NORMAL] = g_object_ref(pixmap);
+			gtk_widget_set_style (GTK_WIDGET(applet->applet), style);
 			gtk_widget_set_style (GTK_WIDGET(applet->event_box), style);
-                        g_object_unref (style);
-                        break;
+			g_object_unref (style);
+			break;
 
-                case PANEL_NO_BACKGROUND:
-                default:
-                        break;
-        }
+		case PANEL_NO_BACKGROUND:
+		default:
+			break;
+	}
 
 }
 
 void applet_destroy(MatePanelApplet *applet_widget, livescore_applet *applet) {
 	g_main_loop_quit(applet->loop);
-        g_assert(applet);
+	g_assert(applet);
 	fifo_free(applet->notif_queue);
 	g_free(applet->all_matches);
-        g_free(applet);
-        return;
+	g_free(applet);
+	return;
 }
 
 
@@ -163,17 +163,17 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 
 	// Get images for matches dialog
 	char image_file[1024];
-        sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_RED);
-        applet->running_image_red = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_RED);
+	applet->running_image_red = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
-        sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GREEN);
-        applet->running_image_green = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GREEN);
+	applet->running_image_green = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
-        sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_YELLOW);
-        applet->running_image_yellow = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_YELLOW);
+	applet->running_image_yellow = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
-        sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GRAY);
-        applet->running_image_gray = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_GRAY);
+	applet->running_image_gray = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
 	// Get images for notifications
 	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_NOTIF_WHISTLE);
@@ -191,7 +191,7 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	gtk_container_add (GTK_CONTAINER (applet->event_box), applet->image);
 
 	// Put the container into the applet
-        gtk_container_add (GTK_CONTAINER (applet->applet), applet->event_box);
+	gtk_container_add (GTK_CONTAINER (applet->applet), applet->event_box);
 
 	// Define menu action group
 	applet->action_group = gtk_action_group_new ("Livescore_Applet_Actions");
@@ -201,22 +201,22 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	mate_panel_applet_setup_menu(applet->applet, ui, applet->action_group);
 
 	// Signals
-        g_signal_connect(G_OBJECT(applet->event_box), "button_press_event", G_CALLBACK (on_left_click), (gpointer)applet);
-        g_signal_connect(G_OBJECT(applet->applet), "change_background", G_CALLBACK (applet_back_change), (gpointer)applet);
+	g_signal_connect(G_OBJECT(applet->event_box), "button_press_event", G_CALLBACK (on_left_click), (gpointer)applet);
+	g_signal_connect(G_OBJECT(applet->applet), "change_background", G_CALLBACK (applet_back_change), (gpointer)applet);
 	g_signal_connect(G_OBJECT(applet->applet), "destroy", G_CALLBACK(applet_destroy), (gpointer)applet);
 
 	// Tooltip
 	gtk_widget_set_tooltip_text (GTK_WIDGET (applet->applet), _("Livescore: click to view, right-click to change settings."));
 
-        // Show applet
-        gtk_widget_show_all (GTK_WIDGET (applet->applet));
+	// Show applet
+	gtk_widget_show_all (GTK_WIDGET (applet->applet));
 
 	// Run timer each 10 seconds
 	g_timeout_add(10000, (GSourceFunc) manager_timer, (gpointer)applet);
 
 	// Run
-        applet->loop = g_main_loop_new (NULL, FALSE);
-        g_main_loop_run (applet->loop);
+	applet->loop = g_main_loop_new (NULL, FALSE);
+	g_main_loop_run (applet->loop);
 
 	return TRUE;
 }

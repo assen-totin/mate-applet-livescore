@@ -27,11 +27,11 @@ int get_url (char *url, char *user_agent, char *filename) {
 	const char *header;
 	FILE *output_file = NULL;
 
-        SoupSession *session = g_object_new (SOUP_TYPE_SESSION,
-                                SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_CONTENT_DECODER,
-                                SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_COOKIE_JAR,
-                                SOUP_SESSION_ACCEPT_LANGUAGE_AUTO, TRUE,
-                                NULL);
+	SoupSession *session = g_object_new (SOUP_TYPE_SESSION,
+				SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_CONTENT_DECODER,
+				SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_COOKIE_JAR,
+				SOUP_SESSION_ACCEPT_LANGUAGE_AUTO, TRUE,
+				NULL);
 
 	if (user_agent)
 		g_object_set(session, "user-agent", user_agent);
