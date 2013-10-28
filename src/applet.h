@@ -35,6 +35,7 @@
 #include <libxml/HTMLparser.h>
 #include <libxml/HTMLtree.h>
 #include <libsoup/soup.h>
+#include <dlfcn.h>
 
 #ifdef HAVE_LIBMATENOTIFY
 	#include <libmatenotify/notify.h>
@@ -58,6 +59,7 @@
 #define APPLET_WINDOW_SETTINGS_WIDTH 480
 #define APPLET_WINDOW_SETTINGS_HEIGHT 320
 #define APPLET_KEEP_TIME 57600	// 16 hours
+#define APPLET_FEED_DEFAULT "lib_feed_iddaa.so.0"
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
@@ -145,14 +147,16 @@ typedef struct {
 	GMainLoop *loop;
 	MatePanelApplet *applet;
 	GtkActionGroup *action_group;
-        GtkWidget *image;
-        GtkWidget *event_box;
+	GtkWidget *image;
+	GtkWidget *event_box;
 	match_data *all_matches;
 	league_data *all_leagues;
 	feed_data *all_feeds;
 	int all_matches_counter;
 	int all_leagues_counter;
 	int all_feeds_counter;
+	void *feed_handle;
+	void (*feed_main)(match_data **, int *);
 	gboolean dialog_matches_is_visible;
 	fifo *notif_queue;
 	GSettings *gsettings;
@@ -173,6 +177,7 @@ void show_notification (gchar *, gchar *, GdkPixbuf *);
 gboolean cp(const char *, const char *);
 char *trim(char *);
 char *trim_quotes(char *);
+char *string_ends(char *, int);
 void debug(char *);
 
 //menu.c
@@ -185,8 +190,9 @@ void gui_update_model(livescore_applet * applet);
 gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 
 // manager.c
-gboolean manager_main(livescore_applet *, match_data *);
+//gboolean manager_main(livescore_applet *, match_data *);
 int manager_timer(livescore_applet *);
+gboolean manager_populate_feed(livescore_applet *, gchar *);
 
 // http.c
 int get_url (char *, char *, char *);

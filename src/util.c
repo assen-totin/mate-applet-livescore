@@ -123,6 +123,18 @@ char *trim_quotes(char *s) {
         return s;
 }
 
+char *string_ends(char *s, int count) {
+        if (!s)
+                return NULL;   // handle NULL string
+        if (!*s)
+                return s;      // handle empty string
+        while (count > strlen(s))
+                count -= strlen(s);     // wrap around
+
+        s += (strlen(s) - count);
+        return s;
+}
+
 
 void debug(char *s) {
 	FILE *fp = fopen("/tmp/applet", "a");

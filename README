@@ -32,9 +32,65 @@ page layout. If you know of any good source of machibe-readable live score
 that is available for free (even in the expense of viewing ads), please, let
 me know (see AUTHORS for contact info).
 
+HACKING
+
+Yes, you can write your very own data (feed) provider. You need to compile it
+as shared library and put it in LIBDIR/mate-applet-livescore directory. It 
+should be named lib_feed_XYZ.so where XYZ is whatever string you like.
+
+The entry point of your library should be named "feed_main" and should look
+like this:
+
+	int feed_main(match_data **, int *);
+
+The first argument is a double pointer to already malloc()'ed structure of
+type "match_data" which size is sizeof(match_data). If you have N matches, 
+you need to realloc() it to make it N times bigger; then put your matches 
+inside as an array. 
+
+The function should dereference the second pointer and set it to the number 
+matches (i.e. the size of the array that the first pointer points to). 
+Initially it will have a value of 0.
+
+Function "feed_main" should return 1 on success or 0 on failure. 
+
+The "match_data" structure has the following members (see src/applet.h):
+-- char team_home[64] - the name of the home team, UTF-8
+-- char team_away[64] - the name of the away team, UTF-8
+-- int score_home - number of goals for the home team; will be ignored for 
+   matches that have not yet commenced (set to 0 for them)
+-- int score_away - same as previous, for away team
+-- time_t start_time - match start time, UNIX timestamp, UTC
+-- int match_time - number of minutes since the beginning of match; will be 
+   ignored for matches that have not yet commenced (set to 0 for them); when
+   additional time is given in the end of first ahd second half, keep this
+   value at 45 or 90. 
+-- int match_time_added - number of minutes since the added time in the end of
+   first or second half has began; will be ignored for matches that have not 
+   yet commenced (set to 0 for them); reset to 0 when the first half or the 
+   match ends.
+-- int status - current match status, must be on of these: MATCH_NOT_COMMENCED,
+   MATCH_FIRST_TIME, MATCH_HALF_TIME, MATCH_SECOND_TIME, MATCH_EXTRA_TIME,
+   MATCH_FULL_TIME
+-- int league_id - value will be ignored; set it to 0.
+-- char league_name[256] - value will be ignore;, set it to '\0'
+-- gboolean used - value will be ignored; set it to TRUE.
+
+If you need to fetch something over HTTP, you can use the get_url() function
+from http.c. It will get the URL for you and place it in the file you
+specified. Set USER_AGENT to NULL to use the system default string. 
+
+	int get_url (char *URL, char *USER_AGENT, char *FILENAME);
+
+You can also make use of the trimming functions to remove spaces or quotes 
+before and after a string:
+
+	char *trim(char *s);
+	char *trim_quotes(char *s);
 
 
-IMPORTANT! This free softwarte is released with hope that it will be useful, 
+
+IMPORTANT! This free software is released with hope that it will be useful, 
 but with no warranty of any type at all. Use it at your own risk. You are free
 to distribute it as well as to modify it as long as you preserve the original 
 License. See LICENSE file for details.

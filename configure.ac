@@ -2,6 +2,9 @@ AC_PREREQ([2.66])
 AC_INIT([mate-applet-livescore], [0.0.1], [assen.totin@gmail.com])
 AC_CONFIG_HEADERS([config.h])
 
+AM_PROG_AR
+LT_INIT
+
 AM_INIT_AUTOMAKE([-Wall])
 
 # prefix
@@ -19,11 +22,21 @@ SBINDIR=$exec_prefix/sbin
 AC_SUBST([SBINDIR])
 DATAROOTDIR=$prefix/share
 AC_SUBST([DATAROOTDIR])
-LIBEXECDIR=$prefix/libexec
+LIBEXECDIR=$exec_prefix/libexec
 if test "$libexecdir" != '${exec_prefix}/libexec'; then
         LIBEXECDIR=$libexecdir
 fi
 AC_SUBST([LIBEXECDIR])
+LIBDIR=${exec_prefix}/lib
+if test -d /usr/lib64 ; then
+        LIBDIR=${exec_prefix}/lib64
+fi
+if test "$libdir" != '${exec_prefix}/lib'; then
+        if test "$libdir" != '${exec_prefix}/lib64'; then
+                LIBDIR=$libdir
+        fi
+fi
+AC_DEFINE_UNQUOTED([LIBDIR], ["$LIBDIR"], ["Directory where application-specific libraries are installed"])
 PIXMAPDIR=$prefix/share/pixmaps
 AC_SUBST([PIXMAPDIR])
 ICONSDIR=$prefix/share/icons
@@ -113,7 +126,7 @@ AC_SUBST([APPLET_FLAGS])
 AC_SUBST([APPLET_LIBS])
 
 # Makefiles
-AC_CONFIG_FILES([Makefile src/Makefile po/Makefile.in po/Makefile images/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile feed-iddaa/Makefile po/Makefile.in po/Makefile images/Makefile])
 
 # Service files
 AC_CONFIG_FILES([src/org.mate.applets.LivescoreApplet.mate-panel-applet src/org.mate.panel.applet.LivescoreApplet.service src/org.mate.panel.applet.LivescoreApplet.gschema.xml mate-applet-livescore.spec])
