@@ -70,13 +70,15 @@ void fifo_free(fifo *queue) {
 	fifo_data *node = queue->fifo_head;
 	fifo_data *tmp;
 
-	while (node->node_next) {
-		tmp = node;
-		node = node->node_next;
-		free(tmp);
+	if (fifo_len(queue) > 0) {
+		while (node->node_next) {
+			tmp = node;
+			node = node->node_next;
+			free(tmp);
+		}
+		free(node);
 	}
 
-	free(node);
 	free(queue);
 }
 
