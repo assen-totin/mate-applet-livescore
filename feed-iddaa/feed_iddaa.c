@@ -64,10 +64,10 @@ gboolean iddaa_is_future(char *s) {
 	return FALSE;
 }
 
-	ime_t iddaa_convert_time(char *s) {
+time_t iddaa_convert_time(char *s) {
 	struct tm now, *now_p;
 
-		ime_t ts = time(NULL);
+	time_t ts = time(NULL);
 	now_p = gmtime(&ts);
 
 	now = *now_p;
