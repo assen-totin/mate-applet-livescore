@@ -98,30 +98,30 @@ enum {
 	NOTIF_SHOW_IMAGE_GOAL
 };
 
-	ypedef struct f_data {
+typedef struct f_data {
 	void *node_data;
 	struct f_data *node_next;
 } fifo_data;
 
-	ypedef struct {
+typedef struct {
 	fifo_data *fifo_head;
 	fifo_data *fifo_tail;
 } fifo;
 
-	ypedef struct {
+typedef struct {
 	char title[256];
 	char body[256];
 	int image;
 } notif_data;
 
-	ypedef struct {
+typedef struct {
 	int feed_id;
 	char feed_name[256];
 	gboolean enabled;
 	gboolean selected;
 } feed_data;
 
-	ypedef struct {
+typedef struct {
 	int league_id;
 	char league_name[256];
 	gboolean used;
@@ -129,7 +129,7 @@ enum {
 	gboolean expanded;
 } league_data;
 
-	ypedef struct {
+typedef struct {
 	int league_id;
 	char league_name[256];
 	char team_home[64];
@@ -143,7 +143,7 @@ enum {
 	gboolean used;
 } match_data;
 
-	ypedef struct {
+typedef struct {
 	GMainLoop *loop;
 	MatePanelApplet *applet;
 	GtkActionGroup *action_group;
