@@ -35,17 +35,38 @@ gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
 }
 
 
-gboolean manager_populate_feed(livescore_applet *applet, gchar *selected_feed) {
+gboolean manager_populate_feed(livescore_applet *applet, gchar *selected_feed, gboolean flag_replace) {
 	char selected_feed_so[1024];
+	void *new_handle;
+	void (*new_feed_main)(match_data **, int *)
 
+	// Test dlopen() of feed provider
 	sprintf(&selected_feed_so[0], "%s/%s/%s", LIBDIR, PACKAGE, selected_feed);
-	applet->feed_handle = dlopen(&selected_feed_so[0], RTLD_NOW|RTLD_GLOBAL);
-	if (!applet->feed_handle)
+	new_handle = dlopen(&selected_feed_so[0], RTLD_NOW|RTLD_GLOBAL);
+	if (!new_handle)
 		return FALSE;
 
-	*(void**)(&applet->feed_main) = dlsym(applet->feed_handle,"feed_main");
-	if (!applet->feed_main)
+	*(void**)(&new_feed_main) = dlsym(applet->feed_handle,"feed_main");
+	if (!new_feed_main)
 		return FALSE;
+
+	// Do the dlopen()
+	if (new_handle)
+		dlclose(new_handle);
+	if (applet->feed_handle)
+		dlclose(applet->feed_handle);
+	applet->feed_handle = dlopen(&selected_feed_so[0], RTLD_NOW|RTLD_GLOBAL);
+	*(void**)(&applet->feed_main) = dlsym(applet->feed_handle,"feed_main");
+
+	// If replacing old provider, clear saved info on expanded and favourite leagues
+	if (flag_replace) {
+		char value[256];
+		sprintf(&value[0], "\"0\"");
+		g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP, &value[0]);
+		g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV, &value[0]);
+		sprintf(&value[0], "\"%s\"", selected_feed);
+		g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED, &value[0]);
+	}
 
 	return TRUE;
 }

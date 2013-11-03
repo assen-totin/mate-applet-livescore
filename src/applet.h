@@ -193,7 +193,7 @@ gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 // manager.c
 //gboolean manager_main(livescore_applet *, match_data *);
 int manager_timer(livescore_applet *);
-gboolean manager_populate_feed(livescore_applet *, gchar *);
+gboolean manager_populate_feed(livescore_applet *, gchar *, gboolean);
 
 // http.c
 int get_url (char *, char *, char *);

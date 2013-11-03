@@ -49,10 +49,10 @@ void menu_cb_about (GtkAction *action, livescore_applet *applet) {
 void menu_cb_feed_combo(GtkWidget *widget, gpointer data) {
 	livescore_applet *applet = data;
 	gchar *feed_name = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(widget));
-	g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED, feed_name);
-	applet->feed_main = NULL;
-	dlclose(applet->feed_handle);
-	manager_populate_feed(applet, feed_name);
+
+	if (!manager_populate_feed(applet, feed_name, TRUE))
+		show_notification(_("MATE Livescore Applet"), "Error: failed to switch to new provider", NULL);
+
 	free(feed_name);
 }
 

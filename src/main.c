@@ -151,8 +151,8 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 
 	// Populate feeds and get selected one to use - exit on failure
 	gchar *selected_feed = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
-	if (!manager_populate_feed(applet, selected_feed)) {
-		if (!manager_populate_feed(applet, APPLET_FEED_DEFAULT)) {
+	if (!manager_populate_feed(applet, selected_feed, FALSE)) {
+		if (!manager_populate_feed(applet, APPLET_FEED_DEFAULT, FALSE)) {
 			show_notification(_("MATE Livescore Applet"), _("Error: failed to load feed provider. Exiting."), NULL);
 			return FALSE;
 		}
