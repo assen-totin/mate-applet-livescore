@@ -69,9 +69,10 @@ void applet_destroy(MyPanelApplet *applet_widget, livescore_applet *applet) {
 
 gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer data) {
 	livescore_applet *applet;
+	gchar *exp_leagues = NULL, *fav_leagues = NULL, *selected_feed = NULL;
 	int i;
 
-	if (strcmp (iid, APPLET_ID) != 0)
+	if (strcmp (iid, APPLET_ID) != 0) 
 		return FALSE;
 
 	// i18n
@@ -99,9 +100,21 @@ gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer d
 	applet->all_leagues->favourite = FALSE;
 	applet->all_leagues_counter = 1;
 
+	// Prepare DConf - GNOME2 only
+	if (panel_applet_gconf_get_bool(PANEL_APPLET(applet->applet), "have_settings", NULL)) {
+		panel_applet_gconf_set_bool(PANEL_APPLET(applet->applet), "have_settings", TRUE, NULL);
+                panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_EXP, "\"0\"", NULL);
+                panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FAV, "\"0\"", NULL);
+                panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FEED, APPLET_FEED_DEFAULT, NULL);		
+	}
+
 	// Favourite leagues - via GSettings
+#ifdef HAVE_MATE
 	applet->gsettings = g_settings_new_with_path(APPLET_GSETTINGS_SCHEMA, APPLET_GSETTINGS_PATH);
-	gchar *fav_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV));
+	fav_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV));
+#elif HAVE_GNOME_2
+	fav_leagues = trim_quotes(panel_applet_gconf_get_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FAV, NULL));
+#endif	
 	// First key is always "0" - in GSettings string value cannot be empty
 	char *fav_leagues_1 = strtok(fav_leagues, APPLET_GSETTINGS_SEPARATOR);
 	i = 0;
@@ -124,7 +137,11 @@ gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer d
 
 	// Get expanded leagues from GSettings, update the leagues array
 	gboolean flag_have_league = FALSE;
-	gchar *exp_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP));
+#ifdef HAVE_MATE
+	exp_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP));
+#elif HAVE_GNOME_2
+	exp_leagues = trim_quotes(panel_applet_gconf_get_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_EXP, NULL));
+#endif
 	// First key is always "0" - in GSettings string value cannot be empty - so we ignore it
 	char *exp_leagues_1 = strtok(exp_leagues, APPLET_GSETTINGS_SEPARATOR);
 	while (exp_leagues_1 = strtok(NULL, APPLET_GSETTINGS_SEPARATOR)) {
@@ -150,7 +167,11 @@ gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer d
 	}
 
 	// Populate feeds and get selected one to use - exit on failure
-	gchar *selected_feed = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
+#ifdef HAVE_MATE
+	selected_feed = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
+#elif HAVE_GNOME_2
+	selected_feed = trim_quotes(panel_applet_gconf_get_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FEED, NULL));
+#endif
 	if (!manager_populate_feed(applet, selected_feed, FALSE)) {
 		if (!manager_populate_feed(applet, APPLET_FEED_DEFAULT, FALSE)) {
 			show_notification(_("MATE Livescore Applet"), _("Error: failed to load feed provider. Exiting."), NULL);

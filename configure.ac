@@ -2,6 +2,8 @@ AC_PREREQ([2.63])
 AC_INIT([mate-applet-livescore], [0.0.1], [assen.totin@gmail.com])
 AC_CONFIG_HEADERS([config.h])
 
+# AM_PROG_AR is not available on RHEL, so allow it
+m4_pattern_allow([AM_PROG_AR])
 AM_PROG_AR
 LT_INIT
 
@@ -77,12 +79,14 @@ if test $FOUND_LMPA_4 = "yes" ; then
         LIBMATEPANELAPPLET="libmatepanelapplet-4.0"
         HAVE_MATE="1"
         AC_DEFINE([HAVE_MATE], [1], [Define if we have MATE Desktop Environment])
+	AC_SUBST([HAVE_MATE])
         RPM_BUILDREQUIRES_PANEL="BuildRequires: mate-panel-devel >= 1.3.0"
         RPM_REQUIRES_PANEL="Requires: mate-panel >= 1.3.0"
 elif test $FOUND_LMPA_3 = "yes" ; then
         LIBMATEPANELAPPLET="libmatepanelapplet-3.0"
         HAVE_MATE="1"
         AC_DEFINE([HAVE_MATE], [1], [Define if we have MATE Desktop Environment])
+	AC_SUBST([HAVE_MATE])
         RPM_BUILDREQUIRES_PANEL="BuildRequires: mate-panel-devel >= 1.3.0"
         RPM_REQUIRES_PANEL="Requires: mate-panel >= 1.3.0"
 elif test $FOUND_LPA_2 = "yes" ; then

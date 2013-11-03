@@ -40,6 +40,7 @@
 	#include <mate-panel-applet.h>
 #elif HAVE_GNOME_2
 	#include <panel-applet.h>
+	#include <panel-applet-gconf.h>
 #endif
 
 #ifdef HAVE_LIBMATENOTIFY
@@ -53,7 +54,7 @@
 	#define APPLET_ID "LivescoreApplet"
 #elif HAVE_GNOME_2
 	#define APPLET_FACTORY "OAFIID:LivescoreApplet_Factory"
-	#define APPLET_ID "OAFIID:LivecoreApplet"
+	#define APPLET_ID "OAFIID:LivescoreApplet"
 #endif
 
 
@@ -87,7 +88,7 @@ static const gchar *ui =
 "<menuitem name='MenuItem2' action='About' />"
 ;
 #elif HAVE_GNOME_2
-static const gchar *ui1 =
+static const gchar *ui =
 "<popup name='button3'>"
 "<menuitem name='MenuItem1' verb='Settings' label='Settings'/>"
 "<menuitem name='MenuItem2' verb='About' label='About' pixtype='stock' pixname='gnome-stock-about'/>"
@@ -189,7 +190,9 @@ typedef struct {
 	void (*feed_main)(match_data **, int *);
 	gboolean dialog_matches_is_visible;
 	fifo *notif_queue;
+#ifdef HAVE_MATE
 	GSettings *gsettings;
+#endif
 	GtkTreeStore *tree_store;
 	GtkWidget *tree_view;
 	GtkWidget *dialog_matches;
@@ -249,8 +252,8 @@ static const GtkActionEntry applet_menu_actions_mate[] = {
 };
 #elif HAVE_GNOME_2
 static const BonoboUIVerb applet_menu_actions_gnome [] = {
-        BONOBO_UI_VERB ("Settings", G_CALLBACK (menu_cb_settings)),
-        BONOBO_UI_VERB ("About", G_CALLBACK (menu_cb_about)),
+        BONOBO_UI_UNSAFE_VERB ("Settings", menu_cb_settings),
+        BONOBO_UI_UNSAFE_VERB ("About", menu_cb_about),
         BONOBO_UI_VERB_END
 };
 #endif

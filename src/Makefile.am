@@ -19,6 +19,7 @@
 
 APPLET_FLAGS=@APPLET_FLAGS@
 APPLET_LIBS=@APPLET_LIBS@
+HAVE_MATE=@HAVE_MATE@
 
 AM_CPPFLAGS = @GTK_CFLAGS@ @APPLET_FLAGS@
 AM_LDFLAGS = -rdynamic
@@ -37,5 +38,9 @@ service_DATA = org.mate.panel.applet.LivescoreApplet.service
 gsettingsdir = $(datadir)/glib-2.0/schemas
 gsettings_DATA = org.mate.panel.applet.LivescoreApplet.gschema.xml
 
+serverdir = $(libdir)/bonobo/servers
+server_DATA = LivescoreAppletFactory.server
+
 install-data-hook:
-	glib-compile-schemas $(DESTDIR)$(datadir)/glib-2.0/schemas 2>/dev/null
+	if test $(HAVE_MATE) = "1" ; then glib-compile-schemas $(DESTDIR)$(datadir)/glib-2.0/schemas 2>/dev/null; fi
+

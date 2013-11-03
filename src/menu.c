@@ -48,7 +48,12 @@ void menu_cb_about (GtkAction *action, livescore_applet *applet) {
 
 void menu_cb_feed_combo(GtkWidget *widget, gpointer data) {
 	livescore_applet *applet = data;
+
+#ifdef HAVE_MATE
 	gchar *feed_name = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(widget));
+#elif HAVE_GNOME_2
+	gchar *feed_name = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
+#endif
 
 	if (!manager_populate_feed(applet, feed_name, TRUE))
 		show_notification(_("MATE Livescore Applet"), "Error: failed to switch to new provider", NULL);
@@ -79,7 +84,11 @@ void menu_cb_notif_checkbox(GtkWidget *widget, gpointer data) {
 	}
 	strcat(&value[0], "\"");
 
+#ifdef HAVE_MATE
 	g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV, &value[0]);
+#elif HAVE_GNOME_2
+        panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FAV, &value[0], NULL);
+#endif
 }
 
 
@@ -122,19 +131,33 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 	// Prepare Feed tab
 	GtkWidget *feed_label = gtk_label_new(_("Choose which feed provider to use:"));
 
+#ifdef HAVE_MATE
 	GtkWidget *feed_combo = gtk_combo_box_text_new();
+#elif HAVE_GNOME_2
+	GtkWidget *feed_combo = gtk_combo_box_new_text();
+#endif
 
 	// Read LIBDIR/PACKAGE, list all files ending with '.so'
 	i = 0;
 	const gchar *file_name;
-	gchar *selected_feed = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
-	GError *error;
-	char so_dir_name[1024];
+	gchar *selected_feed = NULL;
+        GError *error;
+        char so_dir_name[1024];
+
+#ifdef HAVE_MATE
+	selected_feed = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED));
+#elif HAVE_GNOME_2
+	selected_feed = trim_quotes(panel_applet_gconf_get_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FEED, NULL));
+#endif
 	sprintf(&so_dir_name[0], "%s/%s", LIBDIR, PACKAGE);
 	GDir *so_dir = g_dir_open(&so_dir_name[0], 0, &error);
 	while (file_name = g_dir_read_name(so_dir)) {
 		if (!strcmp(string_ends((char *) file_name, 3), ".so")) {
+#ifdef HAVE_MATE
 			gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT(feed_combo), file_name);
+#elif HAVE_GNOME_2
+			gtk_combo_box_append_text (GTK_COMBO_BOX(feed_combo), file_name);
+#endif
 			if (!strcmp(selected_feed, file_name))
 				gtk_combo_box_set_active(GTK_COMBO_BOX(feed_combo), i);
 			i++;

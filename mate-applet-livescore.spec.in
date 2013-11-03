@@ -77,6 +77,7 @@ rm -rf "${RPM_BUILD_ROOT}"
 %{pixmapdir}/applet_livescore_yellow.png
 %{pixmapdir}/applet_livescore_goal.png
 %{pixmapdir}/applet_livescore_whistle.png
+%{pixmapdir}/applet_livescore_icon.48.png
 %{iconsdir}/hicolor/16x16/apps/applet_livescore.png
 %{iconsdir}/hicolor/22x22/apps/applet_livescore.png
 %{iconsdir}/hicolor/24x24/apps/applet_livescore.png

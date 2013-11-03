@@ -60,12 +60,18 @@ gboolean manager_populate_feed(livescore_applet *applet, gchar *selected_feed, g
 
 	// If replacing old provider, clear saved info on expanded and favourite leagues
 	if (flag_replace) {
-		char value[256];
-		sprintf(&value[0], "\"0\"");
-		g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP, &value[0]);
-		g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV, &value[0]);
-		sprintf(&value[0], "\"%s\"", selected_feed);
-		g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED, &value[0]);
+		char value1[256], value2[256];
+		sprintf(&value1[0], "\"0\"");
+		sprintf(&value2[0], "\"%s\"", selected_feed);
+#ifdef HAVE_MATE
+		g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP, &value1[0]);
+		g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV, &value1[0]);
+		g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED, &value2[0]);
+#elif HAVE_GNOME_2
+		panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_EXP, &value1[0], NULL);
+		panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FAV, &value1[0], NULL);
+		panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FEED, &value2[0], NULL);
+#endif
 	}
 
 	return TRUE;

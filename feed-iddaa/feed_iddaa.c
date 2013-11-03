@@ -196,7 +196,6 @@ void iddaa_walk_tree(xmlNode * a_node, iddaa_match_data *iddaa_match, match_data
 
 int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	iddaa_match_data iddaa_match;
-
 	memset(&iddaa_match.match_time[0], '\0', sizeof(iddaa_match.match_time));
 	memset(&iddaa_match.team_home[0], '\0', sizeof(iddaa_match.team_home));
 	memset(&iddaa_match.team_away[0], '\0', sizeof(iddaa_match.team_away));
@@ -205,12 +204,15 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	iddaa_match.score_away = 0;
 	iddaa_match.stage = -1;
 	iddaa_match.skip = FALSE;
-
 	int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, IDDAA_FILENAME);
-
 	if (!res) {
-		htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, HTML_PARSE_NOBLANKS | HTML_PARSE_NOIMPLIED | HTML_PARSE_COMPACT);
-				iddaa_walk_tree(xmlDocGetRootElement(parser), &iddaa_match, feed_matches, feed_matches_counter);
+		htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, 
+			HTML_PARSE_NOBLANKS | 
+#ifdef HAVE_MATE
+			HTML_PARSE_NOIMPLIED | 
+#endif
+			HTML_PARSE_COMPACT);
+		iddaa_walk_tree(xmlDocGetRootElement(parser), &iddaa_match, feed_matches, feed_matches_counter);
 	}
 
 	return 1;
