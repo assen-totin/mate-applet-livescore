@@ -30,11 +30,11 @@ Live scores notification applet for the MATE desktop environment.
 
 %prep
 # If you want to build the RPM in-tree (make rpm), comment out next line
-#%setup -q
+%setup -q
 
 %build
 # If you want to build the RPM in-tree (make rpm), comment out next line
-#%configure
+%configure
 make %{?_smp_mflags} CFLAGS="${CFLAGS}"
 
 %install
