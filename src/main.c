@@ -101,12 +101,14 @@ gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer d
 	applet->all_leagues_counter = 1;
 
 	// Prepare DConf - GNOME2 only
+#ifdef HAVE_GNOME_2
 	if (panel_applet_gconf_get_bool(PANEL_APPLET(applet->applet), "have_settings", NULL)) {
 		panel_applet_gconf_set_bool(PANEL_APPLET(applet->applet), "have_settings", TRUE, NULL);
                 panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_EXP, "\"0\"", NULL);
                 panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FAV, "\"0\"", NULL);
                 panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FEED, APPLET_FEED_DEFAULT, NULL);		
 	}
+#endif
 
 	// Favourite leagues - via GSettings
 #ifdef HAVE_MATE

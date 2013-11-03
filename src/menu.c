@@ -129,7 +129,8 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 	gtk_box_pack_start(GTK_BOX(notif_vbox_1), notif_table, TRUE, TRUE, 0);
 
 	// Prepare Feed tab
-	GtkWidget *feed_label = gtk_label_new(_("Choose which feed provider to use:"));
+	GtkWidget *feed_label = gtk_label_new(_("Choose which feed provider to use:\n(Changing the provider will erase your notification settings)"));
+	gtk_label_set_justify(feed_label, GTK_JUSTIFY_CENTER);
 
 #ifdef HAVE_MATE
 	GtkWidget *feed_combo = gtk_combo_box_text_new();

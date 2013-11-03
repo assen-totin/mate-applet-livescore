@@ -28,8 +28,12 @@ msgid "Assen Totin <assen.totin@gmail.com>"
 msgstr "Assen Totin <assen.totin@gmail.com>"
 
 #: src/menu.c:131
-msgid "Choose which feed provider to use:"
-msgstr "Вуберите источник информации:"
+msgid ""
+"Choose which feed provider to use:\n"
+"(Changing the provider will erase your notification settings)"
+msgstr ""
+"Выберите источник информации:"
+"(смена източника стерет настройки уведомления)"
 
 #: src/menu.c:99
 msgid "Choose which leagues you want to be notified about:"

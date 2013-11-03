@@ -30,7 +30,9 @@ msgid "Choose which feed provider to use:"
 msgstr ""
 
 #: src/menu.c:99
-msgid "Choose which leagues you want to be notified about:"
+msgid ""
+"Choose which feed provider to use:\n"
+"(Changing the provider will erase your notification settings)"
 msgstr ""
 
 #: src/manager.c:120
