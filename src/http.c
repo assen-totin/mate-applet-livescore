@@ -27,12 +27,13 @@ int get_url (char *url, char *user_agent, char *filename) {
 	const char *header;
 	FILE *output_file = NULL;
 
-	SoupSession *session = g_object_new (SOUP_TYPE_SESSION,
+	SoupSession *session = g_object_new (SOUP_TYPE_SESSION_SYNC,
 				SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_CONTENT_DECODER,
 				SOUP_SESSION_ADD_FEATURE_BY_TYPE, SOUP_TYPE_COOKIE_JAR,
+#ifdef HAVE_MATE
 				SOUP_SESSION_ACCEPT_LANGUAGE_AUTO, TRUE,
+#endif
 				NULL);
-
 	if (user_agent)
 		g_object_set(session, "user-agent", user_agent);
 	else {
@@ -40,14 +41,14 @@ int get_url (char *url, char *user_agent, char *filename) {
 		sprintf(&ua[0], "%s", HTTP_USER_AGENT);
 		g_object_set(session, "user-agent", &ua[0]);
 	}
-
 	msg = soup_message_new ("GET", url);
 	soup_message_set_flags (msg, SOUP_MESSAGE_NO_REDIRECT);
 	g_object_ref (msg);
 	soup_session_send_message (session, msg);
-
 	if (SOUP_STATUS_IS_TRANSPORT_ERROR (msg->status_code)) {
-		g_print ("%s: %d %s\n", soup_message_get_uri(msg)->path, msg->status_code, msg->reason_phrase);
+		char _err[1024];
+		sprintf (&_err[0], "%s: %d %s\n", soup_message_get_uri(msg)->path, msg->status_code, msg->reason_phrase);
+		//debug(&_err[0]);
 		return 1;
 	}
 
@@ -82,6 +83,4 @@ int get_url (char *url, char *user_agent, char *filename) {
 		return 0;
 	}
 }
-
-
 

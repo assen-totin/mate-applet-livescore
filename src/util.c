@@ -27,11 +27,14 @@ void show_notification (gchar *title, gchar *body, GdkPixbuf *icon) {
 	GError* error = NULL;
 
 	notify_init(PACKAGE_NAME);
-
-#ifdef HAVE_LIBMATENOTIFY
+#ifdef HAVE_MATE
+	#ifdef HAVE_LIBMATENOTIFY
 	notification = notify_notification_new (title, body, NULL, NULL);
-#elif HAVE_LIBNOTIFY
+	#elif HAVE_LIBNOTIFY
 	notification = notify_notification_new (title, body, NULL);
+	#endif
+#elif HAVE_GNOME_2
+	notification = notify_notification_new (title, body, NULL, NULL);
 #endif
 
 	notify_notification_set_timeout (notification, 5000);
@@ -137,7 +140,7 @@ char *string_ends(char *s, int count) {
 
 
 void debug(char *s) {
-	FILE *fp = fopen("/tmp/applet", "a");
+	FILE *fp = fopen("/tmp/livescore_applet", "a");
 	fprintf(fp, "%s\n", s);
 	fflush(fp);
 	fclose(fp);

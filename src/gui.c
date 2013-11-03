@@ -94,7 +94,11 @@ void gui_rows_expand_collapse(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTree
 	}
 	strcat(&value[0], "\"");
 
+#ifdef HAVE_MATE
 	g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP, &value[0]);
+#elif HAVE_GNOME_2
+        panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_EXP, &value[0], NULL);
+#endif
 }
 
 

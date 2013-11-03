@@ -20,7 +20,6 @@
 
 #include <string.h>
 #include <unistd.h>
-#include <mate-panel-applet.h>
 #include <libintl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -37,15 +36,29 @@
 #include <libsoup/soup.h>
 #include <dlfcn.h>
 
+#ifdef HAVE_MATE
+	#include <mate-panel-applet.h>
+#elif HAVE_GNOME_2
+	#include <panel-applet.h>
+	#include <panel-applet-gconf.h>
+#endif
+
 #ifdef HAVE_LIBMATENOTIFY
 	#include <libmatenotify/notify.h>
 #elif HAVE_LIBNOTIFY
 	#include <libnotify/notify.h>
 #endif
 
+#ifdef HAVE_MATE
+	#define APPLET_FACTORY "LivescoreAppletFactory"
+	#define APPLET_ID "LivescoreApplet"
+#elif HAVE_GNOME_2
+	#define APPLET_FACTORY "OAFIID:LivescoreApplet_Factory"
+	#define APPLET_ID "OAFIID:LivescoreApplet"
+#endif
+
+
 #define _(String) gettext (String)
-#define APPLET_FACTORY "LivescoreAppletFactory"
-#define APPLET_ID "LivescoreApplet"
 #define APPLET_NAME "livescore"
 #define APPLET_ICON_STATIC "applet_livescore_icon.png"
 #define APPLET_IMAGE_RED "applet_livescore_red.png"
@@ -69,10 +82,27 @@
 #define APPLET_GSETTINGS_KEY_FEED "feed"
 
 // Menu strings
+#ifdef HAVE_MATE
 static const gchar *ui = 
 "<menuitem name='MenuItem1' action='Settings' />"
 "<menuitem name='MenuItem2' action='About' />"
 ;
+#elif HAVE_GNOME_2
+static const gchar *ui =
+"<popup name='button3'>"
+"<menuitem name='MenuItem1' verb='Settings' label='Settings'/>"
+"<menuitem name='MenuItem2' verb='About' label='About' pixtype='stock' pixname='gnome-stock-about'/>"
+"</popup>"
+;
+#endif
+
+#ifdef HAVE_MATE
+        typedef MatePanelApplet MyPanelApplet;
+	typedef MatePanelAppletBackgroundType MyPanelAppletBackgroundType;
+#elif HAVE_GNOME_2
+        typedef PanelApplet MyPanelApplet;
+	typedef PanelAppletBackgroundType MyPanelAppletBackgroundType;
+#endif
 
 // Two hidden colums will help manage the font weight for some cells
 enum {
@@ -146,7 +176,7 @@ typedef struct {
 
 typedef struct {
 	GMainLoop *loop;
-	MatePanelApplet *applet;
+	MyPanelApplet *applet;
 	GtkActionGroup *action_group;
 	GtkWidget *image;
 	GtkWidget *event_box;
@@ -160,7 +190,9 @@ typedef struct {
 	void (*feed_main)(match_data **, int *);
 	gboolean dialog_matches_is_visible;
 	fifo *notif_queue;
+#ifdef HAVE_MATE
 	GSettings *gsettings;
+#endif
 	GtkTreeStore *tree_store;
 	GtkWidget *tree_view;
 	GtkWidget *dialog_matches;
@@ -209,11 +241,19 @@ gboolean fifo_is_empty(fifo *);
 int feed_iddaa_main(livescore_applet *);
 
 // main.c
-void applet_back_change (MatePanelApplet *, MatePanelAppletBackgroundType, GdkColor *, GdkPixmap *, livescore_applet *);
-void applet_destroy(MatePanelApplet *, livescore_applet *);
+void applet_back_change (MyPanelApplet *, MyPanelAppletBackgroundType, GdkColor *, GdkPixmap *, livescore_applet *);
+void applet_destroy(MyPanelApplet *, livescore_applet *);
 
 // Menu skeleton
-static const GtkActionEntry applet_menu_actions[] = {
+#ifdef HAVE_MATE
+static const GtkActionEntry applet_menu_actions_mate[] = {
 	{ "Settings", GTK_STOCK_EXECUTE, "_Settings", NULL, NULL, G_CALLBACK (menu_cb_settings) },
 	{ "About", GTK_STOCK_ABOUT, "_About", NULL, NULL, G_CALLBACK (menu_cb_about) }
 };
+#elif HAVE_GNOME_2
+static const BonoboUIVerb applet_menu_actions_gnome [] = {
+        BONOBO_UI_UNSAFE_VERB ("Settings", menu_cb_settings),
+        BONOBO_UI_UNSAFE_VERB ("About", menu_cb_about),
+        BONOBO_UI_VERB_END
+};
+#endif
