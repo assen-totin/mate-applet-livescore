@@ -30,9 +30,9 @@ DATA SOURCES
 Real time sports scores are big business, so nobody is willing to give out his
 data. Ideally, the applet should use a source of data in machine-readable
 format (JSON, RSS, XML...). Unfortunately, I was not able to find any service
-which will provie such data free of charge. The applet now has to parse web
+which will provide such data free of charge. The applet now has to parse web
 pages, which inevitably makes it susceptible to errors on every change of the
-page layout. If you know of any good source of machibe-readable live score 
+page layout. If you know of any good source of machine-readable live score 
 that is available for free (even in the expense of viewing ads), please, let
 me know (see AUTHORS for contact info).
 

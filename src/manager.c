@@ -129,8 +129,11 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	gboolean flag_have_match = FALSE;
 	gboolean flag_unused = FALSE;
 	gboolean flag_have_league = FALSE;
+	gboolean flag_ntf_score = FALSE;
+	gboolean flag_ntf_status = FALSE;
+	gboolean flag_ntf_status_first = FALSE;
 	time_t now = time(NULL);
-	char ntf_text[256], ntf_title[256];
+	char ntf_text_status[256], ntf_title_status[256], ntf_text_score[256], ntf_title_score[256];
 
 //char dbg[1024];
 //sprintf(&dbg[0], "Called for match %s - %s", new_match->team_home, new_match->team_away);
@@ -153,13 +156,10 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			applet->all_matches[match_id].score_away = new_match->score_away;
 
 			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id)) {
-				sprintf(&ntf_title[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
-				sprintf(&ntf_text[0], "%s %u:%u", _("GOAL! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-
-				queue_notification(applet, &ntf_title[0], &ntf_text[0], NOTIF_SHOW_IMAGE_GOAL);
+				sprintf(&ntf_title_score[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+				sprintf(&ntf_text_score[0], "%s %u:%u", _("GOAL! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+				flag_ntf_score = TRUE;
 			}
-
-			return TRUE;
 		}
 
 		// Has status changed?
@@ -167,25 +167,24 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			applet->all_matches[match_id].status = new_match->status;
 
 			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id)) {
-				sprintf(&ntf_title[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+				sprintf(&ntf_title_status[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
 
-				if (new_match->status == MATCH_FIRST_TIME) 
-					sprintf(&ntf_text[0], "%s", _("The game commences."));
+				if (new_match->status == MATCH_FIRST_TIME) {
+					sprintf(&ntf_text_status[0], "%s", _("The game commences."));
+					flag_ntf_status_first = TRUE;
+				}
 				else if (new_match->status == MATCH_HALF_TIME) 
-					sprintf(&ntf_text[0], "%s %u:%u", _("Half time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+					sprintf(&ntf_text_status[0], "%s %u:%u", _("Half time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 				
 				else if (new_match->status == MATCH_SECOND_TIME)
-					sprintf(&ntf_text[0], "%s %u:%u", _("Second time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+					sprintf(&ntf_text_status[0], "%s %u:%u", _("Second time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 				else if (new_match->status == MATCH_EXTRA_TIME)
-					sprintf(&ntf_text[0], "%s %u:%u", _("Extra time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+					sprintf(&ntf_text_status[0], "%s %u:%u", _("Extra time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
 				else if (new_match->status == MATCH_FULL_TIME)
-					sprintf(&ntf_text[0], "%s %u:%u", _("Full time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-
-				queue_notification(applet, &ntf_title[0], &ntf_text[0], NOTIF_SHOW_IMAGE_WHISTLE);
+					sprintf(&ntf_text_status[0], "%s %u:%u", _("Full time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+				flag_ntf_status = TRUE;
 			}
-
-			return TRUE;
 		}
 
 		// Has the time changed?
@@ -193,6 +192,22 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			applet->all_matches[match_id].match_time = new_match->match_time;
 		if (applet->all_matches[match_id].match_time_added != new_match->match_time_added)
 			 applet->all_matches[match_id].match_time_added = new_match->match_time_added;
+
+		// Queue notifications: always queue first goal changes unless the status change is beginning of game
+		if (flag_ntf_status_first) {
+			if (flag_ntf_status)
+				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE);
+			if (flag_ntf_score)
+				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0], NOTIF_SHOW_IMAGE_GOAL);
+		}
+		else {
+			if (flag_ntf_score)
+				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0], NOTIF_SHOW_IMAGE_GOAL);
+			if (flag_ntf_status)
+				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE);
+		}
+
+		return TRUE;
 	}
 	// If we don't have it, add it
 	else {
