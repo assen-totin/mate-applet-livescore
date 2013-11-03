@@ -103,14 +103,14 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	applet->gsettings = g_settings_new_with_path(APPLET_GSETTINGS_SCHEMA, APPLET_GSETTINGS_PATH);
 	gchar *fav_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FAV));
 	// First key is always "0" - in GSettings string value cannot be empty
-	char *fav_leagues_1 = strtok(fav_leagues, ",");
+	char *fav_leagues_1 = strtok(fav_leagues, APPLET_GSETTINGS_SEPARATOR);
 	i = 0;
 	applet->all_leagues[i].league_id = i;
 	sprintf(&applet->all_leagues[i].league_name[0], "%s", fav_leagues_1);
 	applet->all_leagues[i].used = TRUE;
 	applet->all_leagues[i].favourite = FALSE;
 	applet->all_leagues[i].expanded = FALSE;
-	while (fav_leagues_1 = strtok(NULL, ",")) {
+	while (fav_leagues_1 = strtok(NULL, APPLET_GSETTINGS_SEPARATOR)) {
 		i++;
 		void *_tmp = realloc(applet->all_leagues, (i + 1) * sizeof(league_data));
 		applet->all_leagues = (league_data *) _tmp;
@@ -126,8 +126,8 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	gboolean flag_have_league = FALSE;
 	gchar *exp_leagues = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP));
 	// First key is always "0" - in GSettings string value cannot be empty - so we ignore it
-	char *exp_leagues_1 = strtok(exp_leagues, ",");
-	while (exp_leagues_1 = strtok(NULL, ",")) {
+	char *exp_leagues_1 = strtok(exp_leagues, APPLET_GSETTINGS_SEPARATOR);
+	while (exp_leagues_1 = strtok(NULL, APPLET_GSETTINGS_SEPARATOR)) {
 		flag_have_league = FALSE;
 		for (i=0; i < applet->all_leagues_counter; i++) {
 			if (!strcmp(&applet->all_leagues[i].league_name[0], exp_leagues_1)) {

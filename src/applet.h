@@ -63,6 +63,7 @@
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
 #define APPLET_GSETTINGS_PATH "/org/mate/panel/objects/livescore/"
+#define APPLET_GSETTINGS_SEPARATOR "|"
 #define APPLET_GSETTINGS_KEY_FAV "leagues-notify"
 #define APPLET_GSETTINGS_KEY_EXP "leagues-expanded"
 #define APPLET_GSETTINGS_KEY_FEED "feed"
