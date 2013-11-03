@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<oaf_info>
+<oaf_server iid="OAFIID:LivescoreApplet_Factory" type="exe"
+            location="@LIBEXECDIR@/livescore_applet">
+
+        <oaf_attribute name="repo_ids" type="stringv">
+                <item value="IDL:Bonobo/GenericFactory:1.0"/>
+                <item value="IDL:Bonobo/Unknown:1.0"/>
+        </oaf_attribute>
+        <oaf_attribute name="name" type="string" value="Livescore Applet Factory"/>
+        <oaf_attribute name="name-en_GB" type="string" value="Livescore Applet Factory"/>
+        <oaf_attribute name="name-bg_BG" type="string" value="Резултати онлайн"/>
+        <oaf_attribute name="name-ru_RU" type="string" value="Результаты онлайн"/>
+        <oaf_attribute name="description" type="string" value="Factory to create the Livescore applet"/>
+        <oaf_attribute name="description-en_GB" type="string" value="Factory to create the Livescore applet"/>
+        <oaf_attribute name="description-bg_BG" type="string" value="Фабрика за онлайн резултати"/>
+        <oaf_attribute name="description-ru_RU" type="string" value="Фабрика онлайн результатов"/>
+
+</oaf_server>
+
+<oaf_server iid="OAFIID:LivescoreApplet" type="factory"
+            location="OAFIID:LivescoreApplet_Factory">
+
+        <oaf_attribute name="repo_ids" type="stringv">
+                <item value="IDL:GNOME/Vertigo/PanelAppletShell:1.0"/>
+                <item value="IDL:Bonobo/Control:1.0"/>
+                <item value="IDL:Bonobo/Unknown:1.0"/>
+        </oaf_attribute>
+        <oaf_attribute name="name" type="string" value="Livescore Applet"/>
+        <oaf_attribute name="name-en_GB" type="string" value="Livescore Applet Factory"/>
+        <oaf_attribute name="name-bg_BG" type="string" value="Резултати онлайн"/>
+        <oaf_attribute name="name-ru_RU" type="string" value="Результаты онлайн"/>
+        <oaf_attribute name="description" type="string" value="Live scores applet"/>
+        <oaf_attribute name="description-en_GB" type="string" value="Live scores applet"/>
+        <oaf_attribute name="description-bg_BG" type="string" value="Аплет за онлайн футболни резултати"/>
+        <oaf_attribute name="description-ru_RU" type="string" value="Результаты онлайн"/>
+        <oaf_attribute name="panel:icon" type="string" value="applet_livescore_icon.48.png"/>
+</oaf_server>
+</oaf_info>
+

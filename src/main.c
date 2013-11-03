@@ -21,7 +21,7 @@
 #include "../config.h"
 #include "applet.h"
 
-void applet_back_change (MatePanelApplet *a, MatePanelAppletBackgroundType type, GdkColor *color, GdkPixmap *pixmap, livescore_applet *applet) {
+void applet_back_change (MyPanelApplet *a, MyPanelAppletBackgroundType type, GdkColor *color, GdkPixmap *pixmap, livescore_applet *applet) {
 	/* taken from the TrashApplet */
 	GtkRcStyle *rc_style;
 	GtkStyle *style;
@@ -57,7 +57,7 @@ void applet_back_change (MatePanelApplet *a, MatePanelAppletBackgroundType type,
 
 }
 
-void applet_destroy(MatePanelApplet *applet_widget, livescore_applet *applet) {
+void applet_destroy(MyPanelApplet *applet_widget, livescore_applet *applet) {
 	g_main_loop_quit(applet->loop);
 	g_assert(applet);
 	fifo_free(applet->notif_queue);
@@ -67,7 +67,7 @@ void applet_destroy(MatePanelApplet *applet_widget, livescore_applet *applet) {
 }
 
 
-gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer data) {
+gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer data) {
 	livescore_applet *applet;
 	int i;
 
@@ -193,13 +193,16 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	// Put the container into the applet
 	gtk_container_add (GTK_CONTAINER (applet->applet), applet->event_box);
 
+#ifdef HAVE_MATE
 	// Define menu action group
 	applet->action_group = gtk_action_group_new ("Livescore_Applet_Actions");
-	gtk_action_group_add_actions (applet->action_group, applet_menu_actions, G_N_ELEMENTS (applet_menu_actions), applet);
-
+	gtk_action_group_add_actions (applet->action_group, applet_menu_actions_mate, G_N_ELEMENTS (applet_menu_actions_mate), applet);
 	// Build menu
 	mate_panel_applet_setup_menu(applet->applet, ui, applet->action_group);
-
+#elif HAVE_GNOME_2
+	// Build menu
+	panel_applet_setup_menu(applet->applet, ui, applet_menu_actions_gnome, applet);
+#endif
 	// Signals
 	g_signal_connect(G_OBJECT(applet->event_box), "button_press_event", G_CALLBACK (on_left_click), (gpointer)applet);
 	g_signal_connect(G_OBJECT(applet->applet), "change_background", G_CALLBACK (applet_back_change), (gpointer)applet);
@@ -221,5 +224,8 @@ gboolean applet_main (MatePanelApplet *applet_widget, const gchar *iid, gpointer
 	return TRUE;
 }
 
+#ifdef HAVE_MATE
 MATE_PANEL_APPLET_OUT_PROCESS_FACTORY (APPLET_FACTORY, PANEL_TYPE_APPLET, APPLET_NAME, applet_main, NULL)
-
+#elif HAVE_GNOME_2
+PANEL_APPLET_BONOBO_FACTORY (APPLET_FACTORY, PANEL_TYPE_APPLET, APPLET_NAME, APPLET_VERSION, applet_main, NULL)
+#endif
