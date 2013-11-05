@@ -29,6 +29,16 @@ void queue_notification (livescore_applet *applet, gchar *title, gchar *body, in
 	fifo_add(applet->notif_queue, notification);
 }
 
+void queue_goal (livescore_applet *applet, match_data *match) {
+        goal_data *goal = malloc(sizeof(goal_data));
+        sprintf(goal->team_home, "%s", match->team_home);
+	sprintf(goal->team_away, "%s", match->team_away);
+	goal->score_home = match->score_home;
+	goal->score_away = match->score_away;
+	goal->match_time = match->match_time;
+	goal->when = time(NULL);
+        fifo_add(applet->goal_queue, goal);
+}
 
 gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
 	return applet->all_leagues[league_id].favourite;
@@ -105,9 +115,21 @@ int manager_timer(livescore_applet *applet) {
 	// Is it time for clean-up?
 	q = div(now, 1000);
 	if (q.rem < 10) {
+		// TODO: Remove goals which have been onthe list for more than 2 hours
+		time_t now = time(NULL);
+		while (fifo_len(applet->goal_queue) > 0) {
+			goal_data *goal = fifo_read(applet->goal_queue);
+			if (now - goal->when > APPLET_KEEP_TIME_GOAL) {
+				goal = fifo_remove(applet->goal_queue);
+				free(goal);
+			}
+			else
+				break;
+		}
+
 		// Remove all matches older than 36 hours
 		for (i=0; i < applet->all_matches_counter; i++) {
-			if ((now - applet->all_matches[i].start_time) > APPLET_KEEP_TIME)
+			if ((now - applet->all_matches[i].start_time) > APPLET_KEEP_TIME_MATCH)
 				applet->all_matches[i].used = FALSE;
 		}
 		// Check all leagues which are not selected for notifications and have no matches
@@ -224,12 +246,16 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		if (flag_ntf_status_first) {
 			if (flag_ntf_status)
 				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE);
-			if (flag_ntf_score)
+			if (flag_ntf_score) {
 				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0], NOTIF_SHOW_IMAGE_GOAL);
+				queue_goal (applet, new_match);
+			}
 		}
 		else {
-			if (flag_ntf_score)
+			if (flag_ntf_score) {
 				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0], NOTIF_SHOW_IMAGE_GOAL);
+				queue_goal (applet, new_match);
+			}
 			if (flag_ntf_status)
 				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE);
 		}

@@ -71,7 +71,8 @@
 #define APPLET_WINDOW_MATCHES_HEIGHT 480
 #define APPLET_WINDOW_SETTINGS_WIDTH 480
 #define APPLET_WINDOW_SETTINGS_HEIGHT 320
-#define APPLET_KEEP_TIME 57600	// 16 hours
+#define APPLET_KEEP_TIME_MATCH 57600	// 16 hours
+#define APPLET_KEEP_TIME_GOAL 7200	// 2 hours
 #define APPLET_FEED_DEFAULT "lib_feed_iddaa.so"
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
@@ -146,6 +147,15 @@ typedef struct {
 } notif_data;
 
 typedef struct {
+	char team_home[64];
+	char team_away[64];
+	int score_home;
+	int score_away;
+	int match_time;
+	time_t when;
+} goal_data;
+
+typedef struct {
 	int feed_id;
 	char feed_name[256];
 	gboolean enabled;
@@ -190,6 +200,7 @@ typedef struct {
 	void (*feed_main)(match_data **, int *);
 	gboolean dialog_matches_is_visible;
 	fifo *notif_queue;
+	fifo *goals_queue;
 #ifdef HAVE_MATE
 	GSettings *gsettings;
 #endif
