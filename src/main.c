@@ -61,8 +61,9 @@ void applet_destroy(MyPanelApplet *applet_widget, livescore_applet *applet) {
 	g_main_loop_quit(applet->loop);
 	g_assert(applet);
 	fifo_free(applet->notif_queue);
-	fifo_free(applet->glaos_queue);
+	g_free(applet->all_goals);
 	g_free(applet->all_matches);
+	g_free(applet->all_leagues);
 	g_free(applet);
 	return;
 }
@@ -86,21 +87,34 @@ gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer d
 	applet = g_malloc0(sizeof(livescore_applet));
 	applet->applet = applet_widget;
 	applet->dialog_matches_is_visible = FALSE;
+
 	applet->notif_queue = fifo_new();
-	applet->goals_queue = fifo_new();
+
 	applet->all_matches = g_malloc0(sizeof(match_data));
 	applet->all_matches->league_id = -1;
+	applet->all_matches->match_id = 0;
 	applet->all_matches->score_home = 0;
 	applet->all_matches->score_away = 0;
 	applet->all_matches->used = FALSE;
 	applet->all_matches->status = MATCH_NOT_COMMENCED;
 	applet->all_matches_counter = 1;
+
 	applet->all_leagues = g_malloc0(sizeof(league_data));
 	applet->all_leagues->league_id = 0;
 	applet->all_leagues->used = FALSE;
 	applet->all_leagues->expanded = FALSE;
 	applet->all_leagues->favourite = FALSE;
 	applet->all_leagues_counter = 1;
+
+	applet->all_goals = g_malloc0(sizeof(goal_data));
+	applet->all_goals->match_id = -1;
+	applet->all_goals->goal_id = 0;
+	applet->all_goals->score_home = 0;
+	applet->all_goals->score_away = 0;
+	applet->all_goals->match_time = 0;
+	applet->all_goals->match_time_added = 0;
+	applet->all_goals->used = FALSE;
+	applet->all_goals_counter = 1;
 
 	// Prepare DConf - GNOME2 only
 #ifdef HAVE_GNOME_2
