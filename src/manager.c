@@ -156,7 +156,7 @@ int manager_timer(livescore_applet *applet) {
 
 
 gboolean manager_main (livescore_applet *applet, match_data *new_match) {
-	int i, match_id, league_id;
+	int i, league_id, match_id, goal_id, goals_before_this, goals_found;
 	gboolean flag_have_match = FALSE;
 	gboolean flag_unused = FALSE;
 	gboolean flag_have_league = FALSE;
@@ -186,10 +186,16 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		if ((applet->all_matches[match_id].score_home + applet->all_matches[match_id].score_away) != (new_match->score_home + new_match->score_away)) {
 			applet->all_matches[match_id].score_home = new_match->score_home;
 			applet->all_matches[match_id].score_away = new_match->score_away;
+			goals_before_this = new_match->score_home + new_match->score_away - 1;
+			goals_found = 0;
 
 			// Add the goal
 			for (i=0; i < applet->all_goals_counter; i++) {
-				if (!applet->all_goals[i].used) {
+				if (applet->all_goals[i].used && (applet->all_goals[i].match_id == match_id)) {
+					goals_found++;
+					continue;
+				}
+				if (!applet->all_goals[i].used && (goals_found == goals_before_this)) {
 					flag_need_new_goal = FALSE;
 					goal_id = i;
 					break;
@@ -204,8 +210,8 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			}
 			applet->all_goals[goal_id].used = TRUE;
 			applet->all_goals[goal_id].match_id = match_id;
-			applet->all_goals[goal_id].score.home = new_match->score_home;
-			applet->all_goals[goal_id].score.away = new_match->score_away;
+			applet->all_goals[goal_id].score_home = new_match->score_home;
+			applet->all_goals[goal_id].score_away = new_match->score_away;
 			applet->all_goals[goal_id].match_time = new_match->match_time;
 			applet->all_goals[goal_id].match_time_added = new_match->match_time_added;
 
@@ -267,7 +273,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	// If we don't have it, add it
 	else {
 		// If it is too far in the future, skip it
-		if (((new_match->start_time - now) > APPLET_KEEP_TIME) && (new_match->status == MATCH_NOT_COMMENCED))
+		if (((new_match->start_time - now) > APPLET_KEEP_TIME_MATCH) && (new_match->status == MATCH_NOT_COMMENCED))
 			return TRUE;
 
 		// League: do we have it; add if not

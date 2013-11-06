@@ -203,11 +203,11 @@ void gui_matches_dialog (livescore_applet *applet) {
 
 
 void gui_update_model(livescore_applet * applet) {
-	GtkTreeIter child, parent;
+	GtkTreeIter parent, child, grandson;
 	GtkTreeModel *model;
 	GdkPixbuf *running_image = NULL;
-	int i, j;
-	char all_match[256], score[16], image_file[1024], time_elapsed[32];
+	int i, j, k;
+	char all_match[256], score[16], image_file[1024], time_elapsed[32], goal_info[16];
 	struct tm *ltp, lt;
 	gboolean league_has_matches = FALSE;
 
@@ -217,9 +217,8 @@ void gui_update_model(livescore_applet * applet) {
 		gtk_tree_store_clear(applet->tree_store);
 
 		for (i=0; i < applet->all_leagues_counter; i++) {
-			league_has_matches = FALSE;
-
 			// Skip leagues which have no matches (e.g. loaded from GSettings)
+			league_has_matches = FALSE;
 			for (j=0; j < applet->all_matches_counter; j++) {
 				if (i == applet->all_matches[j].league_id) {
 					league_has_matches = TRUE;
@@ -234,7 +233,7 @@ void gui_update_model(livescore_applet * applet) {
 			gtk_tree_store_set (applet->tree_store, &parent, COL_MATCH, &applet->all_leagues[i].league_name[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_BOLD, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
 			for (j=0; j < applet->all_matches_counter; j++) {
-				if (i == applet->all_matches[j].league_id) {
+				if (applet->all_matches[j].used && (i == applet->all_matches[j].league_id)) {
 					// Show match
 					sprintf(&score[0], "%u : %u", applet->all_matches[j].score_home, applet->all_matches[j].score_away);
 
@@ -284,6 +283,14 @@ void gui_update_model(livescore_applet * applet) {
 					gtk_tree_store_append (applet->tree_store, &child, &parent);
 					gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image, COL_TIME, &time_elapsed[0], COL_SCORE, &score[0], COL_MATCH, &all_match[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
+					// Goals for this match
+					for (k=0; k < applet->all_goals_counter; k++) {
+						if (applet->all_goals[k].used && (j = applet->all_goals[k].match_id)) {
+							sprintf(&goal_info[0], "%u' %u:%u", applet->all_goals[k].match_time, applet->all_goals[k].score_home, applet->all_goals[k].score_away); 
+							gtk_tree_store_append (applet->tree_store, &grandson, &child);
+							gtk_tree_store_set (applet->tree_store, &grandson, COL_MATCH, &goal_info[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
+						}
+					}
 				}
 			}
 		}		
