@@ -285,7 +285,7 @@ void gui_update_model(livescore_applet * applet) {
 
 					// Goals for this match
 					for (k=0; k < applet->all_goals_counter; k++) {
-						if (applet->all_goals[k].used && (j = applet->all_goals[k].match_id)) {
+						if (applet->all_goals[k].used && (j == applet->all_goals[k].match_id)) {
 							sprintf(&goal_info[0], "%u' %u:%u", applet->all_goals[k].match_time, applet->all_goals[k].score_home, applet->all_goals[k].score_away); 
 							gtk_tree_store_append (applet->tree_store, &grandson, &child);
 							gtk_tree_store_set (applet->tree_store, &grandson, COL_MATCH, &goal_info[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
