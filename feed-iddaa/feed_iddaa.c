@@ -196,6 +196,8 @@ void iddaa_walk_tree(xmlNode * a_node, iddaa_match_data *iddaa_match, match_data
 
 int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	iddaa_match_data iddaa_match;
+	char tmp_file[1024];
+
 	memset(&iddaa_match.match_time[0], '\0', sizeof(iddaa_match.match_time));
 	memset(&iddaa_match.team_home[0], '\0', sizeof(iddaa_match.team_home));
 	memset(&iddaa_match.team_away[0], '\0', sizeof(iddaa_match.team_away));
@@ -204,7 +206,10 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	iddaa_match.score_away = 0;
 	iddaa_match.stage = -1;
 	iddaa_match.skip = FALSE;
-	int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, IDDAA_FILENAME);
+
+	struct passwd *pw = getpwuid(getuid());
+	sprintf(&tmp_file[0], "/tmp/%s-%u", IDDAA_FILENAME, pw->pw_uid);
+	int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, &tmp_file[0]);
 	if (!res) {
 		htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, 
 			HTML_PARSE_NOBLANKS | 
