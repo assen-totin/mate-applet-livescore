@@ -84,7 +84,7 @@ time_t iddaa_convert_time(char *s) {
 
 void iddaa_build_match(iddaa_match_data *iddaa_match, match_data **feed_matches, int *feed_matches_counter) {
 	int match_status, match_time, match_time_added;
-	time_t start_time;
+	time_t start_time = time(NULL);
 
 	if (strlen(&iddaa_match->team_home[0]) < 2)
 		return;

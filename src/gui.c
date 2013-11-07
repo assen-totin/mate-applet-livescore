@@ -222,7 +222,7 @@ void gui_update_model(livescore_applet * applet) {
 		// Skip leagues which have no matches (e.g. loaded from GSettings)
 		league_has_matches = FALSE;
 		for (j=0; j < applet->all_matches_counter; j++) {
-			if (i == applet->all_matches[j].league_id) {
+			if (applet->all_matches[j].used && (i == applet->all_matches[j].league_id)) {
 				league_has_matches = TRUE;
 				break;
 			}
