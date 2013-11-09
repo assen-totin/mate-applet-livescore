@@ -111,7 +111,7 @@ gboolean gui_expand_row(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *ite
 	gtk_tree_model_get(model, iter, COL_MATCH, &line, -1);
 	for (i=0; i < applet->all_leagues_counter; i++) {
 		if (!strcmp(&applet->all_leagues[i].league_name[0], line) && applet->all_leagues[i].expanded) {
-			gtk_tree_view_expand_row (GTK_TREE_VIEW(applet->tree_view), gtk_tree_model_get_path(model, iter), TRUE);
+			gtk_tree_view_expand_row (GTK_TREE_VIEW(applet->tree_view), gtk_tree_model_get_path(model, iter), FALSE);
 			break;
 		}
 	}
@@ -302,6 +302,7 @@ void gui_update_model(livescore_applet * applet) {
 	gboolean _tmp = applet->dialog_matches_is_visible;
 	applet->dialog_matches_is_visible = FALSE;
 	gtk_tree_model_foreach(model, gui_expand_row, applet);
+	//gtk_tree_view_columns_autosize(GTK_TREE_VIEW(applet->tree_view));
 	if (_tmp)
 		applet->dialog_matches_is_visible = TRUE;
 }
