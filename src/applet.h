@@ -138,12 +138,6 @@ enum {
 	NOTIF_SHOW_IMAGE_GOAL
 };
 
-enum {
-	GOAL_SCORED_NONE = 0,
-	GOAL_SCORED_HOME,
-	GOAL_SCORED_AWAY
-};
-
 typedef struct f_data {
 	void *node_data;
 	struct f_data *node_next;

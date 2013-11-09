@@ -379,7 +379,8 @@ void gui_update_model(livescore_applet * applet) {
 void gui_update_model_goals(livescore_applet *applet) {
         GtkTreeIter iter;
         GtkTreeModel *model;
-        int i, j, m, n=time(NULL)+1, index=0, total;
+	GdkPixbuf *running_image = NULL;
+        int i, j, m, n, index, index_prev, total;
         char all_match[256], score[16], time_elapsed[32];
         gboolean league_has_matches = FALSE;
 
@@ -395,20 +396,30 @@ void gui_update_model_goals(livescore_applet *applet) {
 	else 
 		total = APPLET_KEEP_TIME_MATCH;
 
-	for (i=0; i < total; i++) {
-		if (i > 0)
-			n = m;
 
-		m = applet->all_goals[0].time_added;
+	m = applet->all_goals[0].time_added;
+	n = time(NULL) + 1;
+	index = 0;
+	index_prev = 0;
+	for (i=0; i < total; i++) {
+		if (i > 0) {
+			n = m;
+			m = 0;
+			index_prev = index;
+		}
+
 		for (j=0; j < applet->all_goals_counter; j++) {
 			if (applet->all_goals[j].used && (applet->all_goals[j].time_added >= m) && (applet->all_goals[j].time_added <= n)) {
-				if ((applet->all_goals[j].time_added == n) && (j <= index))
+				if ((applet->all_goals[j].time_added == n) && (j >= index_prev))
 					continue;
 
 				m = applet->all_goals[j].time_added;
 				index = j;
 			}
 		}
+
+		if (m == 0)
+			continue;
 
 		sprintf(&all_match[0], "%s - %s", &applet->all_matches[applet->all_goals[index].match_id].team_home[0], &applet->all_matches[applet->all_goals[index].match_id].team_away[0]);
 		sprintf(&score[0], "%u : %u", applet->all_goals[index].score_home, applet->all_goals[index].score_away);
@@ -418,8 +429,17 @@ void gui_update_model_goals(livescore_applet *applet) {
 		else
 			sprintf(&time_elapsed[0], "%u+%u'", applet->all_goals[index].match_time, applet->all_goals[index].match_time_added);
 
+		if (applet->all_matches[applet->all_goals[index].match_id].status == MATCH_FIRST_TIME)
+			running_image = applet->running_image_green;
+		if (applet->all_matches[applet->all_goals[index].match_id].status == MATCH_SECOND_TIME) {
+			if (applet->all_goals[index].match_time < 80)
+				running_image = applet->running_image_yellow;
+			else
+				running_image = applet->running_image_red;
+		}
+
 		gtk_tree_store_append (applet->tree_store_goals, &iter, NULL);
-		gtk_tree_store_set (applet->tree_store_goals, &iter, COL_PIC, applet->running_image_red, COL_TIME, &time_elapsed[0], COL_SCORE, &score[0], COL_MATCH, &all_match[0], -1);
+		gtk_tree_store_set (applet->tree_store_goals, &iter, COL_PIC, running_image, COL_TIME, &time_elapsed[0], COL_SCORE, &score[0], COL_MATCH, &all_match[0], -1);
 	}
 }
 
