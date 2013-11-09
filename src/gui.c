@@ -30,31 +30,29 @@ void gui_quit(GtkWidget *widget, gpointer data) {
 
 	applet->dialog_matches_is_visible = FALSE;
 
-	// Get the VBox out of the dialog
-	gpointer *gp_vbox = g_object_ref(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
-	gtk_container_remove (GTK_CONTAINER(applet->dialog_matches), gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
+        // Get the VBox out of the dialog
+        gpointer *gp_vbox = g_object_ref(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
+        gtk_container_remove (GTK_CONTAINER(applet->dialog_matches), gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
 
-	// Get the notebook out of the VBox
-	GList *glist_notebook = gtk_container_get_children(GTK_CONTAINER(gp_vbox));
-	gpointer *gp_notebook = g_object_ref(glist_notebook->data);
+        // Get the notebook out of the VBox
+        GList *glist_notebook = gtk_container_get_children(GTK_CONTAINER(gp_vbox));
+        gpointer *gp_notebook = g_object_ref(glist_notebook->data);
+        gtk_container_remove (GTK_CONTAINER(gp_vbox), GTK_WIDGET(gp_notebook));
 
-	// Get the scrolled windows out of the notebook
-	GList *glist = gtk_container_get_children(GTK_CONTAINER(gp_vbox));
-	gpointer *gp_scrolled_window = g_object_ref(glist->data);
-	gpointer *gp_scrolled_window_goals = g_object_ref(glist->next->data);
-	gtk_container_remove (GTK_CONTAINER(gp_vbox), GTK_WIDGET(gp_scrolled_window));
-	gtk_container_remove (GTK_CONTAINER(gp_vbox), GTK_WIDGET(gp_scrolled_window_goals));
+        // Get the scrolled windows out of the notebook
+        GtkWidget *gp_scrolled_window = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gp_notebook), 0);
+        GtkWidget *gp_scrolled_window_goals = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gp_notebook), 1);
 
-	// Get applet->tree_view out of the scrolled window
-	gtk_container_remove (GTK_CONTAINER(gp_scrolled_window), applet->tree_view);
-	gtk_container_remove (GTK_CONTAINER(gp_scrolled_window_goals), applet->tree_view_goals);
+        // Get applet->tree_view out of the scrolled window
+        gpointer *atv = g_object_ref(applet->tree_view);
+        gpointer *atvg = g_object_ref(applet->tree_view_goals);
+        gtk_container_remove (GTK_CONTAINER(gp_scrolled_window), applet->tree_view);
+        gtk_container_remove (GTK_CONTAINER(gp_scrolled_window_goals), applet->tree_view_goals);
 
-	g_object_unref(gp_vbox);
-	g_object_unref(gp_notebook);
-	g_object_unref(gp_scrolled_window);
-	g_object_unref(gp_scrolled_window_goals);
+        g_object_unref(gp_vbox);
+        g_object_unref(gp_notebook);
 
-	gtk_widget_destroy(applet->dialog_matches);
+        gtk_widget_destroy(applet->dialog_matches);
 }
 
 
