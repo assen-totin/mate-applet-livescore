@@ -429,7 +429,7 @@ void gui_update_model_goals(livescore_applet *applet) {
 
 		if (applet->all_goals[index].match_time < 46)
 			running_image = applet->running_image_green;
-		else if (applet->all_goals[index].match_time < 80) {
+		else if (applet->all_goals[index].match_time < 80)
 			running_image = applet->running_image_yellow;
 		else
 			running_image = applet->running_image_red;
