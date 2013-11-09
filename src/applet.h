@@ -72,6 +72,7 @@
 #define APPLET_WINDOW_SETTINGS_WIDTH 480
 #define APPLET_WINDOW_SETTINGS_HEIGHT 320
 #define APPLET_KEEP_TIME_MATCH 57600	// 16 hours
+#define APPLET_SHOW_LAST_GOALS 30
 #define APPLET_FEED_DEFAULT "lib_feed_iddaa.so"
 // GSettings
 #define APPLET_GSETTINGS_SCHEMA "org.mate.panel.applet.LivescoreApplet"
@@ -116,6 +117,14 @@ enum {
 };
 
 enum {
+        COL_GOALS_PIC = 0,
+        COL_GOALS_TIME,
+        COL_GOALS_SCORE,
+        COL_GOALS_MATCH,
+        NUM_COLS_GOAL
+};
+
+enum {
 	MATCH_NOT_COMMENCED = 0,
 	MATCH_FIRST_TIME,
 	MATCH_HALF_TIME,
@@ -127,6 +136,12 @@ enum {
 enum {
 	NOTIF_SHOW_IMAGE_WHISTLE = 0,
 	NOTIF_SHOW_IMAGE_GOAL
+};
+
+enum {
+	GOAL_SCORED_NONE = 0,
+	GOAL_SCORED_HOME,
+	GOAL_SCORED_AWAY
 };
 
 typedef struct f_data {
@@ -152,6 +167,7 @@ typedef struct {
 	int score_away;
 	int match_time;
 	int match_time_added;
+	time_t time_added;
 	gboolean used;
 } goal_data;
 
@@ -208,6 +224,8 @@ typedef struct {
 #endif
 	GtkTreeStore *tree_store;
 	GtkWidget *tree_view;
+	GtkTreeStore *tree_store_goals;
+	GtkWidget *tree_view_goals;
 	GtkWidget *dialog_matches;
 	GtkWidget *dialog_settings;
 	GdkPixbuf *running_image_red;
@@ -232,7 +250,10 @@ void menu_cb_settings(GtkAction *, livescore_applet *);
 void menu_cb_about(GtkAction *, livescore_applet *);
 
 // gui.c
+void gui_create_view_and_model(livescore_applet *);
+void gui_create_view_and_model_goals(livescore_applet *);
 void gui_update_model(livescore_applet * applet);
+void gui_update_model_goals(livescore_applet * applet);
 gboolean on_left_click (GtkWidget *, GdkEventButton *, livescore_applet *);
 
 // manager.c

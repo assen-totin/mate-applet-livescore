@@ -114,6 +114,7 @@ gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer d
 	applet->all_goals->match_time = 0;
 	applet->all_goals->match_time_added = 0;
 	applet->all_goals->used = FALSE;
+	applet->all_goals->time_added = 0;
 	applet->all_goals_counter = 1;
 
 	// Prepare DConf - GNOME2 only
@@ -199,6 +200,7 @@ gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer d
 
 	// View and model
 	gui_create_view_and_model(applet);
+	gui_create_view_and_model_goals(applet);
 
 	// Get images for matches dialog
 	char image_file[1024];

@@ -148,6 +148,7 @@ int manager_timer(livescore_applet *applet) {
 
 			// Rebuild model for GUI
 			gui_update_model(applet);
+			gui_update_model_goals(applet);
 		}
 	}
 
@@ -166,6 +167,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	gboolean flag_need_new_goal = TRUE;
 	time_t now = time(NULL);
 	char ntf_text_status[256], ntf_title_status[256], ntf_text_score[256], ntf_title_score[256];
+	int scored_home = GOAL_SCORED_NONE, scored_away = GOAL_SCORED_NONE;
 
 //char dbg[1024];
 //sprintf(&dbg[0], "Called for match %s - %s", new_match->team_home, new_match->team_away);
@@ -188,6 +190,14 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			applet->all_matches[match_id].score_away = new_match->score_away;
 			goals_before_this = new_match->score_home + new_match->score_away - 1;
 			goals_found = 0;
+
+			// Who scored?
+			if (applet->all_matches[match_id].score_home != new_match->score_home) {
+				scored_home = GOAL_SCORED_HOME;
+			}
+			if (applet->all_matches[match_id].score_away != new_match->score_away) {
+				scored_away = GOAL_SCORED_AWAY;
+			}
 
 			// Add the goal
 			for (i=0; i < applet->all_goals_counter; i++) {
@@ -214,11 +224,17 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			applet->all_goals[goal_id].score_away = new_match->score_away;
 			applet->all_goals[goal_id].match_time = new_match->match_time;
 			applet->all_goals[goal_id].match_time_added = new_match->match_time_added;
+			applet->all_goals[goal_id].time_added = time(NULL);
 
 			// Prepare notification
 			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id)) {
 				sprintf(&ntf_title_score[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
-				sprintf(&ntf_text_score[0], "%s %u:%u", _("GOAL! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+				if (scored_home > GOAL_SCORED_NONE)
+					sprintf(&ntf_text_score[0], "%s %s%s %u:%u", _("GOAL for"), &applet->all_matches[match_id].team_home[0], _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+				if (scored_away > GOAL_SCORED_NONE)
+					sprintf(&ntf_text_score[0], "%s %s%s %u:%u", _("GOAL for"), &applet->all_matches[match_id].team_away[0], _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+				if ((scored_home > GOAL_SCORED_NONE) && (scored_away > GOAL_SCORED_NONE))
+					sprintf(&ntf_text_score[0], "%s %s %s %s%s %u:%u", _("GOALS for"), &applet->all_matches[match_id].team_home[0], _("and"), &applet->all_matches[match_id].team_away[0],_("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 				flag_ntf_score = TRUE;
 			}
 		}
