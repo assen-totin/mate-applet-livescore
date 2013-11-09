@@ -41,7 +41,7 @@ void gui_quit(GtkWidget *widget, gpointer data) {
 	// Get the scrolled windows out of the notebook
 	GList *glist = gtk_container_get_children(GTK_CONTAINER(gp_vbox));
 	gpointer *gp_scrolled_window = g_object_ref(glist->data);
-	gpointer *gp_scrolled_window_goals = = g_object_ref(glist->next->data);
+	gpointer *gp_scrolled_window_goals = g_object_ref(glist->next->data);
 	gtk_container_remove (GTK_CONTAINER(gp_vbox), GTK_WIDGET(gp_scrolled_window));
 	gtk_container_remove (GTK_CONTAINER(gp_vbox), GTK_WIDGET(gp_scrolled_window_goals));
 
@@ -223,7 +223,7 @@ void gui_create_view_and_model_goals(livescore_applet *applet) {
 
 
 void gui_matches_dialog (livescore_applet *applet) {
-	GtkWidget *scrolled_window, *button_close;
+	GtkWidget *scrolled_window, *scrolled_window_goals, *button_close;
 	GtkTreeModel *model;
 
 	// Livescore tab
@@ -242,7 +242,7 @@ void gui_matches_dialog (livescore_applet *applet) {
 
         // First page - Favourites
         GtkWidget *tab_label_1 = gtk_label_new(_("Live scores"));
-        gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scrolled_window tab_label_1);
+        gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scrolled_window, tab_label_1);
 
         // Second page - Icecast
         GtkWidget *tab_label_2 = gtk_label_new(_("Latest goals"));
@@ -390,8 +390,8 @@ void gui_update_model_goals(livescore_applet *applet) {
 
 	gtk_tree_store_clear(applet->tree_store_goals);
 
-	if (applet->all_goals_couner < APPLET_KEEP_TIME_MATCH)
-		total = applet->all_goals_couner;
+	if (applet->all_goals_counter < APPLET_KEEP_TIME_MATCH)
+		total = applet->all_goals_counter;
 	else 
 		total = APPLET_KEEP_TIME_MATCH;
 
