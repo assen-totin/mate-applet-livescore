@@ -429,14 +429,12 @@ void gui_update_model_goals(livescore_applet *applet) {
 		else
 			sprintf(&time_elapsed[0], "%u+%u'", applet->all_goals[index].match_time, applet->all_goals[index].match_time_added);
 
-		if (applet->all_matches[applet->all_goals[index].match_id].status == MATCH_FIRST_TIME)
+		if (applet->all_goals[index].match_time < 46)
 			running_image = applet->running_image_green;
-		if (applet->all_matches[applet->all_goals[index].match_id].status == MATCH_SECOND_TIME) {
-			if (applet->all_goals[index].match_time < 80)
-				running_image = applet->running_image_yellow;
-			else
-				running_image = applet->running_image_red;
-		}
+		else if (applet->all_goals[index].match_time < 80) {
+			running_image = applet->running_image_yellow;
+		else
+			running_image = applet->running_image_red;
 
 		gtk_tree_store_append (applet->tree_store_goals, &iter, NULL);
 		gtk_tree_store_set (applet->tree_store_goals, &iter, COL_PIC, running_image, COL_TIME, &time_elapsed[0], COL_SCORE, &score[0], COL_MATCH, &all_match[0], -1);
