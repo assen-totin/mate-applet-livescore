@@ -391,7 +391,7 @@ void gui_update_model_goals(livescore_applet *applet) {
 
 	gtk_tree_store_clear(applet->tree_store_goals);
 
-	if (applet->all_goals_counter < APPLET_KEEP_TIME_MATCH)
+	if (applet->all_goals_counter < APPLET_SHOW_LAST_GOALS)
 		total = applet->all_goals_counter;
 	else 
 		total = APPLET_KEEP_TIME_MATCH;
