@@ -385,7 +385,7 @@ void gui_update_model_goals(livescore_applet *applet) {
 
 	// Is there at least one goal to show?
 	for (i=0; i <  applet->all_goals_counter; i++) {
-		if (applet->all_goals[j].used) {
+		if (applet->all_goals[0].used) {
 			have_goals = TRUE;
 			break;
 		}
