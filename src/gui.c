@@ -401,7 +401,7 @@ void gui_update_model_goals(livescore_applet *applet) {
 	if (applet->all_goals_counter < APPLET_SHOW_LAST_GOALS)
 		total = applet->all_goals_counter;
 	else 
-		total = APPLET_KEEP_TIME_MATCH;
+		total = APPLET_SHOW_LAST_GOALS;
 
 
 	// Loop through all goals, from newest to oldest
