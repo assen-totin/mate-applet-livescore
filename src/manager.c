@@ -366,6 +366,15 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		applet->all_matches[match_id].match_time = new_match->match_time;
 		applet->all_matches[match_id].match_time_added = new_match->match_time_added;
 
+		// If the match is ongoing, notify about this:
+		if (applet->all_leagues[applet->all_matches[match_id].league_id].favourite) {
+			if ((new_match->status > MATCH_NOT_COMMENCED) && (new_match->status < MATCH_FULL_TIME)) {
+				sprintf(&ntf_title_score[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+				sprintf(&ntf_text_score[0][0], "%u' %u:%u", new_match->match_time, new_match->score_home, new_match->score_away);		
+				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0][0], NOTIF_SHOW_IMAGE_GOAL);
+			}
+		}
+
 //sprintf(&dbg[0], "Registered match: %s - %s", &new_match->team_home[0], &new_match->team_away[0]);
 //debug(&dbg[0]);
 	}
