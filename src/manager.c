@@ -29,10 +29,6 @@ void queue_notification (livescore_applet *applet, gchar *title, gchar *body, in
 	fifo_add(applet->notif_queue, notification);
 }
 
-gboolean is_league_subscribed (livescore_applet *applet, int league_id) {
-	return applet->all_leagues[league_id].favourite;
-}
-
 
 gboolean manager_populate_feed(livescore_applet *applet, gchar *selected_feed, gboolean flag_replace) {
 	char selected_feed_so[1024];
@@ -156,8 +152,51 @@ int manager_timer(livescore_applet *applet) {
 }
 
 
+void manager_add_goal(livescore_applet *applet, int match_id, int match_time, int match_time_added, char *ntf_text_score, gboolean flag_goal_home) {
+	int i, goal_id, goals_found = 0;
+	int goals_before = applet->all_matches[match_id].score_home + applet->all_matches[match_id].score_away;
+	gboolean flag_need_new_goal = TRUE;
+
+        for (i=0; i < applet->all_goals_counter; i++) {
+        	if (applet->all_goals[i].used && (applet->all_goals[i].match_id == match_id)) {
+                	goals_found++;
+                        continue;
+                }
+                if (!applet->all_goals[i].used && (goals_found == goals_before)) {
+                        flag_need_new_goal = FALSE;
+	                        goal_id = i;
+                                break;
+                }
+        }
+
+        if (flag_need_new_goal) {
+                void *_tmp = realloc(applet->all_goals, (applet->all_goals_counter + 1) * sizeof(goal_data));
+                applet->all_goals = (goal_data *) _tmp;
+                applet->all_goals_counter++;
+                goal_id = applet->all_goals_counter - 1;
+                applet->all_goals[goal_id].goal_id = goal_id;
+        }
+
+	if (flag_goal_home) {
+		applet->all_matches[match_id].score_home++;
+		sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), &applet->all_matches[match_id].team_home[0], _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+	}
+	else {
+		applet->all_matches[match_id].score_away++;
+		sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), &applet->all_matches[match_id].team_away[0], _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+	}
+
+        applet->all_goals[goal_id].used = TRUE;
+        applet->all_goals[goal_id].match_id = match_id;
+        applet->all_goals[goal_id].score_home = applet->all_matches[match_id].score_home;
+        applet->all_goals[goal_id].score_away = applet->all_matches[match_id].score_away;
+        applet->all_goals[goal_id].match_time = match_time;
+        applet->all_goals[goal_id].match_time_added = match_time_added;
+        applet->all_goals[goal_id].time_added = time(NULL);
+}
+
 gboolean manager_main (livescore_applet *applet, match_data *new_match) {
-	int i, league_id, match_id, goal_id, goals_before_this, goals_now, goals_found;
+	int i, j, league_id, match_id;
 	gboolean flag_have_match = FALSE;
 	gboolean flag_unused = FALSE;
 	gboolean flag_have_league = FALSE;
@@ -166,8 +205,8 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	gboolean flag_ntf_status_first = FALSE;
 	gboolean flag_need_new_goal = TRUE;
 	time_t now = time(NULL);
-	char ntf_text_status[256], ntf_title_status[256], ntf_text_score[256], ntf_title_score[256];
-	gboolean scored_home = FALSE, scored_away = FALSE;
+	char ntf_text_status[256], ntf_title_status[256], ntf_text_score[10][256], ntf_title_score[256];
+	int scored_home = 0, scored_away = 0;
 
 //char dbg[1024];
 //sprintf(&dbg[0], "Called for match %s - %s", new_match->team_home, new_match->team_away);
@@ -185,56 +224,19 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	// If we have it, check events
 	if (flag_have_match) {
 		// Has score changed?
-		if (applet->all_matches[match_id].score_home != new_match->score_home)
-			scored_home = TRUE;
-		if (applet->all_matches[match_id].score_away != new_match->score_away)
-			scored_away = TRUE;
+		scored_home = new_match->score_home - applet->all_matches[match_id].score_home;
+		scored_away = new_match->score_away - applet->all_matches[match_id].score_away;
 
-		if (scored_home || scored_away) {
-			goals_before_this = applet->all_matches[match_id].score_home + applet->all_matches[match_id].score_away;
-			goals_now = new_match->score_home + new_match->score_away;
-			applet->all_matches[match_id].score_home = new_match->score_home;
-			applet->all_matches[match_id].score_away = new_match->score_away;
-			goals_found = 0;
+		if ((scored_home > 0) || (scored_away > 0)) {
+			// Add the goal(s)
+			for (i=0; i < scored_home; i++)
+				manager_add_goal(applet, match_id, new_match->match_time, new_match->match_time_added, &ntf_text_score[i][0], TRUE);
+			for (i=scored_home; i < (scored_home + scored_away); i++)
+				manager_add_goal(applet, match_id, new_match->match_time, new_match->match_time_added, &ntf_text_score[i][0], FALSE);
 
-			// Add the goal
-			for (i=0; i < applet->all_goals_counter; i++) {
-				if (applet->all_goals[i].used && (applet->all_goals[i].match_id == match_id)) {
-					goals_found++;
-					continue;
-				}
-				if (!applet->all_goals[i].used && (goals_found == goals_before_this)) {
-					flag_need_new_goal = FALSE;
-					goal_id = i;
-					break;
-				}
-			}
-			if (flag_need_new_goal) {
-                                void *_tmp = realloc(applet->all_goals, (applet->all_goals_counter + 1) * sizeof(goal_data));
-                                applet->all_goals = (goal_data *) _tmp;
-                                applet->all_goals_counter++;
-                                goal_id = applet->all_goals_counter - 1;
-				applet->all_goals[goal_id].goal_id = goal_id;
-			}
-			applet->all_goals[goal_id].used = TRUE;
-			applet->all_goals[goal_id].match_id = match_id;
-			applet->all_goals[goal_id].score_home = new_match->score_home;
-			applet->all_goals[goal_id].score_away = new_match->score_away;
-			applet->all_goals[goal_id].match_time = new_match->match_time;
-			applet->all_goals[goal_id].match_time_added = new_match->match_time_added;
-			applet->all_goals[goal_id].time_added = time(NULL);
-
-			// Prepare notification
-			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id)) {
+			// Prepare notification(s)
+			if (applet->all_leagues[applet->all_matches[match_id].league_id].favourite) {
 				sprintf(&ntf_title_score[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
-				if (scored_home && scored_away)
-                                        sprintf(&ntf_text_score[0], "%s %s %s %s%s %u:%u", _("GOALS for"), &applet->all_matches[match_id].team_home[0], _("and"), &applet->all_matches[match_id].team_away[0],_("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-				else if (scored_home)
-					sprintf(&ntf_text_score[0], "%s %s%s %u:%u", _("GOAL for"), &applet->all_matches[match_id].team_home[0], _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-				else if (scored_away)
-					sprintf(&ntf_text_score[0], "%s %s%s %u:%u", _("GOAL for"), &applet->all_matches[match_id].team_away[0], _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
-				else
-					sprintf(&ntf_text_score[0], "%s %u:%u", _("GOAL! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 				flag_ntf_score = TRUE;
 			}
 		}
@@ -243,7 +245,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		if (applet->all_matches[match_id].status < new_match->status) {
 			applet->all_matches[match_id].status = new_match->status;
 
-			if (is_league_subscribed(applet, applet->all_matches[match_id].league_id)) {
+			if (applet->all_leagues[applet->all_matches[match_id].league_id].favourite) {
 				sprintf(&ntf_title_status[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
 
 				if (new_match->status == MATCH_FIRST_TIME) {
@@ -274,12 +276,16 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		if (flag_ntf_status_first) {
 			if (flag_ntf_status)
 				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE);
-			if (flag_ntf_score) 
-				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0], NOTIF_SHOW_IMAGE_GOAL);
+			if (flag_ntf_score) {
+				for (i=0; i < (scored_home + scored_away); i++)
+					queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL);
+			}
 		}
 		else {
-			if (flag_ntf_score) 
-				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0], NOTIF_SHOW_IMAGE_GOAL);
+			if (flag_ntf_score) {
+				for (i=0; i < (scored_home + scored_away); i++)
+					queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL);
+			}
 			if (flag_ntf_status)
 				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE);
 		}
