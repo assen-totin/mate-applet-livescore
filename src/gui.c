@@ -30,22 +30,29 @@ void gui_quit(GtkWidget *widget, gpointer data) {
 
 	applet->dialog_matches_is_visible = FALSE;
 
-	// Get the VBox out of the dialog
-	gpointer *gp_vbox = g_object_ref(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
-	gtk_container_remove (GTK_CONTAINER(applet->dialog_matches), gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
+        // Get the VBox out of the dialog
+        gpointer *gp_vbox = g_object_ref(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
+        gtk_container_remove (GTK_CONTAINER(applet->dialog_matches), gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
 
-	// Get the scrolled window out of the VBox
-	GList *glist = gtk_container_get_children(GTK_CONTAINER(gp_vbox));
-	gpointer *gp_scrolled_window = g_object_ref(glist->data);
-	gtk_container_remove (GTK_CONTAINER(gp_vbox), GTK_WIDGET(gp_scrolled_window));
+        // Get the notebook out of the VBox
+        GList *glist_notebook = gtk_container_get_children(GTK_CONTAINER(gp_vbox));
+        gpointer *gp_notebook = g_object_ref(glist_notebook->data);
+        gtk_container_remove (GTK_CONTAINER(gp_vbox), GTK_WIDGET(gp_notebook));
 
-	// Get applet->tree_view out of the scrolled window
-	gtk_container_remove (GTK_CONTAINER(gp_scrolled_window), applet->tree_view);
+        // Get the scrolled windows out of the notebook
+        GtkWidget *gp_scrolled_window = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gp_notebook), 0);
+        GtkWidget *gp_scrolled_window_goals = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gp_notebook), 1);
 
-	g_object_unref(gp_vbox);
-	g_object_unref(gp_scrolled_window);
+        // Get applet->tree_view out of the scrolled window
+        gpointer *atv = g_object_ref(applet->tree_view);
+        gpointer *atvg = g_object_ref(applet->tree_view_goals);
+        gtk_container_remove (GTK_CONTAINER(gp_scrolled_window), applet->tree_view);
+        gtk_container_remove (GTK_CONTAINER(gp_scrolled_window_goals), applet->tree_view_goals);
 
-	gtk_widget_destroy(applet->dialog_matches);
+        g_object_unref(gp_vbox);
+        g_object_unref(gp_notebook);
+
+        gtk_widget_destroy(applet->dialog_matches);
 }
 
 
@@ -111,7 +118,7 @@ gboolean gui_expand_row(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *ite
 	gtk_tree_model_get(model, iter, COL_MATCH, &line, -1);
 	for (i=0; i < applet->all_leagues_counter; i++) {
 		if (!strcmp(&applet->all_leagues[i].league_name[0], line) && applet->all_leagues[i].expanded) {
-			gtk_tree_view_expand_row (GTK_TREE_VIEW(applet->tree_view), gtk_tree_model_get_path(model, iter), TRUE);
+			gtk_tree_view_expand_row (GTK_TREE_VIEW(applet->tree_view), gtk_tree_model_get_path(model, iter), FALSE);
 			break;
 		}
 	}
@@ -172,20 +179,79 @@ void gui_create_view_and_model(livescore_applet *applet) {
 }
 
 
+void gui_create_view_and_model_goals(livescore_applet *applet) {
+        GtkCellRenderer *renderer, *renderer_image;
+        GtkTreeViewColumn *column;
+        GtkTreeModel *model;
+        GtkTreeIter iter;
+
+        applet->tree_view_goals = gtk_tree_view_new();
+        applet->tree_store_goals = gtk_tree_store_new(NUM_COLS_GOAL, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+
+        // Column 1 - image
+        renderer_image = gtk_cell_renderer_pixbuf_new();
+        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, " ", renderer_image, "pixbuf", COL_GOALS_PIC, NULL);
+
+        // Column 2
+        renderer = gtk_cell_renderer_text_new();
+        g_object_set (renderer, "xalign", 1.0, NULL);
+        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, _("Time"), renderer, "text", COL_GOALS_TIME, NULL);
+
+        // Column 3
+        renderer = gtk_cell_renderer_text_new();
+        g_object_set (renderer, "xalign", 0.5, NULL);
+        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, _("Score"), renderer, "text", COL_GOALS_SCORE, NULL);
+
+        // Column 4
+        renderer = gtk_cell_renderer_text_new();
+        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, _("Match"), renderer, "text", COL_GOALS_MATCH, NULL);
+
+        gtk_tree_store_append (applet->tree_store_goals, &iter, NULL);
+        gtk_tree_store_set (applet->tree_store_goals, &iter, COL_GOALS_MATCH, _("No goals yet. Wait until some are scored."), -1);
+
+        model = GTK_TREE_MODEL(applet->tree_store_goals);
+        gtk_tree_view_set_model (GTK_TREE_VIEW (applet->tree_view_goals), model);
+        // The tree view has acquired its own reference to the model, so we can drop ours. 
+        // That way the model will be freed automatically when the tree view is destroyed 
+        g_object_unref (model);
+
+        GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(applet->tree_view_goals));
+        gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+}
+
+
 void gui_matches_dialog (livescore_applet *applet) {
-	GtkWidget *scrolled_window, *button_close;
+	GtkWidget *scrolled_window, *scrolled_window_goals, *button_close;
 	GtkTreeModel *model;
 
+	// Livescore tab
 	scrolled_window = gtk_scrolled_window_new(NULL,NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 	gtk_container_add (GTK_CONTAINER (scrolled_window), applet->tree_view);
+
+	// Goals log tab
+	scrolled_window_goals = gtk_scrolled_window_new(NULL,NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window_goals), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+	gtk_container_add (GTK_CONTAINER (scrolled_window_goals), applet->tree_view_goals);
+
+        // Create notebook widget
+        GtkWidget *notebook = gtk_notebook_new();
+        gtk_widget_set_size_request (notebook, APPLET_WINDOW_MATCHES_WIDTH, APPLET_WINDOW_MATCHES_HEIGHT);
+
+        // First page - Favourites
+        GtkWidget *tab_label_1 = gtk_label_new(_("Live scores"));
+        gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scrolled_window, tab_label_1);
+
+        // Second page - Icecast
+        GtkWidget *tab_label_2 = gtk_label_new(_("Latest goals"));
+        gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scrolled_window_goals, tab_label_2);
 
 	// Assemble window
 	applet->dialog_matches = gtk_dialog_new_with_buttons (_("MATE Livescore Applet"), GTK_WINDOW(applet), GTK_DIALOG_MODAL, NULL);
 	gtk_window_resize(GTK_WINDOW(applet->dialog_matches), APPLET_WINDOW_MATCHES_WIDTH, APPLET_WINDOW_MATCHES_HEIGHT);
 	button_close = gtk_dialog_add_button (GTK_DIALOG(applet->dialog_matches), GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL);
 	gtk_dialog_set_default_response (GTK_DIALOG (applet->dialog_matches), GTK_RESPONSE_CANCEL);
-	gtk_container_add (GTK_CONTAINER(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches))), scrolled_window);
+	gtk_container_add (GTK_CONTAINER(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches))), notebook);
 
 	// Signals
 	g_signal_connect (G_OBJECT(button_close), "clicked", G_CALLBACK (gui_quit), (gpointer) applet);
@@ -203,99 +269,185 @@ void gui_matches_dialog (livescore_applet *applet) {
 
 
 void gui_update_model(livescore_applet * applet) {
-	GtkTreeIter child, parent;
+	GtkTreeIter parent, child, grandson;
 	GtkTreeModel *model;
 	GdkPixbuf *running_image = NULL;
-	int i, j;
-	char all_match[256], score[16], image_file[1024], time_elapsed[32];
+	int i, j, k;
+	char all_match[256], score[16], image_file[1024], time_elapsed[32], goal_info[16];
 	struct tm *ltp, lt;
 	gboolean league_has_matches = FALSE;
 
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view));
 
-	if (applet->all_matches_counter > 1) {
-		gtk_tree_store_clear(applet->tree_store);
+	if (applet->all_matches_counter < 2) 
+		return;
 
-		for (i=0; i < applet->all_leagues_counter; i++) {
-			league_has_matches = FALSE;
+	gtk_tree_store_clear(applet->tree_store);
 
-			// Skip leagues which have no matches (e.g. loaded from GSettings)
-			for (j=0; j < applet->all_matches_counter; j++) {
-				if (i == applet->all_matches[j].league_id) {
-					league_has_matches = TRUE;
-					break;
-				}
+	for (i=0; i < applet->all_leagues_counter; i++) {
+		// Skip leagues which have no matches (e.g. loaded from GSettings)
+		league_has_matches = FALSE;
+		for (j=0; j < applet->all_matches_counter; j++) {
+			if (applet->all_matches[j].used && (i == applet->all_matches[j].league_id)) {
+				league_has_matches = TRUE;
+				break;
 			}
-			if (!league_has_matches)
-				continue;
+		}
+		if (!league_has_matches)
+			continue;
 
-			// Show league
-			gtk_tree_store_append (applet->tree_store, &parent, NULL);
-			gtk_tree_store_set (applet->tree_store, &parent, COL_MATCH, &applet->all_leagues[i].league_name[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_BOLD, COL_HIDDEN_BOOLEAN, TRUE, -1);
+		// Show league
+		gtk_tree_store_append (applet->tree_store, &parent, NULL);
+		gtk_tree_store_set (applet->tree_store, &parent, COL_MATCH, &applet->all_leagues[i].league_name[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_BOLD, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
-			for (j=0; j < applet->all_matches_counter; j++) {
-				if (i == applet->all_matches[j].league_id) {
-					// Show match
-					sprintf(&score[0], "%u : %u", applet->all_matches[j].score_home, applet->all_matches[j].score_away);
+		for (j=0; j < applet->all_matches_counter; j++) {
+			if (applet->all_matches[j].used && (i == applet->all_matches[j].league_id)) {
+				// Show match
+				sprintf(&score[0], "%u : %u", applet->all_matches[j].score_home, applet->all_matches[j].score_away);
 
-					if (applet->all_matches[j].status == MATCH_FIRST_TIME) {
-						if (applet->all_matches[j].match_time_added == 0)
-							sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
-						else
-							sprintf(&time_elapsed[0], "%u+%u'", applet->all_matches[j].match_time, applet->all_matches[j].match_time_added);
-						running_image = applet->running_image_green;
-					}
-					else if (applet->all_matches[j].status == MATCH_HALF_TIME) {
-						sprintf(&time_elapsed[0], _("HT"));
-						running_image = applet->running_image_gray;
-					}
-					else if (applet->all_matches[j].status == MATCH_SECOND_TIME) {
-						if (applet->all_matches[j].match_time_added == 0)
-							sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
-						else
-							sprintf(&time_elapsed[0], "%u+%u'", applet->all_matches[j].match_time, applet->all_matches[j].match_time_added);
-						if (applet->all_matches[j].match_time < 80)
-							running_image = applet->running_image_yellow;
-						else
-							running_image = applet->running_image_red;
-					}
-					else if (applet->all_matches[j].status == MATCH_EXTRA_TIME) {
-						if (applet->all_matches[j].match_time_added == 0)
-							sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
-						else
-							sprintf(&time_elapsed[0], "%u+%u'", applet->all_matches[j].match_time, applet->all_matches[j].match_time_added);
+				if (applet->all_matches[j].status == MATCH_FIRST_TIME) {
+					if (applet->all_matches[j].match_time_added == 0)
+						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+					else
+						sprintf(&time_elapsed[0], "%u+%u'", applet->all_matches[j].match_time, applet->all_matches[j].match_time_added);
+					running_image = applet->running_image_green;
+				}
+				else if (applet->all_matches[j].status == MATCH_HALF_TIME) {
+					sprintf(&time_elapsed[0], _("HT"));
+					running_image = applet->running_image_gray;
+				}
+				else if (applet->all_matches[j].status == MATCH_SECOND_TIME) {
+					if (applet->all_matches[j].match_time_added == 0)
+						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+					else
+						sprintf(&time_elapsed[0], "%u+%u'", applet->all_matches[j].match_time, applet->all_matches[j].match_time_added);
+					if (applet->all_matches[j].match_time < 80)
+						running_image = applet->running_image_yellow;
+					else
 						running_image = applet->running_image_red;
-					}
-					else if (applet->all_matches[j].status == MATCH_FULL_TIME) { 
-						sprintf(&time_elapsed[0], _("FT"));
-						running_image = NULL;
-					}
-					else {
-						sprintf(&score[0], " ");
-						ltp = localtime(&applet->all_matches[j].start_time);
-						sprintf(&time_elapsed[0], "%u:%u", ltp->tm_hour, ltp->tm_min);
-						if (ltp->tm_min < 10)
-							strcat(&time_elapsed[0], "0");
-						running_image = NULL;
-					}
+				}
+				else if (applet->all_matches[j].status == MATCH_EXTRA_TIME) {
+					if (applet->all_matches[j].match_time_added == 0)
+						sprintf(&time_elapsed[0], "%u'", applet->all_matches[j].match_time);
+					else
+						sprintf(&time_elapsed[0], "%u+%u'", applet->all_matches[j].match_time, applet->all_matches[j].match_time_added);
+					running_image = applet->running_image_red;
+				}
+				else if (applet->all_matches[j].status == MATCH_FULL_TIME) { 
+					sprintf(&time_elapsed[0], _("FT"));
+					running_image = NULL;
+				}
+				else {
+					sprintf(&score[0], " ");
+					ltp = localtime(&applet->all_matches[j].start_time);
+					sprintf(&time_elapsed[0], "%u:%u", ltp->tm_hour, ltp->tm_min);
+					if (ltp->tm_min < 10)
+						strcat(&time_elapsed[0], "0");
+					running_image = NULL;
+				}
 
-					sprintf(&all_match[0], "%s - %s", &applet->all_matches[j].team_home[0], &applet->all_matches[j].team_away[0]);
+				sprintf(&all_match[0], "%s - %s", &applet->all_matches[j].team_home[0], &applet->all_matches[j].team_away[0]);
 
-					gtk_tree_store_append (applet->tree_store, &child, &parent);
-					gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image, COL_TIME, &time_elapsed[0], COL_SCORE, &score[0], COL_MATCH, &all_match[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
+				gtk_tree_store_append (applet->tree_store, &child, &parent);
+				gtk_tree_store_set (applet->tree_store, &child, COL_PIC, running_image, COL_TIME, &time_elapsed[0], COL_SCORE, &score[0], COL_MATCH, &all_match[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
 
+				// Goals for this match
+				for (k=0; k < applet->all_goals_counter; k++) {
+					if (applet->all_goals[k].used && (j == applet->all_goals[k].match_id)) {
+						sprintf(&goal_info[0], "%u' %u:%u", applet->all_goals[k].match_time, applet->all_goals[k].score_home, applet->all_goals[k].score_away); 
+						gtk_tree_store_append (applet->tree_store, &grandson, &child);
+						gtk_tree_store_set (applet->tree_store, &grandson, COL_MATCH, &goal_info[0], COL_HIDDEN_BOLD, PANGO_WEIGHT_NORMAL, COL_HIDDEN_BOOLEAN, TRUE, -1);
+					}
 				}
 			}
-		}		
-	}
+		}
+	}		
 
 	// Expand rows
 	// Termporarily block visibility in order not to trigget the 'row-expanded' callback function
 	gboolean _tmp = applet->dialog_matches_is_visible;
 	applet->dialog_matches_is_visible = FALSE;
 	gtk_tree_model_foreach(model, gui_expand_row, applet);
+	//gtk_tree_view_columns_autosize(GTK_TREE_VIEW(applet->tree_view));
 	if (_tmp)
 		applet->dialog_matches_is_visible = TRUE;
+}
+
+
+void gui_update_model_goals(livescore_applet *applet) {
+        GtkTreeIter iter;
+        GtkTreeModel *model;
+	GdkPixbuf *running_image = NULL;
+        int i, j, m, n, index, index_prev, total;
+        char all_match[256], score[16], time_elapsed[32];
+        gboolean league_has_matches = FALSE;
+	gboolean have_goals = FALSE;
+
+	// Is there at least one goal to show?
+	for (i=0; i <  applet->all_goals_counter; i++) {
+		if (applet->all_goals[0].used) {
+			have_goals = TRUE;
+			break;
+		}
+	}
+	if (!have_goals)
+		return;
+
+	// Get model, clear store
+        model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view_goals));
+	gtk_tree_store_clear(applet->tree_store_goals);
+
+	// Show up to APPLET_SHOW_LAST_GOALS goals but no more than they are actually
+	if (applet->all_goals_counter < APPLET_SHOW_LAST_GOALS)
+		total = applet->all_goals_counter;
+	else 
+		total = APPLET_SHOW_LAST_GOALS;
+
+
+	// Loop through all goals, from newest to oldest
+	// Caveat: more than one goal can be added within the same round, so there may be goals with same timestamp
+	m = applet->all_goals[0].time_added;
+	n = time(NULL) + 1;
+	index = 0;
+	index_prev = 0;
+	for (i=0; i < total; i++) {
+		if (i > 0) {
+			n = m;
+			m = 0;
+			index_prev = index;
+		}
+
+		for (j=0; j < applet->all_goals_counter; j++) {
+			if (applet->all_goals[j].used && (applet->all_goals[j].time_added >= m) && (applet->all_goals[j].time_added <= n)) {
+				if ((applet->all_goals[j].time_added == n) && (j >= index_prev))
+					continue;
+
+				m = applet->all_goals[j].time_added;
+				index = j;
+			}
+		}
+
+		if (m == 0)
+			continue;
+
+		sprintf(&all_match[0], "%s - %s", &applet->all_matches[applet->all_goals[index].match_id].team_home[0], &applet->all_matches[applet->all_goals[index].match_id].team_away[0]);
+		sprintf(&score[0], "%u : %u", applet->all_goals[index].score_home, applet->all_goals[index].score_away);
+
+		if (applet->all_goals[index].match_time_added == 0)
+			sprintf(&time_elapsed[0], "%u'", applet->all_goals[index].match_time);
+		else
+			sprintf(&time_elapsed[0], "%u+%u'", applet->all_goals[index].match_time, applet->all_goals[index].match_time_added);
+
+		if (applet->all_goals[index].match_time < 46)
+			running_image = applet->running_image_green;
+		else if (applet->all_goals[index].match_time < 80)
+			running_image = applet->running_image_yellow;
+		else
+			running_image = applet->running_image_red;
+
+		gtk_tree_store_append (applet->tree_store_goals, &iter, NULL);
+		gtk_tree_store_set (applet->tree_store_goals, &iter, COL_PIC, running_image, COL_TIME, &time_elapsed[0], COL_SCORE, &score[0], COL_MATCH, &all_match[0], -1);
+	}
 }
 
 

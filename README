@@ -66,7 +66,8 @@ The "match_data" structure has the following members (see src/applet.h):
 -- int score_home - number of goals for the home team; will be ignored for 
    matches that have not yet commenced (set to 0 for them)
 -- int score_away - same as previous, for away team
--- time_t start_time - match start time, UNIX timestamp, UTC
+-- time_t start_time - match start time, UNIX timestamp, UTC (or current time)
+   if actual start time is unknown.
 -- int match_time - number of minutes since the beginning of match; will be 
    ignored for matches that have not yet commenced (set to 0 for them); when
    additional time is given in the end of first ahd second half, keep this

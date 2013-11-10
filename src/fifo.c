@@ -65,22 +65,6 @@ void *fifo_remove(fifo *queue) {
 }
 
 
-/* Read from the front of the fifo, but don;t remove the node yet */
-void *fifo_read(fifo *queue) {
-        fifo_data *node;
-        void *data;
-
-        if ((node = queue->fifo_head) == NULL)
-                return (NULL);
-
-        data = node->node_data;
-//        if ((queue->fifo_head = node->node_next) == NULL)
-//                queue->fifo_tail = NULL;
-
-        return (data);
-}
-
-
 /* Free an entire fifo */
 void fifo_free(fifo *queue) {
 	fifo_data *node = queue->fifo_head;
