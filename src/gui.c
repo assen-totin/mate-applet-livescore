@@ -381,20 +381,31 @@ void gui_update_model_goals(livescore_applet *applet) {
         int i, j, m, n, index, index_prev, total;
         char all_match[256], score[16], time_elapsed[32];
         gboolean league_has_matches = FALSE;
+	gboolean have_goals = FALSE;
 
-	if (applet->all_goals_counter < 2)
+	// Is there at least one goal to show?
+	for (i=0; i <  applet->all_goals_counter; i++) {
+		if (applet->all_goals[j].used) {
+			have_goals = TRUE;
+			break;
+		}
+	}
+	if (!have_goals)
 		return;
 
+	// Get model, clear store
         model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view_goals));
-
 	gtk_tree_store_clear(applet->tree_store_goals);
 
+	// Show up to APPLET_SHOW_LAST_GOALS goals but no more than they are actually
 	if (applet->all_goals_counter < APPLET_SHOW_LAST_GOALS)
 		total = applet->all_goals_counter;
 	else 
 		total = APPLET_KEEP_TIME_MATCH;
 
 
+	// Loop through all goals, from newest to oldest
+	// Caveat: more than one goal can be added within the same round, so there may be goals with same timestamp
 	m = applet->all_goals[0].time_added;
 	n = time(NULL) + 1;
 	index = 0;
