@@ -10,6 +10,9 @@ of the following events: commenicing of a game, half time, game's end and goal
 scored. To select which leagues to follow, right-click the applet.
 Notifications will be shown up to 3 a time. 
 
+In addition, at  start-up, the applet will notify you about any game in 
+progress from the leagues you have selected. 
+
 You can also view all the currents scores. To do so, left-click the applet.
 The window will refresh each time an update is received. If you expand one or 
 more leagues, this will be rememered between window closures and also between 
@@ -22,6 +25,8 @@ minute and red means after 80th minute (and extra time).
 
 Past games will be stored in the list for 16 hours after their original start
 time. Future games will appear on the list up to 16 fours before they begin.
+
+The next tab of the same window lists the last 30 scored goals in all matches.
 
 
 DATA SOURCES

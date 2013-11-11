@@ -214,10 +214,10 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	iddaa_match.skip = FALSE;
 
 	struct passwd *pw = getpwuid(getuid());
-	sprintf(&tmp_file[0], "/tmp/%s-%u", IDDAA_FILENAME, pw->pw_uid);
+	sprintf(&tmp_file[0], "%s-%u", IDDAA_FILENAME, pw->pw_uid);
 	int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, &tmp_file[0]);
 	if (!res) {
-		htmlDocPtr parser = htmlReadFile(IDDAA_FILENAME, IDDAA_CHARSET, 
+		htmlDocPtr parser = htmlReadFile(&tmp_file[0], IDDAA_CHARSET, 
 			HTML_PARSE_NOBLANKS | 
 #ifdef HAVE_MATE
 			HTML_PARSE_NOIMPLIED | 
