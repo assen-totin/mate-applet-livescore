@@ -283,20 +283,20 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE, FALSE);
 			if (flag_ntf_score) {
 				for (i=0; i < (scored_home + scored_away); i++) {
-					if (i == 0)
-						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, FALSE);
-					else
+					if ((scored_home + scored_away) > 1)
 						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, TRUE);
+					else
+						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, FALSE);
 				}
 			}
 		}
 		else {
 			if (flag_ntf_score) {
 				for (i=0; i < (scored_home + scored_away); i++) {
-					if (i == 0)
-						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, FALSE);
-					else
+					if ((scored_home + scored_away) > 1)
 						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, TRUE);
+					else
+						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, FALSE);
 				}
 			}
 			if (flag_ntf_status)
