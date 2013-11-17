@@ -21,11 +21,12 @@
 #include "../config.h"
 #include "applet.h"
 
-void queue_notification (livescore_applet *applet, gchar *title, gchar *body, int image) {
+void queue_notification (livescore_applet *applet, gchar *title, gchar *body, int image, gboolean block) {
 	notif_data *notification = malloc(sizeof(notif_data));
 	sprintf(notification->title, "%s", title);
 	sprintf(notification->body, "%s", body);
 	notification->image = image;
+	notification->block = block;
 	fifo_add(applet->notif_queue, notification);
 }
 
@@ -90,6 +91,10 @@ int manager_timer(livescore_applet *applet) {
 					show_notification(notification->title, notification->body, applet->notif_image_whistle);
 				else
 					show_notification(notification->title, notification->body, NULL);
+
+				if (notification->block)
+					break;
+
 				free(notification);
 			}
 		}
@@ -275,19 +280,27 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		// Queue notifications: always queue first goal changes unless the status change is beginning of game
 		if (flag_ntf_status_first) {
 			if (flag_ntf_status)
-				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE);
+				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE, FALSE);
 			if (flag_ntf_score) {
-				for (i=0; i < (scored_home + scored_away); i++)
-					queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL);
+				for (i=0; i < (scored_home + scored_away); i++) {
+					if (i == 0)
+						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, FALSE);
+					else
+						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, TRUE);
+				}
 			}
 		}
 		else {
 			if (flag_ntf_score) {
-				for (i=0; i < (scored_home + scored_away); i++)
-					queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL);
+				for (i=0; i < (scored_home + scored_away); i++) {
+					if (i == 0)
+						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, FALSE);
+					else
+						queue_notification(applet, &ntf_title_score[0], &ntf_text_score[i][0], NOTIF_SHOW_IMAGE_GOAL, TRUE);
+				}
 			}
 			if (flag_ntf_status)
-				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE);
+				queue_notification(applet, &ntf_title_status[0], &ntf_text_status[0], NOTIF_SHOW_IMAGE_WHISTLE, FALSE);
 		}
 
 		return TRUE;
@@ -371,7 +384,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			if ((new_match->status > MATCH_NOT_COMMENCED) && (new_match->status < MATCH_FULL_TIME)) {
 				sprintf(&ntf_title_score[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
 				sprintf(&ntf_text_score[0][0], "%u' %u:%u", new_match->match_time, new_match->score_home, new_match->score_away);		
-				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0][0], NOTIF_SHOW_IMAGE_GOAL);
+				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0][0], NOTIF_SHOW_IMAGE_GOAL, FALSE);
 			}
 		}
 

@@ -152,6 +152,7 @@ typedef struct {
 	char title[256];
 	char body[256];
 	int image;
+	gboolean block;
 } notif_data;
 
 typedef struct {
