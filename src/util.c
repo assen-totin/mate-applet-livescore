@@ -126,6 +126,16 @@ char *trim_quotes(char *s) {
 	return s;
 }
 
+
+char *first_word(char *s) {
+        if (!s)
+                return NULL;   // handle NULL string
+        if (!*s)
+                return s;      // handle empty string
+	return (strtok(s, " "));
+}
+
+
 char *string_ends(char *s, int count) {
 	if (!s)
 		return NULL;   // handle NULL string

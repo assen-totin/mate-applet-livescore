@@ -236,6 +236,7 @@ void show_notification (gchar *, gchar *, GdkPixbuf *);
 gboolean cp(const char *, const char *);
 char *trim(char *);
 char *trim_quotes(char *);
+char *first_word(char *);
 char *string_ends(char *, int);
 void debug(char *);
 

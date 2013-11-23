@@ -184,11 +184,11 @@ void manager_add_goal(livescore_applet *applet, int match_id, int match_time, in
 
 	if (flag_goal_home) {
 		applet->all_matches[match_id].score_home++;
-		sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), &applet->all_matches[match_id].team_home[0], _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+		sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), first_word(&applet->all_matches[match_id].team_home[0]), _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 	}
 	else {
 		applet->all_matches[match_id].score_away++;
-		sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), &applet->all_matches[match_id].team_away[0], _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+		sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), first_word(&applet->all_matches[match_id].team_away[0]), _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 	}
 
         applet->all_goals[goal_id].used = TRUE;
