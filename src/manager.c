@@ -241,7 +241,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 
 			// Prepare notification(s)
 			if (applet->all_leagues[applet->all_matches[match_id].league_id].favourite) {
-				sprintf(&ntf_title_score[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+				snprintf(&ntf_title_score[0], sizeof(ntf_title_score), "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
 				flag_ntf_score = TRUE;
 			}
 		}
@@ -251,22 +251,22 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			applet->all_matches[match_id].status = new_match->status;
 
 			if (applet->all_leagues[applet->all_matches[match_id].league_id].favourite) {
-				sprintf(&ntf_title_status[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+				snprintf(&ntf_title_status[0], sizeof(&ntf_title_status), "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
 
 				if (new_match->status == MATCH_FIRST_TIME) {
-					sprintf(&ntf_text_status[0], "%s", _("The game commences."));
+					snprintf(&ntf_text_status[0], sizeof(ntf_text_status), "%s", _("The game commences."));
 					flag_ntf_status_first = TRUE;
 				}
 				else if (new_match->status == MATCH_HALF_TIME) 
-					sprintf(&ntf_text_status[0], "%s %u:%u", _("Half time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+					snprintf(&ntf_text_status[0], sizeof(ntf_text_status), "%s %u:%u", _("Half time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 				
 				else if (new_match->status == MATCH_SECOND_TIME)
-					sprintf(&ntf_text_status[0], "%s %u:%u", _("Second time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+					snprintf(&ntf_text_status[0], sizeof(ntf_text_status), "%s %u:%u", _("Second time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 				else if (new_match->status == MATCH_EXTRA_TIME)
-					sprintf(&ntf_text_status[0], "%s %u:%u", _("Extra time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+					snprintf(&ntf_text_status[0], sizeof(ntf_text_status), "%s %u:%u", _("Extra time commences at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
 				else if (new_match->status == MATCH_FULL_TIME)
-					sprintf(&ntf_text_status[0], "%s %u:%u", _("Full time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+					snprintf(&ntf_text_status[0], sizeof(ntf_text_status), "%s %u:%u", _("Full time at"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 				flag_ntf_status = TRUE;
 			}
 		}

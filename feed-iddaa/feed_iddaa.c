@@ -122,9 +122,9 @@ void iddaa_build_match(iddaa_match_data *iddaa_match, match_data **feed_matches,
 		void *_tmp = realloc(*feed_matches, (index + 1) * sizeof(match_data));
 		*feed_matches = (match_data *) _tmp;
 		match_data *tmp_matches = *feed_matches;
-		sprintf(&tmp_matches[index].league_name[0], "%s", trim(&iddaa_match->league_name[0]));
-		sprintf(&tmp_matches[index].team_home[0], "%s", trim(&iddaa_match->team_home[0]));
-		sprintf(&tmp_matches[index].team_away[0], "%s", trim(&iddaa_match->team_away[0]));
+		snprintf(&tmp_matches[index].league_name[0], sizeof(tmp_matches[index].league_name), "%s", trim(&iddaa_match->league_name[0]));
+		snprintf(&tmp_matches[index].team_home[0], sizeof(tmp_matches[index].team_home), "%s", trim(&iddaa_match->team_home[0]));
+		snprintf(&tmp_matches[index].team_away[0], sizeof(tmp_matches[index].team_away), "%s", trim(&iddaa_match->team_away[0]));
 		tmp_matches[index].score_home = iddaa_match->score_home;
 		tmp_matches[index].score_away = iddaa_match->score_away;
 		tmp_matches[index].status = match_status;
@@ -214,7 +214,7 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	iddaa_match.skip = FALSE;
 
 	struct passwd *pw = getpwuid(getuid());
-	sprintf(&tmp_file[0], "%s-%u", IDDAA_FILENAME, pw->pw_uid);
+	snprintf(&tmp_file[0], sizeof(tmp_file), "%s-%u", IDDAA_FILENAME, pw->pw_uid);
 	int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, &tmp_file[0]);
 	if (!res) {
 		htmlDocPtr parser = htmlReadFile(&tmp_file[0], IDDAA_CHARSET, 
