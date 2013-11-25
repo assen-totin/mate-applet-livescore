@@ -1,4 +1,4 @@
-Nov 11, 2013 - Version 0.1.0
+Nov 25, 2013 - Version 0.1.0
 ============================
 * Added info on goals for each match (info is only available on goals, scored
   after the applet started).
@@ -9,7 +9,6 @@ Nov 11, 2013 - Version 0.1.0
 Nov 3, 2013 - Version 0.0.2
 ===========================
 * Backported to GNOME2 (RHEL 6 and derivatives like CentOS, SL...).
-
 
 Nov 1, 2013 - Version 0.0.1
 ============================
