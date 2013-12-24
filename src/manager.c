@@ -251,7 +251,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 			applet->all_matches[match_id].status = new_match->status;
 
 			if (applet->all_leagues[applet->all_matches[match_id].league_id].favourite) {
-				snprintf(&ntf_title_status[0], sizeof(&ntf_title_status), "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+				snprintf(&ntf_title_status[0], sizeof(ntf_title_status), "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
 
 				if (new_match->status == MATCH_FIRST_TIME) {
 					snprintf(&ntf_text_status[0], sizeof(ntf_text_status), "%s", _("The game commences."));
