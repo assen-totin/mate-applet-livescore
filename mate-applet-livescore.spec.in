@@ -9,7 +9,7 @@ Summary:        MATE Software Update Applet
 Group:          Applications/System
 License:        GPLv2
 URL:            http://www.zavedil.com/mate-livescore-applet/
-Source:         http://www.zavedil.com/wp-content/uploads/2013/11/mate-applet-livescore-@PACKAGE_VERSION@.tar.gz
+Source:         http://www.zavedil.com/wp-content/uploads/2014/1/mate-applet-livescore-@PACKAGE_VERSION@.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  gettext-devel
 BuildRequires:  automake
@@ -88,6 +88,9 @@ rm -rf "${RPM_BUILD_ROOT}"
 %{_libdir}/bonobo/servers/LivescoreAppletFactory.server
 
 %changelog
+
+* Wed Jan 1 2014 Assen Totin <assen.totin@gmail.com>
+- Release 0.1.2
 
 * Wed Dec 26 2013 Assen Totin <assen.totin@gmail.com>
 - Release 0.1.1

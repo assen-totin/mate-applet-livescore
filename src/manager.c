@@ -160,6 +160,7 @@ int manager_timer(livescore_applet *applet) {
 void manager_add_goal(livescore_applet *applet, int match_id, int match_time, int match_time_added, char *ntf_text_score, gboolean flag_goal_home) {
 	int i, goal_id, goals_found = 0;
 	int goals_before = applet->all_matches[match_id].score_home + applet->all_matches[match_id].score_away;
+	char team_trunc[64];
 	gboolean flag_need_new_goal = TRUE;
 
         for (i=0; i < applet->all_goals_counter; i++) {
@@ -183,13 +184,15 @@ void manager_add_goal(livescore_applet *applet, int match_id, int match_time, in
         }
 
 	if (flag_goal_home) {
+		// first_word() works on the pointer we give, but we don;t want to mangle the original string, hence copy it.
+		strcpy(&team_trunc[0], &applet->all_matches[match_id].team_home[0]);
 		applet->all_matches[match_id].score_home++;
-		sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), first_word(&applet->all_matches[match_id].team_home[0]), _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 	}
 	else {
+		strcpy(&team_trunc[0], &applet->all_matches[match_id].team_away[0]);
 		applet->all_matches[match_id].score_away++;
-		sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), first_word(&applet->all_matches[match_id].team_away[0]), _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 	}
+	sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), first_word(&team_trunc[0]), _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
         applet->all_goals[goal_id].used = TRUE;
         applet->all_goals[goal_id].match_id = match_id;
@@ -214,7 +217,7 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	int scored_home = 0, scored_away = 0;
 
 //char dbg[1024];
-//sprintf(&dbg[0], "Called for match %s - %s", new_match->team_home, new_match->team_away);
+//sprintf(&dbg[0], "all_matches_counter is: %u", applet->all_matches_counter);
 //debug(&dbg[0]);
 
 	// Do we have this match?

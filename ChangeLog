@@ -1,3 +1,7 @@
+Jan 1, 2014 - Version 0.1.2
+===========================
+* Fixed match duplication in main window
+
 Dec 26, 2013 - Version 0.1.1
 ============================
 * Fixed match name truncation in notifications.
@@ -5,7 +9,7 @@ Dec 26, 2013 - Version 0.1.1
 Nov 25, 2013 - Version 0.1.0
 ============================
 * Added info on goals for each match (info is only available on goals, scored
-  after the applet started).
+after the applet started).
 * Added second tab to GUI - shows last 30 goals.
 * Added notifications upon start-up about ongoing matches.
 * Added handling of multiple goals in a match between two updates.
