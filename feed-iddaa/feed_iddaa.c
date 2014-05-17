@@ -42,11 +42,14 @@ gboolean iddaa_is_full_time(char *s) {
 }
 
 gboolean iddaa_is_playing(char *s, int *match_time, int *match_time_added) {
+	char *c;
 	if (strstr(s, "'")) {
 		char *tmp = strtok(s, "'");
 		if (strstr(tmp, "+")) {
 			*match_time = atoi(trim(strtok(tmp, "+")));
-			*match_time_added = atoi(trim(strtok(NULL, "+")));
+			//*match_time_added = atoi(trim(strtok(NULL, "+")));
+			if (c = trim(strtok(NULL, "+")))
+				*match_time_added = atoi(c);
 		}
 		else {
 			*match_time = atoi(strtok(s, "'"));
