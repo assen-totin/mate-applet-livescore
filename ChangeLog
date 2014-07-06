@@ -1,3 +1,7 @@
+Jul 6, 2014 - Version 0.2.0
+===========================
+* Added InetPulse as second feed provider and set it as default.
+
 May 17, 2014 - Version 0.1.3
 ============================
 * Adapted IDDAA feed to change it time format for additional time.

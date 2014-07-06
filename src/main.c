@@ -187,7 +187,7 @@ gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer d
 
 	// Populate feeds and get selected one to use - exit on failure
 #ifdef HAVE_MATE
-	selected_feed = g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED);
+	selected_feed = trim_quotes(g_settings_get_string(applet->gsettings, APPLET_GSETTINGS_KEY_FEED));
 #elif HAVE_GNOME_2
 	selected_feed = trim_quotes(panel_applet_gconf_get_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_FEED, NULL));
 #endif
