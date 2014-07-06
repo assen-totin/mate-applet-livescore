@@ -1,5 +1,5 @@
 AC_PREREQ([2.63])
-AC_INIT([mate-applet-livescore], [0.1.3], [assen.totin@gmail.com])
+AC_INIT([mate-applet-livescore], [0.2.0], [assen.totin@gmail.com])
 AC_CONFIG_HEADERS([config.h])
 
 # AM_PROG_AR is not available on RHEL, so allow it
