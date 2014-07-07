@@ -148,15 +148,18 @@ time_t enetpulse_convert_time(char *s) {
 	now_p = gmtime(&ts);
 
 	now = *now_p;
-	now.tm_hour = atoi(strtok(s, ":"));
+	// Convert time to GMT+1
+	now.tm_hour = atoi(strtok(s, ":")) + 1;
+	if (now.tm_hour > 23)
+		now.tm_hour -= 24;
 	now.tm_min = atoi(strtok(NULL, ":" ));
 	now.tm_sec = 0;
 
 	// mktime treats 'now' as localtime, but we need it UTC.
 	// NOTE: timegm() is not POSIX-compliant, hence not portable!
 	// See 'man timegm' for POSIX-compliant replacecement function.
-	//return mktime(&now);
-	return timegm(&now);
+	return mktime(&now);
+	//return timegm(&now);
 }
 
 void enetpulse_build_match(enetpulse_match_data *enetpulse_match, match_data **feed_matches, int *feed_matches_counter) {
@@ -182,6 +185,8 @@ void enetpulse_build_match(enetpulse_match_data *enetpulse_match, match_data **f
 	}
 	else if (enetpulse_is_future(trim(&enetpulse_match->match_time[0]))) {
 		match_status = MATCH_NOT_COMMENCED;
+		enetpulse_match->score_home = 0;
+		enetpulse_match->score_away = 0;
 		start_time = enetpulse_convert_time(&enetpulse_match->match_time[0]);
 	}
 	else if (enetpulse_is_playing(trim(&enetpulse_match->match_time[0]), &match_time, &match_time_added)) {
@@ -243,16 +248,11 @@ void enetpulse_walk_tree(xmlNode * a_node, enetpulse_match_data *enetpulse_match
 				enetpulse_match->stage = ENETPULSE_PARSING_SKIP;
 			}
 			else if (enetpulse_match->stage == ENETPULSE_PARSING_SCORE) {
-				// Skip if the value is "-"
-				if (strcmp(trim(cur_node->content), "-")) {
-					enetpulse_match->score_home = atoi(cur_node->content);
-				}
+				enetpulse_match->score_home = atoi(cur_node->content);
 				enetpulse_match->stage = ENETPULSE_PARSING_SKIP;
 			}
 			else if (enetpulse_match->stage == ENETPULSE_PARSING_SCORE2) {
-				if (strcmp(trim(cur_node->content), "-")) {
-					enetpulse_match->score_away = atoi(cur_node->content);
-				}
+				enetpulse_match->score_away = atoi(cur_node->content);
 				enetpulse_match->stage = ENETPULSE_PARSING_SKIP;
 			}
 		}
