@@ -53,8 +53,7 @@ char *enetpulse_load_file(char *filename) {
 }
 
 
-char *enetpulse_fix_score(char *input) {
-	char *delim = "</span> - <span style=\"";
+char *enetpulse_fix_score(char *input, char *delim, char *insert) {
 	char *output = (char *)malloc(strlen(input) + 2048);
 	memset(output, '\0', 1024);
 	char *tmp1 = (char *)malloc(strlen(input) + 2048);
@@ -78,7 +77,7 @@ char *enetpulse_fix_score(char *input) {
 		if (res) {
 			strncat(output, tmp, res - tmp);
 			strcat(output, delim);
-			strcat(output, "score_away ");
+			strcat(output, insert);
 
 			if (counter % 2)
 				tmp2 = res + strlen(delim);
@@ -98,6 +97,12 @@ char *enetpulse_fix_score(char *input) {
 	return output;
 }
 
+
+gboolean enetpulse_is_canceled(char *s) {
+	if (strstr(s, "CAN"))
+		return TRUE;
+	return FALSE;
+}
 
 gboolean enetpulse_is_half_time(char *s) {
 	if (strstr(s, "HT"))
@@ -160,6 +165,10 @@ void enetpulse_build_match(enetpulse_match_data *enetpulse_match, match_data **f
 //printf("%s %s-%s %u:%u\n", &enetpulse_match->match_time[0], &enetpulse_match->team_home[0], &enetpulse_match->team_away[0], enetpulse_match->score_home, enetpulse_match->score_away);
 	//if (strlen(&enetpulse_match->team_home[0]) < 2)
 	//	return;
+
+	if (enetpulse_is_canceled(trim(&enetpulse_match->match_time[0]))) {
+		return;
+	}
 
 	if (enetpulse_is_half_time(trim(&enetpulse_match->match_time[0]))) {
 		match_status = MATCH_HALF_TIME;
@@ -261,7 +270,7 @@ void enetpulse_walk_tree(xmlNode * a_node, enetpulse_match_data *enetpulse_match
 					enetpulse_match->stage = ENETPULSE_PARSING_TIME;
 				else if (strstr(cur_attr->children->content, "score_away"))
 					enetpulse_match->stage = ENETPULSE_PARSING_SCORE2;
-				else if (!strcmp(cur_attr->children->content, "")) 
+				else if (strstr(cur_attr->children->content, "score_home")) 
 					enetpulse_match->stage = ENETPULSE_PARSING_SCORE;
 			}
 
@@ -310,7 +319,8 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 		// In addition, the style="" attribute may not always be empty. 
 		// To fix this, try adding a distinct attribute to the away score
 		char *orig_xml = enetpulse_load_file(&tmp_file[0]);
-		char *fixed_xml = enetpulse_fix_score(orig_xml);
+		char *some_fixed_xml = enetpulse_fix_score(orig_xml, "</span> - <span style=\"", "score_away ");
+		char *fixed_xml = enetpulse_fix_score(some_fixed_xml, "class=\"live_b\"><span style=\"", "score_home ");
 		FILE *fp = fopen (&tmp_file2[0], "w");
 		if (!fp)
 			printf("Cannot open output file!\n");
@@ -329,6 +339,7 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 		enetpulse_walk_tree(xmlDocGetRootElement(parser), &enetpulse_match, feed_matches, feed_matches_counter);
 
 		free(orig_xml);
+		free(some_fixed_xml);
 		free(fixed_xml);
 	}
 
