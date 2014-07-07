@@ -22,6 +22,83 @@
 #include "../src/applet.h"
 #include "feed_enetpulse.h"
 
+char *enetpulse_load_file(char *filename) {
+	FILE *fp_in = fopen (filename, "r");
+	if (!fp_in)
+		printf("failed to open input file");
+
+	int counter = 1;
+
+	char *output = malloc(1024);
+	char *tmp = malloc(1024);
+
+	if (!output || !tmp)
+		printf("malloc failed!");
+	memset(output, '\0', 1024);
+
+	while (fgets(tmp, 1024, fp_in)) {
+		// Append the chunk
+		void *_tmp = realloc(output, (counter * 1024));
+		if (!_tmp)
+			printf("realloc failed!");
+		output = (char *)_tmp;
+
+		strcat(output, tmp);
+		counter++;
+	}
+
+	free(tmp);
+
+	return output;
+}
+
+
+char *enetpulse_fix_score(char *input) {
+	char *delim = "</span> - <span style=\"";
+	char *output = (char *)malloc(strlen(input) + 2048);
+	memset(output, '\0', 1024);
+	char *tmp1 = (char *)malloc(strlen(input) + 2048);
+	char *tmp2 = (char *)malloc(strlen(input) + 2048);
+	char *tmp;
+	char *res;
+	char *tmp1_orig = tmp1;
+	char *tmp2_orig = tmp2;
+	int counter = 1;
+	
+	strcpy(tmp1, input);
+
+	while (1) {
+		if (counter % 2) 
+			tmp = tmp1;
+		else
+			tmp = tmp2;
+
+		res = strstr(tmp, delim);
+
+		if (res) {
+			strncat(output, tmp, res - tmp);
+			strcat(output, delim);
+			strcat(output, "score_away ");
+
+			if (counter % 2)
+				tmp2 = res + strlen(delim);
+			else
+				tmp1 = res + strlen(delim);
+		}
+		else {
+			strcat(output, tmp);
+			break;
+		}
+		counter++;
+	}
+
+	free(tmp1_orig);
+	free(tmp2_orig);
+
+	return output;
+}
+
+
 gboolean enetpulse_is_half_time(char *s) {
 	if (strstr(s, "HT"))
 		return TRUE;
@@ -43,7 +120,8 @@ gboolean enetpulse_is_playing(char *s, int *match_time, int *match_time_added) {
 			*match_time_added = atoi(c);
 	}
 	else {
-		*match_time = atoi(strtok(s, "'"));
+		//*match_time = atoi(strtok(s, "'"));
+		*match_time = atoi(s);
 		*match_time_added = 0;
 	}
 	return TRUE;
@@ -79,7 +157,7 @@ time_t enetpulse_convert_time(char *s) {
 void enetpulse_build_match(enetpulse_match_data *enetpulse_match, match_data **feed_matches, int *feed_matches_counter) {
 	int match_status, match_time, match_time_added;
 	time_t start_time = time(NULL);
-
+//printf("%s %s-%s %u:%u\n", &enetpulse_match->match_time[0], &enetpulse_match->team_home[0], &enetpulse_match->team_away[0], enetpulse_match->score_home, enetpulse_match->score_away);
 	//if (strlen(&enetpulse_match->team_home[0]) < 2)
 	//	return;
 
@@ -143,6 +221,7 @@ void enetpulse_walk_tree(xmlNode * a_node, enetpulse_match_data *enetpulse_match
 			}
 			else if (enetpulse_match->stage == ENETPULSE_PARSING_HOME) {
 				strcpy(&enetpulse_match->team_home[0], cur_node->content);
+				enetpulse_match->stage = ENETPULSE_PARSING_SKIP;
 			}
 			else if (enetpulse_match->stage == ENETPULSE_PARSING_AWAY) {
 				strcpy(&enetpulse_match->team_away[0], cur_node->content);
@@ -152,15 +231,20 @@ void enetpulse_walk_tree(xmlNode * a_node, enetpulse_match_data *enetpulse_match
 			}
 			else if (enetpulse_match->stage == ENETPULSE_PARSING_TIME) {
 				strcpy(&enetpulse_match->match_time[0], cur_node->content);
+				enetpulse_match->stage = ENETPULSE_PARSING_SKIP;
 			}
 			else if (enetpulse_match->stage == ENETPULSE_PARSING_SCORE) {
 				// Skip if the value is "-"
 				if (strcmp(trim(cur_node->content), "-")) {
 					enetpulse_match->score_home = atoi(cur_node->content);
 				}
+				enetpulse_match->stage = ENETPULSE_PARSING_SKIP;
 			}
 			else if (enetpulse_match->stage == ENETPULSE_PARSING_SCORE2) {
-				enetpulse_match->score_away = atoi(cur_node->content);
+				if (strcmp(trim(cur_node->content), "-")) {
+					enetpulse_match->score_away = atoi(cur_node->content);
+				}
+				enetpulse_match->stage = ENETPULSE_PARSING_SKIP;
 			}
 		}
 
@@ -172,14 +256,13 @@ void enetpulse_walk_tree(xmlNode * a_node, enetpulse_match_data *enetpulse_match
 				}
 			}
 
-			if (!strcmp(cur_attr->name, "style")) {
-				if (strstr(cur_attr->children->content, "padding-left: 10px;text-align: left;"))  {
+			else if (!strcmp(cur_attr->name, "style")) {
+				if (strstr(cur_attr->children->content, "padding-left: 10px;text-align: left;")) 
 					enetpulse_match->stage = ENETPULSE_PARSING_TIME;
-				}
-				else if ((!strcmp(cur_attr->children->content, "")) && (enetpulse_match->stage != ENETPULSE_PARSING_SCORE))
-					enetpulse_match->stage = ENETPULSE_PARSING_SCORE;
-				else if (!strcmp(cur_attr->children->content, ""))
+				else if (strstr(cur_attr->children->content, "score_away"))
 					enetpulse_match->stage = ENETPULSE_PARSING_SCORE2;
+				else if (!strcmp(cur_attr->children->content, "")) 
+					enetpulse_match->stage = ENETPULSE_PARSING_SCORE;
 			}
 
 			else if (!strcmp(cur_attr->name, "id")) {
@@ -205,6 +288,7 @@ void enetpulse_walk_tree(xmlNode * a_node, enetpulse_match_data *enetpulse_match
 int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	enetpulse_match_data enetpulse_match;
 	char tmp_file[1024];
+	char tmp_file2[1024];
 
 	memset(&enetpulse_match.match_time[0], '\0', sizeof(enetpulse_match.match_time));
 	memset(&enetpulse_match.team_home[0], '\0', sizeof(enetpulse_match.team_home));
@@ -216,11 +300,24 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 
 	struct passwd *pw = getpwuid(getuid());
 	snprintf(&tmp_file[0], sizeof(tmp_file), "%s-%u", ENETPULSE_FILENAME, pw->pw_uid);
-//debug("Getting page...");
+	snprintf(&tmp_file2[0], sizeof(tmp_file), "%s-%u-a", ENETPULSE_FILENAME, pw->pw_uid);
+
 	int res = get_url(ENETPULSE_URL, ENETPULSE_USER_AGENT, &tmp_file[0]);
 	if (!res) {
-//debug("Got page!");
-		htmlDocPtr parser = htmlReadFile(&tmp_file[0], ENETPULSE_CHARSET, 
+
+		// libxml cannot guaratnee the order of sibling parsing, hence issues when parsing score - because it is in the form of 
+		// <span style="">0</span> - <span style="">3</span>
+		// In addition, the style="" attribute may not always be empty. 
+		// To fix this, try adding a distinct attribute to the away score
+		char *orig_xml = enetpulse_load_file(&tmp_file[0]);
+		char *fixed_xml = enetpulse_fix_score(orig_xml);
+		FILE *fp = fopen (&tmp_file2[0], "w");
+		if (!fp)
+			printf("Cannot open output file!\n");
+		fprintf(fp, "%s\n", fixed_xml);
+		fclose(fp);
+
+		htmlDocPtr parser = htmlReadFile(&tmp_file2[0], ENETPULSE_CHARSET, 
 			HTML_PARSE_RECOVER |
 			//HTML_PARSE_NOBLANKS | 
 			HTML_PARSE_NOERROR | 
@@ -230,6 +327,9 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 #endif
 			HTML_PARSE_COMPACT);
 		enetpulse_walk_tree(xmlDocGetRootElement(parser), &enetpulse_match, feed_matches, feed_matches_counter);
+
+		free(orig_xml);
+		free(fixed_xml);
 	}
 
 	return 1;
