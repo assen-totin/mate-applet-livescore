@@ -149,9 +149,7 @@ time_t enetpulse_convert_time(char *s) {
 
 	now = *now_p;
 	// Convert time to GMT+1
-	now.tm_hour = atoi(strtok(s, ":")) + 1;
-	if (now.tm_hour > 23)
-		now.tm_hour -= 24;
+	now.tm_hour = atoi(strtok(s, ":"));
 	now.tm_min = atoi(strtok(NULL, ":" ));
 	now.tm_sec = 0;
 
