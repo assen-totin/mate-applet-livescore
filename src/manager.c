@@ -184,7 +184,7 @@ void manager_add_goal(livescore_applet *applet, int match_id, int match_time, in
         }
 
 	if (flag_goal_home) {
-		// first_word() works on the pointer we give, but we don;t want to mangle the original string, hence copy it.
+		// first_word() works on the pointer we give, but we don't want to mangle the original string, hence copy it.
 		strcpy(&team_trunc[0], &applet->all_matches[match_id].team_home[0]);
 		applet->all_matches[match_id].score_home++;
 	}
@@ -192,7 +192,7 @@ void manager_add_goal(livescore_applet *applet, int match_id, int match_time, in
 		strcpy(&team_trunc[0], &applet->all_matches[match_id].team_away[0]);
 		applet->all_matches[match_id].score_away++;
 	}
-	sprintf(ntf_text_score, "%s %s%s %u:%u", _("GOAL for"), first_word(&team_trunc[0]), _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+	sprintf(ntf_text_score, "%u' %s %s%s %u:%u", match_time, _("GOAL for"), first_word(&team_trunc[0]), _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
         applet->all_goals[goal_id].used = TRUE;
         applet->all_goals[goal_id].match_id = match_id;
