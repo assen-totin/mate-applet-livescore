@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="stopwatch.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="208.71429"
+     inkscape:cy="714.28571"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1280"
+     inkscape:window-height="978"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1">
+    <sodipodi:guide
+       orientation="1,0"
+       position="247,911"
+       id="guide3757" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="314,795"
+       id="guide3759" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="-54,598"
+       id="guide3779" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#008000;stroke:#ffffff;stroke-width:10;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect3755"
+       width="612"
+       height="528"
+       x="97"
+       y="580.36218" />
+    <path
+       transform="matrix(-0.99992998,0.01183356,-0.01183356,-0.99992998,497.52232,511.28941)"
+       sodipodi:type="arc"
+       style="fill:#ff0000;fill-opacity:1;stroke:none"
+       id="path2985-4"
+       sodipodi:cx="246.5"
+       sodipodi:cy="256.86218"
+       sodipodi:rx="167.5"
+       sodipodi:ry="167.5"
+       d="M 246.99265,424.36146 A 167.5,167.5 0 1 1 413.99368,258.31668 L 246.5,256.86218 z"
+       sodipodi:start="1.5678551"
+       sodipodi:end="6.291869"
+       inkscape:export-filename="/root/Desktop/text3801.png"
+       inkscape:export-xdpi="81.129997"
+       inkscape:export-ydpi="81.129997" />
+    <path
+       sodipodi:type="arc"
+       style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:20;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:0.14220184000000000;stroke-miterlimit:4;stroke-dasharray:none"
+       id="path2985"
+       sodipodi:cx="246.5"
+       sodipodi:cy="256.86218"
+       sodipodi:rx="167.5"
+       sodipodi:ry="167.5"
+       d="m 414,256.86218 a 167.5,167.5 0 1 1 -335,0 167.5,167.5 0 1 1 335,0 z"
+       inkscape:export-filename="/root/Desktop/text3801.png"
+       inkscape:export-xdpi="81.129997"
+       inkscape:export-ydpi="81.129997" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="255"
+       y="330.36218"
+       id="text3800"
+       sodipodi:linespacing="125%"
+       inkscape:export-xdpi="81.129997"
+       inkscape:export-ydpi="81.129997"
+       inkscape:export-filename="/root/Desktop/text3801.png"><tspan
+         sodipodi:role="line"
+         id="tspan3802"
+         x="255"
+         y="330.36218"
+         style="font-size:200px;fill:#ffffff">1</tspan></text>
+  </g>
+</svg>
