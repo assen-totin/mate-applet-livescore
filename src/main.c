@@ -223,6 +223,12 @@ gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer d
 	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_NOTIF_GOAL);
 	applet->notif_image_goal = gdk_pixbuf_new_from_file(&image_file[0], NULL);
 
+	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_NOTIF_T1);
+	applet->notif_image_t1 = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
+	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_IMAGE_NOTIF_T2);
+	applet->notif_image_t2 = gdk_pixbuf_new_from_file(&image_file[0], NULL);
+
 	// Get main icon
 	sprintf(&image_file[0], "%s/%s", APPLET_ICON_PATH, APPLET_ICON_STATIC);
 	applet->image = gtk_image_new_from_file (&image_file[0]);

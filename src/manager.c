@@ -89,6 +89,10 @@ int manager_timer(livescore_applet *applet) {
 					show_notification(notification->title, notification->body, applet->notif_image_goal);
 				else if (notification->image == NOTIF_SHOW_IMAGE_WHISTLE)
 					show_notification(notification->title, notification->body, applet->notif_image_whistle);
+				else if (notification->image == NOTIF_SHOW_IMAGE_T1)
+					show_notification(notification->title, notification->body, applet->notif_image_t1);
+				else if (notification->image == NOTIF_SHOW_IMAGE_T2)
+					show_notification(notification->title, notification->body, applet->notif_image_t2);
 				else
 					show_notification(notification->title, notification->body, NULL);
 
@@ -386,8 +390,11 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 		if (applet->all_leagues[applet->all_matches[match_id].league_id].favourite) {
 			if ((new_match->status > MATCH_NOT_COMMENCED) && (new_match->status < MATCH_FULL_TIME)) {
 				sprintf(&ntf_title_score[0], "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
-				sprintf(&ntf_text_score[0][0], "%u' %u:%u", new_match->match_time, new_match->score_home, new_match->score_away);		
-				queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0][0], NOTIF_SHOW_IMAGE_GOAL, FALSE);
+				sprintf(&ntf_text_score[0][0], "%u' %u:%u", new_match->match_time, new_match->score_home, new_match->score_away);
+				if (new_match->status < MATCH_SECOND_TIME)
+					queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0][0], NOTIF_SHOW_IMAGE_T1, FALSE);
+				else
+					queue_notification(applet, &ntf_title_score[0], &ntf_text_score[0][0], NOTIF_SHOW_IMAGE_T2, FALSE);
 			}
 		}
 

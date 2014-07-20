@@ -67,6 +67,8 @@
 #define APPLET_IMAGE_GRAY "applet_livescore_gray.png"
 #define APPLET_IMAGE_NOTIF_GOAL "applet_livescore_goal.png"
 #define APPLET_IMAGE_NOTIF_WHISTLE "applet_livescore_whistle.png"
+#define APPLET_IMAGE_NOTIF_T1 "applet_livescore_t1.png"
+#define APPLET_IMAGE_NOTIF_T2 "applet_livescore_t2.png"
 #define APPLET_WINDOW_MATCHES_WIDTH 640
 #define APPLET_WINDOW_MATCHES_HEIGHT 480
 #define APPLET_WINDOW_SETTINGS_WIDTH 480
@@ -135,7 +137,9 @@ enum {
 
 enum {
 	NOTIF_SHOW_IMAGE_WHISTLE = 0,
-	NOTIF_SHOW_IMAGE_GOAL
+	NOTIF_SHOW_IMAGE_GOAL,
+	NOTIF_SHOW_IMAGE_T1,
+	NOTIF_SHOW_IMAGE_T2
 };
 
 typedef struct f_data {
@@ -229,6 +233,8 @@ typedef struct {
 	GdkPixbuf *running_image_gray;
 	GdkPixbuf *notif_image_goal;
 	GdkPixbuf *notif_image_whistle;
+	GdkPixbuf *notif_image_t1;
+	GdkPixbuf *notif_image_t2;
 } livescore_applet;
 
 // util.c
