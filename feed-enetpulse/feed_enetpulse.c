@@ -104,6 +104,12 @@ gboolean enetpulse_is_canceled(char *s) {
 	return FALSE;
 }
 
+gboolean enetpulse_no_info(char *s) {
+	if (strstr(s, "NIY"))
+		return TRUE;
+	return FALSE;
+}
+
 gboolean enetpulse_is_half_time(char *s) {
 	if (strstr(s, "HT"))
 		return TRUE;
@@ -168,6 +174,10 @@ void enetpulse_build_match(enetpulse_match_data *enetpulse_match, match_data **f
 	//	return;
 
 	if (enetpulse_is_canceled(trim(&enetpulse_match->match_time[0]))) {
+		return;
+	}
+
+	if (enetpulse_no_info(trim(&enetpulse_match->match_time[0]))) {
 		return;
 	}
 
