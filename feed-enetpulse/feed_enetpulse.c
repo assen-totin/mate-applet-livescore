@@ -117,7 +117,7 @@ gboolean enetpulse_is_half_time(char *s) {
 }
 
 gboolean enetpulse_is_full_time(char *s) {
-	if (strstr(s, "FT"))
+	if (strstr(s, "FT") || strstr(s, "FAP") || strstr(s, "FAE"))
 		return TRUE;
 	return FALSE;
 }
