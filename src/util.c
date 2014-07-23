@@ -28,13 +28,13 @@ void show_notification (gchar *title, gchar *body, GdkPixbuf *icon) {
 
 	notify_init(PACKAGE_NAME);
 #ifdef HAVE_MATE
-	#ifdef HAVE_LIBMATENOTIFY
-	notification = notify_notification_new (title, body, NULL, NULL);
-	#elif HAVE_LIBNOTIFY
-	notification = notify_notification_new (title, body, NULL);
-	#endif
+        #ifdef HAVE_LIBMATENOTIFY
+        notification = notify_notification_new (g_markup_escape_text(title, -1), g_markup_escape_text(body, -1), NULL, NULL);
+        #elif HAVE_LIBNOTIFY
+        notification = notify_notification_new (g_markup_escape_text(title, -1), g_markup_escape_text(body, -1), NULL);
+        #endif
 #elif HAVE_GNOME_2
-	notification = notify_notification_new (title, body, NULL, NULL);
+        notification = notify_notification_new (g_markup_escape_text(title, -1), g_markup_escape_text(body, -1), NULL, NULL);
 #endif
 
 	notify_notification_set_timeout (notification, 5000);

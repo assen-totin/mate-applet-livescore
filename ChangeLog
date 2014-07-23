@@ -2,6 +2,7 @@ Mmm DD, YYYY - Verzion x.y.z
 ============================
 * Show minute when the goal is scored in notification.
 * Handle 'no information yet' status for matches which should have began.
+* Fix blank notifications for teams which name contains as ampersand.
 
 Jul 11, 2014 - Version 0.2.0
 ===========================
