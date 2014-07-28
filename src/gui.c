@@ -30,29 +30,29 @@ void gui_quit(GtkWidget *widget, gpointer data) {
 
 	applet->dialog_matches_is_visible = FALSE;
 
-        // Get the VBox out of the dialog
-        gpointer *gp_vbox = g_object_ref(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
-        gtk_container_remove (GTK_CONTAINER(applet->dialog_matches), gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
+	// Get the VBox out of the dialog
+	gpointer *gp_vbox = g_object_ref(gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
+	gtk_container_remove (GTK_CONTAINER(applet->dialog_matches), gtk_dialog_get_content_area (GTK_DIALOG (applet->dialog_matches)));
 
-        // Get the notebook out of the VBox
-        GList *glist_notebook = gtk_container_get_children(GTK_CONTAINER(gp_vbox));
-        gpointer *gp_notebook = g_object_ref(glist_notebook->data);
-        gtk_container_remove (GTK_CONTAINER(gp_vbox), GTK_WIDGET(gp_notebook));
+	// Get the notebook out of the VBox
+	GList *glist_notebook = gtk_container_get_children(GTK_CONTAINER(gp_vbox));
+	gpointer *gp_notebook = g_object_ref(glist_notebook->data);
+	gtk_container_remove (GTK_CONTAINER(gp_vbox), GTK_WIDGET(gp_notebook));
 
-        // Get the scrolled windows out of the notebook
-        GtkWidget *gp_scrolled_window = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gp_notebook), 0);
-        GtkWidget *gp_scrolled_window_goals = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gp_notebook), 1);
+	// Get the scrolled windows out of the notebook
+	GtkWidget *gp_scrolled_window = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gp_notebook), 0);
+	GtkWidget *gp_scrolled_window_goals = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gp_notebook), 1);
 
-        // Get applet->tree_view out of the scrolled window
-        gpointer *atv = g_object_ref(applet->tree_view);
-        gpointer *atvg = g_object_ref(applet->tree_view_goals);
-        gtk_container_remove (GTK_CONTAINER(gp_scrolled_window), applet->tree_view);
-        gtk_container_remove (GTK_CONTAINER(gp_scrolled_window_goals), applet->tree_view_goals);
+	// Get applet->tree_view out of the scrolled window
+	gpointer *atv = g_object_ref(applet->tree_view);
+	gpointer *atvg = g_object_ref(applet->tree_view_goals);
+	gtk_container_remove (GTK_CONTAINER(gp_scrolled_window), applet->tree_view);
+	gtk_container_remove (GTK_CONTAINER(gp_scrolled_window_goals), applet->tree_view_goals);
 
-        g_object_unref(gp_vbox);
-        g_object_unref(gp_notebook);
+	g_object_unref(gp_vbox);
+	g_object_unref(gp_notebook);
 
-        gtk_widget_destroy(applet->dialog_matches);
+	gtk_widget_destroy(applet->dialog_matches);
 }
 
 
@@ -104,7 +104,7 @@ void gui_rows_expand_collapse(GtkTreeView *tree_view, GtkTreeIter *iter, GtkTree
 #ifdef HAVE_MATE
 	g_settings_set_string(applet->gsettings, APPLET_GSETTINGS_KEY_EXP, &value[0]);
 #elif HAVE_GNOME_2
-        panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_EXP, &value[0], NULL);
+	panel_applet_gconf_set_string(PANEL_APPLET(applet->applet), APPLET_GSETTINGS_KEY_EXP, &value[0], NULL);
 #endif
 }
 
@@ -180,43 +180,43 @@ void gui_create_view_and_model(livescore_applet *applet) {
 
 
 void gui_create_view_and_model_goals(livescore_applet *applet) {
-        GtkCellRenderer *renderer, *renderer_image;
-        GtkTreeViewColumn *column;
-        GtkTreeModel *model;
-        GtkTreeIter iter;
+	GtkCellRenderer *renderer, *renderer_image;
+	GtkTreeViewColumn *column;
+	GtkTreeModel *model;
+	GtkTreeIter iter;
 
-        applet->tree_view_goals = gtk_tree_view_new();
-        applet->tree_store_goals = gtk_tree_store_new(NUM_COLS_GOAL, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+	applet->tree_view_goals = gtk_tree_view_new();
+	applet->tree_store_goals = gtk_tree_store_new(NUM_COLS_GOAL, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 
-        // Column 1 - image
-        renderer_image = gtk_cell_renderer_pixbuf_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, " ", renderer_image, "pixbuf", COL_GOALS_PIC, NULL);
+	// Column 1 - image
+	renderer_image = gtk_cell_renderer_pixbuf_new();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, " ", renderer_image, "pixbuf", COL_GOALS_PIC, NULL);
 
-        // Column 2
-        renderer = gtk_cell_renderer_text_new();
-        g_object_set (renderer, "xalign", 1.0, NULL);
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, _("Time"), renderer, "text", COL_GOALS_TIME, NULL);
+	// Column 2
+	renderer = gtk_cell_renderer_text_new();
+	g_object_set (renderer, "xalign", 1.0, NULL);
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, _("Time"), renderer, "text", COL_GOALS_TIME, NULL);
 
-        // Column 3
-        renderer = gtk_cell_renderer_text_new();
-        g_object_set (renderer, "xalign", 0.5, NULL);
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, _("Score"), renderer, "text", COL_GOALS_SCORE, NULL);
+	// Column 3
+	renderer = gtk_cell_renderer_text_new();
+	g_object_set (renderer, "xalign", 0.5, NULL);
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, _("Score"), renderer, "text", COL_GOALS_SCORE, NULL);
 
-        // Column 4
-        renderer = gtk_cell_renderer_text_new();
-        gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, _("Match"), renderer, "text", COL_GOALS_MATCH, NULL);
+	// Column 4
+	renderer = gtk_cell_renderer_text_new();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (applet->tree_view_goals), -1, _("Match"), renderer, "text", COL_GOALS_MATCH, NULL);
 
-        gtk_tree_store_append (applet->tree_store_goals, &iter, NULL);
-        gtk_tree_store_set (applet->tree_store_goals, &iter, COL_GOALS_MATCH, _("No goals yet. Wait until some are scored."), -1);
+	gtk_tree_store_append (applet->tree_store_goals, &iter, NULL);
+	gtk_tree_store_set (applet->tree_store_goals, &iter, COL_GOALS_MATCH, _("No goals yet. Wait until some are scored."), -1);
 
-        model = GTK_TREE_MODEL(applet->tree_store_goals);
-        gtk_tree_view_set_model (GTK_TREE_VIEW (applet->tree_view_goals), model);
-        // The tree view has acquired its own reference to the model, so we can drop ours. 
-        // That way the model will be freed automatically when the tree view is destroyed 
-        g_object_unref (model);
+	model = GTK_TREE_MODEL(applet->tree_store_goals);
+	gtk_tree_view_set_model (GTK_TREE_VIEW (applet->tree_view_goals), model);
+	// The tree view has acquired its own reference to the model, so we can drop ours. 
+	// That way the model will be freed automatically when the tree view is destroyed 
+	g_object_unref (model);
 
-        GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(applet->tree_view_goals));
-        gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+	GtkTreeSelection *selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(applet->tree_view_goals));
+	gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
 }
 
 
@@ -234,17 +234,17 @@ void gui_matches_dialog (livescore_applet *applet) {
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window_goals), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 	gtk_container_add (GTK_CONTAINER (scrolled_window_goals), applet->tree_view_goals);
 
-        // Create notebook widget
-        GtkWidget *notebook = gtk_notebook_new();
-        gtk_widget_set_size_request (notebook, APPLET_WINDOW_MATCHES_WIDTH, APPLET_WINDOW_MATCHES_HEIGHT);
+	// Create notebook widget
+	GtkWidget *notebook = gtk_notebook_new();
+	gtk_widget_set_size_request (notebook, APPLET_WINDOW_MATCHES_WIDTH, APPLET_WINDOW_MATCHES_HEIGHT);
 
-        // First page - Favourites
-        GtkWidget *tab_label_1 = gtk_label_new(_("Live scores"));
-        gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scrolled_window, tab_label_1);
+	// First page - Favourites
+	GtkWidget *tab_label_1 = gtk_label_new(_("Live scores"));
+	gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scrolled_window, tab_label_1);
 
-        // Second page - Icecast
-        GtkWidget *tab_label_2 = gtk_label_new(_("Latest goals"));
-        gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scrolled_window_goals, tab_label_2);
+	// Second page - Icecast
+	GtkWidget *tab_label_2 = gtk_label_new(_("Latest goals"));
+	gtk_notebook_append_page (GTK_NOTEBOOK(notebook), scrolled_window_goals, tab_label_2);
 
 	// Assemble window
 	applet->dialog_matches = gtk_dialog_new_with_buttons (_("MATE Livescore Applet"), GTK_WINDOW(applet), GTK_DIALOG_MODAL, NULL);
@@ -375,12 +375,12 @@ void gui_update_model(livescore_applet * applet) {
 
 
 void gui_update_model_goals(livescore_applet *applet) {
-        GtkTreeIter iter;
-        GtkTreeModel *model;
+	GtkTreeIter iter;
+	GtkTreeModel *model;
 	GdkPixbuf *running_image = NULL;
-        int i, j, m, n, index, index_prev, total;
-        char all_match[256], score[16], time_elapsed[32];
-        gboolean league_has_matches = FALSE;
+	int i, j, m, n, index, index_prev, total;
+	char all_match[256], score[16], time_elapsed[32];
+	gboolean league_has_matches = FALSE;
 	gboolean have_goals = FALSE;
 
 	// Is there at least one goal to show?
@@ -394,7 +394,7 @@ void gui_update_model_goals(livescore_applet *applet) {
 		return;
 
 	// Get model, clear store
-        model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view_goals));
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(applet->tree_view_goals));
 	gtk_tree_store_clear(applet->tree_store_goals);
 
 	// Show up to APPLET_SHOW_LAST_GOALS goals but no more than they are actually

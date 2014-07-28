@@ -125,7 +125,7 @@ int manager_timer(livescore_applet *applet) {
 				continue;
 			league_has_matches = FALSE;
 			for (j=0; j < applet->all_matches_counter; j++) {
-				if (applet->all_matches[j].league_id == j) {
+				if (applet->all_matches[j].used && applet->all_matches[j].league_id == i) {
 					league_has_matches = TRUE;
 					break;
 				}
