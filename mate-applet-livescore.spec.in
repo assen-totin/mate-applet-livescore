@@ -49,6 +49,11 @@ mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so.0.0.0 $RPM_BUILD_ROOT%{_l
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so.0
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so
+mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so.0
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.la
 
 # Do not install doc files: they are handled as rpm doc files.
 rm -rf "${RPM_BUILD_ROOT}%{_docdir}"
@@ -70,6 +75,7 @@ rm -rf "${RPM_BUILD_ROOT}"
 %doc AUTHORS BUGS COPYING ChangeLog NEWS README TODO
 %{_libexecdir}/livescore_applet
 %{_libdir}/%{name}/lib_feed_iddaa.so
+%{_libdir}/%{name}/lib_feed_enetpulse.so
 %{pixmapdir}/applet_livescore_icon.png
 %{pixmapdir}/applet_livescore_gray.png
 %{pixmapdir}/applet_livescore_green.png
@@ -78,6 +84,8 @@ rm -rf "${RPM_BUILD_ROOT}"
 %{pixmapdir}/applet_livescore_goal.png
 %{pixmapdir}/applet_livescore_whistle.png
 %{pixmapdir}/applet_livescore_icon.48.png
+%{pixmapdir}/applet_livescore_t1.png
+%{pixmapdir}/applet_livescore_t2.png
 %{iconsdir}/hicolor/16x16/apps/applet_livescore.png
 %{iconsdir}/hicolor/22x22/apps/applet_livescore.png
 %{iconsdir}/hicolor/24x24/apps/applet_livescore.png
@@ -101,7 +109,7 @@ rm -rf "${RPM_BUILD_ROOT}"
 * Wed Jan 1 2014 Assen Totin <assen.totin@gmail.com>
 - Release 0.1.2
 
-* Wed Dec 26 2013 Assen Totin <assen.totin@gmail.com>
+* Thu Dec 26 2013 Assen Totin <assen.totin@gmail.com>
 - Release 0.1.1
 
 * Mon Nov 25 2013 Assen Totin <assen.totin@gmail.com>
