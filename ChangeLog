@@ -1,8 +1,12 @@
+Jan 30, 2015 - Version 0.3.0
+============================
+* Added Omnibet as feed provider and set it as default.
+
 Jul 29, 2014 - Verzion 0.2.1
 ============================
 * Show minute when the goal is scored in notification.
 * Handle 'no information yet' status for matches which should have began.
-* Fix blank notifications for teams which name contains as ampersand.
+* Fix blank notifications for teams which name contains an ampersand.
 * Fix matches window to not periodically collapse opened leagues.
 
 Jul 11, 2014 - Version 0.2.0
