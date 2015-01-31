@@ -54,10 +54,10 @@ char *enetpulse_load_file(char *filename) {
 
 
 char *enetpulse_fix_score(char *input, char *delim, char *insert) {
-	char *output = (char *)malloc(strlen(input) + 2048);
+	char *output = (char *)malloc(strlen(input) + 8192);
 	memset(output, '\0', 1024);
-	char *tmp1 = (char *)malloc(strlen(input) + 2048);
-	char *tmp2 = (char *)malloc(strlen(input) + 2048);
+	char *tmp1 = (char *)malloc(strlen(input) + 8192);
+	char *tmp2 = (char *)malloc(strlen(input) + 8192);
 	char *tmp;
 	char *res;
 	char *tmp1_orig = tmp1;
