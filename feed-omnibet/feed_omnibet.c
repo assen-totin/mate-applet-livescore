@@ -54,10 +54,10 @@ char *omnibet_load_file(char *filename) {
 
 
 char *omnibet_insert(char *input, char *delim, char *insert) {
-	char *output = (char *)malloc(strlen(input) + 2048);
+	char *output = (char *)malloc(strlen(input) + 8192);
 	memset(output, '\0', 1024);
-	char *tmp1 = (char *)malloc(strlen(input) + 2048);
-	char *tmp2 = (char *)malloc(strlen(input) + 2048);
+	char *tmp1 = (char *)malloc(strlen(input) + 8192);
+	char *tmp2 = (char *)malloc(strlen(input) + 8192);
 	char *tmp;
 	char *res;
 	char *tmp1_orig = tmp1;
@@ -99,10 +99,10 @@ char *omnibet_insert(char *input, char *delim, char *insert) {
 }
 
 char *omnibet_replace(char *input, char *delim, char *replace) {
-        char *output = (char *)malloc(strlen(input) + 2048);
+        char *output = (char *)malloc(strlen(input) + 8192);
         memset(output, '\0', 1024);
-        char *tmp1 = (char *)malloc(strlen(input) + 2048);
-        char *tmp2 = (char *)malloc(strlen(input) + 2048);
+        char *tmp1 = (char *)malloc(strlen(input) + 8192);
+        char *tmp2 = (char *)malloc(strlen(input) + 8192);
         char *tmp;
         char *res;
         char *tmp1_orig = tmp1;
@@ -144,7 +144,7 @@ char *omnibet_replace(char *input, char *delim, char *replace) {
 
 
 gboolean omnibet_is_canceled(char *s) {
-	if (strstr(s, "CAN"))
+	if (strstr(s, "Postp."))
 		return TRUE;
 	return FALSE;
 }
@@ -373,7 +373,7 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 		// In addition, the style="" attribute may not always be empty. 
 		// To fix this, try adding a distinct attribute to the away score
 		char *orig_xml = omnibet_load_file(&tmp_file[0]);
-		char *fixed_xml1 = omnibet_replace(orig_xml, "&nbps;", "");
+		char *fixed_xml1 = omnibet_replace(orig_xml, "&nbsp;", "");
 		char *fixed_xml2 = omnibet_replace(fixed_xml1, "&", " and ");
 		char *fixed_xml3 = omnibet_replace(fixed_xml2, "<strong>", "<strong custom=score>");
 		char *fixed_xml4 = omnibet_replace(fixed_xml3, "<td>", "<td custom=away>");
