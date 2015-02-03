@@ -245,6 +245,8 @@ char *trim_quotes(char *);
 char *first_word(char *);
 char *string_ends(char *, int);
 void debug(char *);
+void debug_i(int);
+void debug_u(unsigned int);
 
 //menu.c
 void quitDialogClose(GtkWidget *, gpointer);
@@ -275,6 +277,12 @@ gboolean fifo_is_empty(fifo *);
 
 // feed_iddaa.c
 int feed_iddaa_main(livescore_applet *);
+
+// feed_enetpulse.c
+int feed_enetpulse_main(livescore_applet *);
+
+// feed_omnibet.c
+int feed_omnibet_main(livescore_applet *);
 
 // main.c
 void applet_back_change (MyPanelApplet *, MyPanelAppletBackgroundType, GdkColor *, GdkPixmap *, livescore_applet *);

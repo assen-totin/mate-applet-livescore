@@ -155,3 +155,18 @@ void debug(char *s) {
 	fflush(fp);
 	fclose(fp);
 }
+
+void debug_i(int i) {
+        FILE *fp = fopen("/tmp/livescore_applet", "a");
+        fprintf(fp, "%i\n", i);
+        fflush(fp);
+        fclose(fp);
+}
+
+void debug_u(unsigned int u) {
+        FILE *fp = fopen("/tmp/livescore_applet", "a");
+        fprintf(fp, "%i\n", u);
+        fflush(fp);
+        fclose(fp);
+}
+

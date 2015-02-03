@@ -33,6 +33,7 @@ typedef struct {
 	int unsigned start_time;
 	char team_home[256];
 	char team_away[256];
+	char score[256];
 	int score_home;
 	int score_away;
 	int stage;
