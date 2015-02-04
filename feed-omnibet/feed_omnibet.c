@@ -22,44 +22,48 @@
 #include "../src/applet.h"
 #include "feed_omnibet.h"
 
-gboolean omnibet_load_file(char *filename, char **output) {
+char *omnibet_load_file(char *filename) {
 	FILE *fp_in = fopen (filename, "r");
 	if (!fp_in)
-		return FALSE;
+		return NULL;
 
 	int counter = 1;
 
-	*output = malloc(1024);
+	char *output = malloc(1024);
 	char *tmp = malloc(1024);
 
-	if (!*output || !tmp)
+	if (!output || !tmp)
 		return FALSE;
 
-	memset(*output, '\0', 1024);
+	memset(output, '\0', 1024);
 
 	while (fgets(tmp, 1024, fp_in)) {
 		// Append the chunk
-		void *_tmp = realloc(*output, (counter * 1024));
+		void *_tmp = realloc(output, (counter * 1024));
 		if (!_tmp)
 			printf("realloc failed!");
-		*output = (char *)_tmp;
+		output = (char *)_tmp;
 
-		strcat(*output, tmp);
+		strcat(output, tmp);
 		counter++;
 	}
 
 	free(tmp);
 
-	return TRUE;
+	return output;
 }
 
-int omnibet_count_matches(char *input, char *delim) {
+char *omnibet_replace(char *input, char *delim, char *replace) {
+debug("CALLED REPLACE...");
+        // Calc how many bytes to add 
         int counter = 0;
-        char *in = (char *)malloc(strlen(input) + 1);
-        char *in_orig = in;
-        char *match;
+	char *match;
 
-        strcpy(in, input);
+        char *in = (char *)malloc(strlen(input) + 1);
+	if (! in)
+		return NULL;
+	strcpy(in, input);
+        char *in_orig = in;
 
         while (1) {
                 match = strstr(in, delim);
@@ -71,50 +75,38 @@ int omnibet_count_matches(char *input, char *delim) {
                         break;
         }
 
-        free(in_orig);
+        int bytes = counter * (strlen(replace) - strlen(delim));
+	// Ensure we can fit the original input even if no matches were found
+	if (bytes < 0)
+		bytes = 1;
+	else
+		bytes++;
+debug_i(bytes);
 
-        return counter;
-}
-
-gboolean omnibet_replace(char *input, char **output, char *delim, char *replace, int lines) {
-        // Calc how many bytes to add for each line
-        int per_line = strlen(replace) - strlen(delim) + 1;
-        if (per_line < 0)
-                per_line = 0;
-        int bytes = (lines + 1) * per_line;
-
-        *output = (char *)malloc(strlen(input) + bytes);
-        char *in = (char *)malloc(strlen(input) + bytes);
-
-	if (!*output || !in)
+        char *output = (char *)malloc(strlen(input) + bytes);
+	if (!output || !in)
 		return FALSE;
+	memset(output, '\0', strlen(input) + bytes);
 
-        char *in_orig = in;
-
-        memset(in, '\0', strlen(input) + bytes);
-        memset(*output, '\0', strlen(input) + bytes);
-
-        strcpy(in, input);
-
-        char *match;
+        in = in_orig;
 
         while (1) {
                 match = strstr(in, delim);
                 if (match) {
-                        strncat(*output, in, match - in);
+                        strncat(output, in, match - in);
 			in = match + strlen(delim);
                         if (strlen(replace) > 0)
-                                strcat(*output, replace);
+                                strcat(output, replace);
                 }
                 else {
-                        strcat(*output, in);
+                        strcat(output, in);
                         break;
                 }
         }
 
         free(in_orig);
 
-        return TRUE;
+        return output;
 }
 
 gboolean omnibet_is_cancelled(char *s) {
@@ -340,39 +332,24 @@ debug("CALLED LIB...");
 
 	int res = get_url(OMNIBET_URL, OMNIBET_USER_AGENT, &tmp_file[0]);
 	if (!res) {
-
-		// libxml cannot guaratnee the order of sibling parsing, hence issues when parsing score - because it is in the form of 
-		// <span style="">0</span> - <span style="">3</span>
-		// In addition, the style="" attribute may not always be empty. 
-		// To fix this, try adding a distinct attribute to the away score
-		//char *orig_xml = malloc(sizeof(char));
-		char *orig_xml;
-		if (!omnibet_load_file(&tmp_file[0], &orig_xml)) {
-			//free(orig_xml);
+		char *orig_xml = omnibet_load_file(&tmp_file[0]);
+		if (!orig_xml)
 			return;
-		}
-		
-		int total_matches = omnibet_count_matches(orig_xml, "<td>");
-		// If the counter is 0, the server must have returned an error
-		if (total_matches == 0) {
-			*feed_matches_counter = 0;
-			return;
-		}
-
-		char *fixed_xml1;
-		if (!omnibet_replace(orig_xml, &fixed_xml1, "&nbsp;", "", total_matches))
+	
+		char *fixed_xml1 = omnibet_replace(orig_xml, "&nbsp;", "");
+		if (!fixed_xml1)
 			return;
 
-		char *fixed_xml2;
-		if (!omnibet_replace(fixed_xml1, &fixed_xml2, "&", " and ", total_matches)) 
+		char *fixed_xml2 = omnibet_replace(fixed_xml1, "&", " and ");
+		if (!fixed_xml2) 
 			return;
 
-		char *fixed_xml3;
-		if (!omnibet_replace(fixed_xml2, &fixed_xml3, "<strong>", "<strong custom=score>", total_matches)) 
+		char *fixed_xml3 = omnibet_replace(fixed_xml2, "<strong>", "<strong custom=score>");
+		if (!fixed_xml3)
 			return;
 
-		char *fixed_xml4;
-		if (!omnibet_replace(fixed_xml3, &fixed_xml4, "<td>", "<td custom=away>", total_matches)) 
+		char *fixed_xml4 = omnibet_replace(fixed_xml3, "<td>", "<td custom=away>");
+		if (!fixed_xml4)
 			return;
 
 		FILE *fp = fopen (&tmp_file2[0], "w");

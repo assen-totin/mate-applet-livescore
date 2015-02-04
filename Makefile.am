@@ -17,7 +17,7 @@
 #  MATE Livescore applet written by Assen Totin <assen.totin@gmail.com>
 #
 
-SUBDIRS = src feed-iddaa feed-enetpulse images po
+SUBDIRS = src feed-iddaa feed-enetpulse feed-omnibet images po
 
 dist_doc_DATA = AUTHORS BUGS ChangeLog COPYING INSTALL NEWS README TODO
 
