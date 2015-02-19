@@ -32,16 +32,21 @@ char *omnibet_load_file(char *filename) {
 	char *output = malloc(1024);
 	char *tmp = malloc(1024);
 
-	if (!output || !tmp)
-		return FALSE;
+	if (!output || !tmp) {
+		fclose(fp_in);
+		return NULL;
+	}
 
 	memset(output, '\0', 1024);
 
-	while (fgets(tmp, 1024, fp_in)) {
+	while (fgets(tmp, 1023, fp_in)) {
 		// Append the chunk
 		void *_tmp = realloc(output, (counter * 1024));
-		if (!_tmp)
+		if (!_tmp) {
+			fclose(fp_in);
 			printf("realloc failed!");
+			return NULL;
+		}
 		output = (char *)_tmp;
 
 		strcat(output, tmp);
@@ -49,6 +54,8 @@ char *omnibet_load_file(char *filename) {
 	}
 
 	free(tmp);
+
+	fclose(fp_in);
 
 	return output;
 }
@@ -334,29 +341,28 @@ debug("CALLED LIB...");
 	if (!res) {
 		char *orig_xml = omnibet_load_file(&tmp_file[0]);
 		if (!orig_xml)
-			return;
+			return 0;
 	
 		char *fixed_xml1 = omnibet_replace(orig_xml, "&nbsp;", "");
 		if (!fixed_xml1)
-			return;
+			return 0;
 
 		char *fixed_xml2 = omnibet_replace(fixed_xml1, "&", " and ");
 		if (!fixed_xml2) 
-			return;
+			return 0;
 
 		char *fixed_xml3 = omnibet_replace(fixed_xml2, "<strong>", "<strong custom=score>");
 		if (!fixed_xml3)
-			return;
+			return 0;
 
 		char *fixed_xml4 = omnibet_replace(fixed_xml3, "<td>", "<td custom=away>");
 		if (!fixed_xml4)
-			return;
+			return 0;
 
 		FILE *fp = fopen (&tmp_file2[0], "w");
 		if (!fp) {
 			printf("Cannot open output file!\n");
-			*feed_matches_counter = 0;
-			return;
+			return 0;
 		}
 		fprintf(fp, "%s\n", fixed_xml4);
 		fclose(fp);

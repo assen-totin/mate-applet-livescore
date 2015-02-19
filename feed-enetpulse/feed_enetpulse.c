@@ -24,23 +24,31 @@
 
 char *enetpulse_load_file(char *filename) {
 	FILE *fp_in = fopen (filename, "r");
-	if (!fp_in)
+	if (!fp_in) {
 		printf("failed to open input file");
+		return NULL;
+	}
 
 	int counter = 1;
 
 	char *output = malloc(1024);
 	char *tmp = malloc(1024);
 
-	if (!output || !tmp)
+	if (!output || !tmp) {
+		fclose(fp_in);
 		printf("malloc failed!");
+		return NULL;
+	}
 	memset(output, '\0', 1024);
 
-	while (fgets(tmp, 1024, fp_in)) {
+	while (fgets(tmp, 1023, fp_in)) {
 		// Append the chunk
 		void *_tmp = realloc(output, (counter * 1024));
-		if (!_tmp)
+		if (!_tmp) {
+			fclose(fp_in);
 			printf("realloc failed!");
+			return NULL;
+		}
 		output = (char *)_tmp;
 
 		strcat(output, tmp);
@@ -48,6 +56,8 @@ char *enetpulse_load_file(char *filename) {
 	}
 
 	free(tmp);
+
+	fclose(fp_in);
 
 	return output;
 }
@@ -321,17 +331,20 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 
 	int res = get_url(ENETPULSE_URL, ENETPULSE_USER_AGENT, &tmp_file[0]);
 	if (!res) {
-
 		// libxml cannot guaratnee the order of sibling parsing, hence issues when parsing score - because it is in the form of 
 		// <span style="">0</span> - <span style="">3</span>
 		// In addition, the style="" attribute may not always be empty. 
 		// To fix this, try adding a distinct attribute to the away score
 		char *orig_xml = enetpulse_load_file(&tmp_file[0]);
+		if (! orig_xml)
+			return 0;
 		char *some_fixed_xml = enetpulse_fix_score(orig_xml, "</span> - <span style=\"", "score_away ");
 		char *fixed_xml = enetpulse_fix_score(some_fixed_xml, "class=\"live_b\"><span style=\"", "score_home ");
 		FILE *fp = fopen (&tmp_file2[0], "w");
-		if (!fp)
+		if (!fp) {
 			printf("Cannot open output file!\n");
+			return 0;
+		}
 		fprintf(fp, "%s\n", fixed_xml);
 		fclose(fp);
 
