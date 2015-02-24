@@ -151,22 +151,28 @@ char *string_ends(char *s, int count) {
 
 void debug(char *s) {
 	FILE *fp = fopen("/tmp/livescore_applet", "a");
-	fprintf(fp, "%s\n", s);
-	fflush(fp);
-	fclose(fp);
+	if (fp) {
+		fprintf(fp, "%s\n", s);
+		fflush(fp);
+		fclose(fp);
+	}
 }
 
 void debug_i(int i) {
         FILE *fp = fopen("/tmp/livescore_applet", "a");
-        fprintf(fp, "%i\n", i);
-        fflush(fp);
-        fclose(fp);
+	if (fp) {
+	        fprintf(fp, "%i\n", i);
+        	fflush(fp);
+	        fclose(fp);
+	}
 }
 
 void debug_u(unsigned int u) {
         FILE *fp = fopen("/tmp/livescore_applet", "a");
-        fprintf(fp, "%i\n", u);
-        fflush(fp);
-        fclose(fp);
+	if (fp) {
+	        fprintf(fp, "%i\n", u);
+        	fflush(fp);
+	        fclose(fp);
+	}
 }
 

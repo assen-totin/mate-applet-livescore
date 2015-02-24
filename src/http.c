@@ -34,6 +34,9 @@ int get_url (char *url, char *user_agent, char *filename) {
 				SOUP_SESSION_ACCEPT_LANGUAGE_AUTO, TRUE,
 #endif
 				NULL);
+
+	g_object_set(session, "idle-timeout", 60);
+
 	if (user_agent)
 		g_object_set(session, "user-agent", user_agent);
 	else {
@@ -41,6 +44,7 @@ int get_url (char *url, char *user_agent, char *filename) {
 		snprintf(&ua[0], sizeof(ua), "%s", HTTP_USER_AGENT);
 		g_object_set(session, "user-agent", &ua[0]);
 	}
+
 	msg = soup_message_new ("GET", url);
 	soup_message_set_flags (msg, SOUP_MESSAGE_NO_REDIRECT);
 	g_object_ref (msg);
