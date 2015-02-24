@@ -56,6 +56,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.la
 mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so.0
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.la
 
