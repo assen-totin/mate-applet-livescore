@@ -54,6 +54,10 @@ mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so.0.0.0 $RPM_BUILD_ROOT
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so.0
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.la
+mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so.0
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.la
 
 # Do not install doc files: they are handled as rpm doc files.
 rm -rf "${RPM_BUILD_ROOT}%{_docdir}"
@@ -96,6 +100,8 @@ rm -rf "${RPM_BUILD_ROOT}"
 %{_libdir}/bonobo/servers/LivescoreAppletFactory.server
 
 %changelog
+* Tue Feb 24 2015 Assen Totin <assen.totin@gmail.com>
+- Release 0.3.0
 
 * Tue Jul 29 2014 Assen Totin <assen.totin@gmail.com>
 - Release 0.2.1
