@@ -117,7 +117,7 @@ debug_i(bytes);
 }
 
 gboolean omnibet_is_cancelled(char *s) {
-	if (strstr(s, "Postp."))
+	if (strstr(s, "Postp.") || (strstr(s, "Int."))
 		return TRUE;
 	return FALSE;
 }
@@ -159,7 +159,10 @@ gboolean omnibet_is_playing(char *s, int *match_time, int *match_time_added) {
 		*match_time = atoi(s);
 		*match_time_added = 0;
 	}
-	return TRUE;
+
+	if (*match_time)
+		return TRUE;
+	return FALSE;
 }
 
 gboolean omnibet_is_future(char *s) {

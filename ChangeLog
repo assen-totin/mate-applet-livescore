@@ -1,4 +1,4 @@
-* Updated the default feed provider to better handle Extra Time events.
+* Improve Extra Time and interrupted games handling in default provider.
 
 Feb 24, 2015 - Version 0.3.0
 ============================
