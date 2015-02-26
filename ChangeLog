@@ -1,3 +1,5 @@
+* Updated the default feed provider to better handle Extra Time events.
+
 Feb 24, 2015 - Version 0.3.0
 ============================
 * Added Omnibet as feed provider and set it as default.

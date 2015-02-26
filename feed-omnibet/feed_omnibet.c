@@ -135,10 +135,17 @@ gboolean omnibet_is_half_time(char *s) {
 }
 
 gboolean omnibet_is_full_time(char *s) {
-	if (strstr(s, "FT") || strstr(s, "FAP") || strstr(s, "FAE"))
+	if (strstr(s, "FT") || strstr(s, "Pen.") || strstr(s, "FAE"))
 		return TRUE;
 	return FALSE;
 }
+
+gboolean omnibet_is_extra_time(char *s) {
+        if (strstr(s, "Break") || strstr(s, "ET") || strstr(s, "P"))
+                return TRUE;
+        return FALSE;
+}
+
 
 gboolean omnibet_is_playing(char *s, int *match_time, int *match_time_added) {
 	char *c;
@@ -208,6 +215,10 @@ void omnibet_build_match(omnibet_match_data *omnibet_match, match_data **feed_ma
 		match_status = MATCH_FULL_TIME;
 		match_time = 90;
 		match_time_added = 0;
+	}
+	else if (omnibet_is_extra_time(trim(&omnibet_match->match_time[0]))) {
+		match_time = 90;
+		match_status = MATCH_EXTRA_TIME;
 	}
 	else if (omnibet_is_future(trim(&omnibet_match->match_time[0]))) {
 		match_status = MATCH_NOT_COMMENCED;
