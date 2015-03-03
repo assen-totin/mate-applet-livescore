@@ -167,25 +167,25 @@ void manager_add_goal(livescore_applet *applet, int match_id, int match_time, in
 	char team_trunc[64];
 	gboolean flag_need_new_goal = TRUE;
 
-        for (i=0; i < applet->all_goals_counter; i++) {
-        	if (applet->all_goals[i].used && (applet->all_goals[i].match_id == match_id)) {
-                	goals_found++;
-                        continue;
-                }
-                if (!applet->all_goals[i].used && (goals_found == goals_before)) {
-                        flag_need_new_goal = FALSE;
-	                        goal_id = i;
-                                break;
-                }
-        }
+	for (i=0; i < applet->all_goals_counter; i++) {
+		if (applet->all_goals[i].used && (applet->all_goals[i].match_id == match_id)) {
+			goals_found++;
+			continue;
+		}
+		if (!applet->all_goals[i].used && (goals_found == goals_before)) {
+			flag_need_new_goal = FALSE;
+			goal_id = i;
+			break;
+		}
+	}
 
-        if (flag_need_new_goal) {
-                void *_tmp = realloc(applet->all_goals, (applet->all_goals_counter + 1) * sizeof(goal_data));
-                applet->all_goals = (goal_data *) _tmp;
-                applet->all_goals_counter++;
-                goal_id = applet->all_goals_counter - 1;
-                applet->all_goals[goal_id].goal_id = goal_id;
-        }
+	if (flag_need_new_goal) {
+		void *_tmp = realloc(applet->all_goals, (applet->all_goals_counter + 1) * sizeof(goal_data));
+		applet->all_goals = (goal_data *) _tmp;
+		applet->all_goals_counter++;
+		goal_id = applet->all_goals_counter - 1;
+		applet->all_goals[goal_id].goal_id = goal_id;
+	}
 
 	if (flag_goal_home) {
 		// first_word() works on the pointer we give, but we don't want to mangle the original string, hence copy it.
@@ -198,14 +198,56 @@ void manager_add_goal(livescore_applet *applet, int match_id, int match_time, in
 	}
 	sprintf(ntf_text_score, "%u' %s %s%s %u:%u", match_time, _("GOAL for"), first_word(&team_trunc[0]), _("! Score now is"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
 
-        applet->all_goals[goal_id].used = TRUE;
-        applet->all_goals[goal_id].match_id = match_id;
-        applet->all_goals[goal_id].score_home = applet->all_matches[match_id].score_home;
-        applet->all_goals[goal_id].score_away = applet->all_matches[match_id].score_away;
-        applet->all_goals[goal_id].match_time = match_time;
-        applet->all_goals[goal_id].match_time_added = match_time_added;
-        applet->all_goals[goal_id].time_added = time(NULL);
+	applet->all_goals[goal_id].used = TRUE;
+	applet->all_goals[goal_id].match_id = match_id;
+	applet->all_goals[goal_id].score_home = applet->all_matches[match_id].score_home;
+	applet->all_goals[goal_id].score_away = applet->all_matches[match_id].score_away;
+	applet->all_goals[goal_id].match_time = match_time;
+	applet->all_goals[goal_id].match_time_added = match_time_added;
+	applet->all_goals[goal_id].time_added = time(NULL);
+	applet->all_goals[goal_id].scored_home = flag_goal_home;
 }
+
+
+void manager_del_goal(livescore_applet *applet, int match_id, int match_time, int match_time_added, char *ntf_text_score, gboolean flag_goal_home) {
+	int i, goal_id, goals_found = 0;
+	int goals_before = applet->all_matches[match_id].score_home + applet->all_matches[match_id].score_away;
+	char team_trunc[64];
+	time_t newest_goal_time = 0;
+
+	// Cancel the goal
+	for (i=0; i < applet->all_goals_counter; i++) {
+		if (applet->all_goals[i].used && (applet->all_goals[i].match_id == match_id)) {
+			if (flag_goal_home && applet->all_goals[i].scored_home) {
+				if (newest_goal_time < applet->all_goals[i].time_added) {
+					newest_goal_time = applet->all_goals[i].time_added;
+					goal_id = i;
+				}
+			}
+			else if (! flag_goal_home && ! applet->all_goals[i].scored_home) {
+				if (newest_goal_time < applet->all_goals[i].time_added) {
+					newest_goal_time = applet->all_goals[i].time_added;
+					goal_id = i;
+				}
+			}
+		}
+	}
+
+	if (newest_goal_time)
+		applet->all_goals[goal_id].used = FALSE;
+
+	if (flag_goal_home) {
+		// first_word() works on the pointer we give, but we don't want to mangle the original string, hence copy it.
+		strcpy(&team_trunc[0], &applet->all_matches[match_id].team_home[0]);
+		applet->all_matches[match_id].score_home--;
+	}
+	else {
+		strcpy(&team_trunc[0], &applet->all_matches[match_id].team_away[0]);
+		applet->all_matches[match_id].score_away--;
+	}
+	sprintf(ntf_text_score, "%u' %s %s%s %u:%u", match_time, _("CANCELLED goal for"), first_word(&team_trunc[0]), _(":( Score is still"), applet->all_matches[match_id].score_home, applet->all_matches[match_id].score_away);
+}
+
 
 gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	int i, j, league_id, match_id;
@@ -219,10 +261,6 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 	time_t now = time(NULL);
 	char ntf_text_status[256], ntf_title_status[256], ntf_text_score[10][256], ntf_title_score[256];
 	int scored_home = 0, scored_away = 0;
-
-//char dbg[1024];
-//sprintf(&dbg[0], "all_matches_counter is: %u", applet->all_matches_counter);
-//debug(&dbg[0]);
 
 	// Do we have this match?
 	for (i=0; i < applet->all_matches_counter; i++) {
@@ -245,6 +283,20 @@ gboolean manager_main (livescore_applet *applet, match_data *new_match) {
 				manager_add_goal(applet, match_id, new_match->match_time, new_match->match_time_added, &ntf_text_score[i][0], TRUE);
 			for (i=scored_home; i < (scored_home + scored_away); i++)
 				manager_add_goal(applet, match_id, new_match->match_time, new_match->match_time_added, &ntf_text_score[i][0], FALSE);
+
+			// Prepare notification(s)
+			if (applet->all_leagues[applet->all_matches[match_id].league_id].favourite) {
+				snprintf(&ntf_title_score[0], sizeof(ntf_title_score), "%s vs. %s", &applet->all_matches[match_id].team_home[0], &applet->all_matches[match_id].team_away[0]);
+				flag_ntf_score = TRUE;
+			}
+		}
+		// Handle the rare ocasion when a goal that has been reported previously was cancelled
+		else if ((scored_home < 0) || (scored_away < 0)) {
+			// Adjust the score as we keep it
+			for (i=0; i > scored_home; i--)
+				manager_del_goal(applet, match_id, new_match->match_time, new_match->match_time_added, &ntf_text_score[-1*i][0], TRUE);
+			for (i=scored_home; i > (scored_home + scored_away); i--)
+				manager_del_goal(applet, match_id, new_match->match_time, new_match->match_time_added, &ntf_text_score[-1*i][0], FALSE);
 
 			// Prepare notification(s)
 			if (applet->all_leagues[applet->all_matches[match_id].league_id].favourite) {

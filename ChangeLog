@@ -1,4 +1,5 @@
 * Improve Extra Time and interrupted games handling in default provider.
+* Handle the rare case when a reported call gets cancelled. 
 
 Feb 24, 2015 - Version 0.3.0
 ============================

@@ -117,7 +117,7 @@ debug_i(bytes);
 }
 
 gboolean omnibet_is_cancelled(char *s) {
-	if (strstr(s, "Postp.") || (strstr(s, "Int."))
+	if (strstr(s, "Postp.") || strstr(s, "Int."))
 		return TRUE;
 	return FALSE;
 }

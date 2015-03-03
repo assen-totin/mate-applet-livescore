@@ -119,11 +119,11 @@ enum {
 };
 
 enum {
-        COL_GOALS_PIC = 0,
-        COL_GOALS_TIME,
-        COL_GOALS_SCORE,
-        COL_GOALS_MATCH,
-        NUM_COLS_GOAL
+	COL_GOALS_PIC = 0,
+	COL_GOALS_TIME,
+	COL_GOALS_SCORE,
+	COL_GOALS_MATCH,
+	NUM_COLS_GOAL
 };
 
 enum {
@@ -168,6 +168,7 @@ typedef struct {
 	int match_time_added;
 	time_t time_added;
 	gboolean used;
+	gboolean scored_home;
 } goal_data;
 
 typedef struct {
