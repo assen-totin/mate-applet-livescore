@@ -25,8 +25,12 @@
 void show_notification (gchar *title, gchar *body, GdkPixbuf *icon) {
 	NotifyNotification* notification;
 	GError* error = NULL;
+	char *version;
 
 	notify_init(PACKAGE_NAME);
+
+	//Attempt to fetch server version; then linbotify will use proper image attribute (e.g., icon_data or image_data)
+	notify_get_server_info (NULL, NULL, NULL, &version);
 #ifdef HAVE_MATE
         #ifdef HAVE_LIBMATENOTIFY
         notification = notify_notification_new (g_markup_escape_text(title, -1), g_markup_escape_text(body, -1), NULL, NULL);
