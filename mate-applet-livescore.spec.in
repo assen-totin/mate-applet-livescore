@@ -44,19 +44,22 @@ rm -rf "${RPM_BUILD_ROOT}"
 make install DESTDIR="${RPM_BUILD_ROOT}"
 
 rm -f $RPM_BUILD_ROOT@DATAROOTDIR@/glib-2.0/schemas/gschemas.compiled
+
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so
 mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.so.0
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_iddaa.la
+
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so
 mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.so.0
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_enetpulse.la
+
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so
 mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so.0
-rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.la
 
@@ -81,6 +84,7 @@ rm -rf "${RPM_BUILD_ROOT}"
 %{_libexecdir}/livescore_applet
 %{_libdir}/%{name}/lib_feed_iddaa.so
 %{_libdir}/%{name}/lib_feed_enetpulse.so
+%{_libdir}/%{name}/lib_feed_omnibet.so
 %{pixmapdir}/applet_livescore_icon.png
 %{pixmapdir}/applet_livescore_gray.png
 %{pixmapdir}/applet_livescore_green.png

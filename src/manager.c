@@ -21,6 +21,9 @@
 #include "../config.h"
 #include "applet.h"
 
+// Some prototypes here - implementatons are below
+gboolean manager_main (livescore_applet *applet, match_data *new_match);
+
 void queue_notification (livescore_applet *applet, gchar *title, gchar *body, int image, gboolean block) {
 	notif_data *notification = malloc(sizeof(notif_data));
 	sprintf(notification->title, "%s", title);

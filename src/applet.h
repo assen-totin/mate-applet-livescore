@@ -35,6 +35,7 @@
 #include <libxml/HTMLtree.h>
 #include <libsoup/soup.h>
 #include <dlfcn.h>
+#include <ctype.h>
 
 #ifdef HAVE_MATE
 	#include <mate-panel-applet.h>

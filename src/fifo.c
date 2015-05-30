@@ -65,6 +65,17 @@ void *fifo_remove(fifo *queue) {
 }
 
 
+/* Get the length of the fifo */
+int fifo_len(fifo *queue) {
+	fifo_data *node;
+	int i;
+
+	for (i = 0, node = queue->fifo_head; node; node = node->node_next, i++);
+
+	return (i);
+}
+
+
 /* Free an entire fifo */
 void fifo_free(fifo *queue) {
 	fifo_data *node = queue->fifo_head;
@@ -80,16 +91,6 @@ void fifo_free(fifo *queue) {
 	}
 
 	free(queue);
-}
-
-
-int fifo_len(fifo *queue) {
-	fifo_data *node;
-	int i;
-
-	for (i = 0, node = queue->fifo_head; node; node = node->node_next, i++);
-
-	return (i);
 }
 
 
