@@ -88,7 +88,6 @@ debug("CALLED REPLACE...");
 		bytes = 1;
 	else
 		bytes++;
-debug_i(bytes);
 
         char *output = (char *)malloc(strlen(input) + bytes);
 	if (!output || !in)
@@ -135,7 +134,7 @@ gboolean omnibet_is_half_time(char *s) {
 }
 
 gboolean omnibet_is_full_time(char *s) {
-	if (strstr(s, "FT") || strstr(s, "Pen.") || strstr(s, "FAE"))
+	if (strstr(s, "FT") || strstr(s, "Pen.") || strstr(s, "FAE") || strstr(s, "AET"))
 		return TRUE;
 	return FALSE;
 }
