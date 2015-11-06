@@ -21,6 +21,7 @@
 #include "../config.h"
 #include "applet.h"
 
+#ifdef HAVE_GNOME_2
 void applet_back_change (MyPanelApplet *a, MyPanelAppletBackgroundType type, GdkColor *color, GdkPixmap *pixmap, livescore_applet *applet) {
 	/* taken from the TrashApplet */
 	GtkRcStyle *rc_style;
@@ -56,6 +57,18 @@ void applet_back_change (MyPanelApplet *a, MyPanelAppletBackgroundType type, Gdk
 	}
 
 }
+#elif HAVE_MATE
+	#ifdef HAVE_GTK2
+void applet_back_change (MyPanelApplet *a, MyPanelAppletBackgroundType type, GdkColor *color, GdkPixmap *pixmap, livescore_applet *applet) {
+	#elif HAVE_GTK3
+void applet_back_change (MyPanelApplet *a, MyPanelAppletBackgroundType type, GdkRGBA *color, cairo_pattern_t *pattern, livescore_applet *applet) {
+	#endif
+
+	// Use MATE-provided wrapper to change the background (same for both GTK2 and GTK3)
+	mate_panel_applet_set_background_widget (a, GTK_WIDGET(applet->applet));
+	mate_panel_applet_set_background_widget (a, GTK_WIDGET(applet->event_box));
+}
+#endif
 
 void applet_destroy(MyPanelApplet *applet_widget, livescore_applet *applet) {
 	g_main_loop_quit(applet->loop);
@@ -67,7 +80,6 @@ void applet_destroy(MyPanelApplet *applet_widget, livescore_applet *applet) {
 	g_free(applet);
 	return;
 }
-
 
 gboolean applet_main (MyPanelApplet *applet_widget, const gchar *iid, gpointer data) {
 	livescore_applet *applet;

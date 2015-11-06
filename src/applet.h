@@ -287,7 +287,13 @@ int feed_enetpulse_main(livescore_applet *);
 int feed_omnibet_main(livescore_applet *);
 
 // main.c
+#ifdef HAVE_GTK2
 void applet_back_change (MyPanelApplet *, MyPanelAppletBackgroundType, GdkColor *, GdkPixmap *, livescore_applet *);
+#elif HAVE_GTK3
+void applet_back_change (MyPanelApplet *, MyPanelAppletBackgroundType, GdkRGBA *, cairo_pattern_t *, livescore_applet *);
+#endif
+
+
 void applet_destroy(MyPanelApplet *, livescore_applet *);
 
 // Menu skeleton

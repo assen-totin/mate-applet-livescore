@@ -39,7 +39,13 @@ void menu_cb_about (GtkAction *action, livescore_applet *applet) {
 	GtkWidget *buttonOK = gtk_dialog_add_button (GTK_DIALOG(applet->dialog_settings), GTK_STOCK_OK, GTK_RESPONSE_OK);
 
 	gtk_dialog_set_default_response (GTK_DIALOG (applet->dialog_settings), GTK_RESPONSE_CANCEL);
+
+#ifdef HAVE_GTK2
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG(applet->dialog_settings)->vbox), label);
+#elif HAVE_GTK3
+	gtk_container_add (GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(applet->dialog_settings))), label);
+#endif
+
 	g_signal_connect (G_OBJECT(buttonOK), "clicked", G_CALLBACK (quitDialogClose), (gpointer) applet);
 
 	gtk_widget_show_all (GTK_WIDGET(applet->dialog_settings));
@@ -104,7 +110,13 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 
 	GtkWidget *viewport = gtk_viewport_new (NULL, NULL);
 
-	GtkWidget *notif_vbox_2 = gtk_vbox_new (FALSE, 0);
+	GtkWidget *notif_vbox_2;
+#ifdef HAVE_GTK2
+	notif_vbox_2 = gtk_vbox_new (FALSE, 0);
+#elif HAVE_GTK3
+	notif_vbox_2 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+#endif
+
 	for (i=0; i < applet->all_leagues_counter; i++) {
 		// Skip league with name '0' - a servie one
 		if (!strcmp(&applet->all_leagues[i].league_name[0], "0"))
@@ -123,7 +135,12 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 	gtk_container_add (GTK_CONTAINER (viewport), notif_vbox_2);
 	gtk_container_add (GTK_CONTAINER (notif_table), viewport);
 
-	GtkWidget *notif_vbox_1 = gtk_vbox_new (FALSE, 0);
+	GtkWidget *notif_vbox_1;
+#ifdef HAVE_GTK2
+	notif_vbox_1 = gtk_vbox_new (FALSE, 0);
+#elif HAVE_GTK3
+	notif_vbox_1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+#endif
 
 	gtk_box_pack_start(GTK_BOX(notif_vbox_1), notif_label, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(notif_vbox_1), notif_table, TRUE, TRUE, 0);
@@ -168,10 +185,15 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 
 	g_signal_connect (G_OBJECT(feed_combo), "changed", G_CALLBACK (menu_cb_feed_combo), (gpointer) applet);
 
-	GtkWidget *feed_vbox_1 = gtk_vbox_new (FALSE, 0);
+	GtkWidget *feed_vbox_1;
+#ifdef HAVE_GTK2
+	feed_vbox_1 = gtk_vbox_new (FALSE, 0);
+#elif HAVE_GTK3
+	feed_vbox_1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+#endif
+
 	gtk_box_pack_start(GTK_BOX(feed_vbox_1), feed_label, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(feed_vbox_1), feed_combo, FALSE, FALSE, 0);
-
 
 	// Create notebook widget
 	GtkWidget *notebook = gtk_notebook_new();
@@ -190,7 +212,13 @@ void menu_cb_settings (GtkAction *action, livescore_applet *applet) {
 	GtkWidget *buttonClose = gtk_dialog_add_button (GTK_DIALOG(applet->dialog_settings), GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL);
 
 	gtk_dialog_set_default_response (GTK_DIALOG (applet->dialog_settings), GTK_RESPONSE_CANCEL);
+
+#ifdef HAVE_GTK2
 	gtk_container_add (GTK_CONTAINER (GTK_DIALOG(applet->dialog_settings)->vbox), notebook);
+#elif HAVE_GTK3
+	gtk_container_add (GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(applet->dialog_settings))), notebook);
+#endif
+
 	g_signal_connect (G_OBJECT(buttonClose), "clicked", G_CALLBACK (quitDialogClose), (gpointer) applet);
 
 	gtk_widget_show_all(GTK_WIDGET(applet->dialog_settings));

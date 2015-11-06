@@ -11,7 +11,7 @@
       <description>List of leagues for which all matches are show expanded in the GUI</description>
     </key>
     <key name="feed" type="s">
-      <default>"lib_feed_iddaa.so"</default>
+      <default>"lib_feed_omnibet.so"</default>
       <summary>Name of the selected feed provider</summary>
       <description>Name of the selected matches feed provider</description>
     </key>
