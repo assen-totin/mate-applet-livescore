@@ -221,6 +221,7 @@ void omnibet_build_match(omnibet_match_data *omnibet_match, match_data **feed_ma
 	else if (omnibet_is_extra_time(trim(&omnibet_match->match_time[0]))) {
 		match_time = 90;
 		match_status = MATCH_EXTRA_TIME;
+		match_time_added = 0;
 	}
 	else if (omnibet_is_future(trim(&omnibet_match->match_time[0]))) {
 		match_status = MATCH_NOT_COMMENCED;
