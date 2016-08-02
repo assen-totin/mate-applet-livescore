@@ -1,5 +1,5 @@
 AC_PREREQ([2.63])
-AC_INIT([mate-applet-livescore], [0.3.0], [assen.totin@gmail.com])
+AC_INIT([mate-applet-livescore], [0.3.1], [assen.totin@gmail.com])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([m4])
 
