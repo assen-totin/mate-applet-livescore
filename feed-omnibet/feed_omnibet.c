@@ -61,58 +61,63 @@ char *omnibet_load_file(char *filename) {
 }
 
 char *omnibet_replace(char *input, char *delim, char *replace) {
-debug("CALLED REPLACE...");
-        // Calc how many bytes to add 
-        int counter = 0;
+	// Calc how many bytes to add 
+	int counter = 0;
 	char *match;
 
-        char *in = (char *)malloc(strlen(input) + 1);
+	char *in = (char *)malloc(strlen(input) + 1);
 	if (! in)
 		return NULL;
+
+	// Save a pointer s that we may free it later
+	char *in_orig = in;
+
 	strcpy(in, input);
-        char *in_orig = in;
 
-        while (1) {
-                match = strstr(in, delim);
-                if (match) {
-                        in = match + strlen(delim);
-                        counter++;
-                }
-                else
-                        break;
-        }
+	while (1) {
+		match = strstr(in, delim);
+		if (match) {
+			in = match + strlen(delim);
+			counter++;
+		}
+		else
+			break;
+	}
 
-        int bytes = counter * (strlen(replace) - strlen(delim));
+	int bytes = counter * (strlen(replace) - strlen(delim));
 	// Ensure we can fit the original input even if no matches were found
 	if (bytes < 0)
 		bytes = 1;
 	else
 		bytes++;
 
-        char *output = (char *)malloc(strlen(input) + bytes);
-	if (!output || !in)
+	char *output = (char *)malloc(strlen(input) + bytes);
+	if (!output || !in) {
+		free(in_orig);
 		return FALSE;
+	}
+
 	memset(output, '\0', strlen(input) + bytes);
 
-        in = in_orig;
+	in = in_orig;
 
-        while (1) {
-                match = strstr(in, delim);
-                if (match) {
-                        strncat(output, in, match - in);
+	while (1) {
+		match = strstr(in, delim);
+		if (match) {
+			strncat(output, in, match - in);
 			in = match + strlen(delim);
-                        if (strlen(replace) > 0)
-                                strcat(output, replace);
-                }
-                else {
-                        strcat(output, in);
-                        break;
-                }
-        }
+			if (strlen(replace) > 0)
+				strcat(output, replace);
+		}
+		else {
+			strcat(output, in);
+			break;
+		}
+	}
 
-        free(in_orig);
+	free(in_orig);
 
-        return output;
+	return output;
 }
 
 gboolean omnibet_is_cancelled(char *s) {
@@ -328,9 +333,7 @@ void omnibet_walk_tree(xmlNode * a_node, omnibet_match_data *omnibet_match, matc
 	}
 }
 
-
 int feed_main(match_data **feed_matches, int *feed_matches_counter) {
-debug("CALLED LIB...");
 	omnibet_match_data omnibet_match;
 	char tmp_file[1024];
 	char tmp_file2[1024];
@@ -392,6 +395,7 @@ debug("CALLED LIB...");
 			HTML_PARSE_COMPACT);
 		omnibet_walk_tree(xmlDocGetRootElement(parser), &omnibet_match, feed_matches, feed_matches_counter);
 
+		xmlFreeDoc(parser);
 		free(orig_xml);
 		free(fixed_xml1);
 		free(fixed_xml2);

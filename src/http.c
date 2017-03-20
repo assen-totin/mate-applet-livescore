@@ -47,12 +47,15 @@ int get_url (char *url, char *user_agent, char *filename) {
 
 	msg = soup_message_new ("GET", url);
 	soup_message_set_flags (msg, SOUP_MESSAGE_NO_REDIRECT);
-	g_object_ref (msg);
+//	g_object_ref (msg);
 	soup_session_send_message (session, msg);
 	if (SOUP_STATUS_IS_TRANSPORT_ERROR (msg->status_code)) {
 		char _err[1024];
 		snprintf (&_err[0], sizeof(_err), "%s: %d %s\n", soup_message_get_uri(msg)->path, msg->status_code, msg->reason_phrase);
 		//debug(&_err[0]);
+		g_object_unref (msg);
+		g_object_unref (session);
+
 		return 1;
 	}
 
@@ -66,6 +69,8 @@ int get_url (char *url, char *user_agent, char *filename) {
 			get_url (uri_string, user_agent, filename);
 			g_free (uri_string);
 			soup_uri_free (uri);
+			g_object_unref (msg);
+			g_object_unref (session);
 			return 0;
 		}
 	} 
@@ -74,17 +79,20 @@ int get_url (char *url, char *user_agent, char *filename) {
 		output_file = fopen (filename, "w");
 		if (!output_file) {
 			g_printerr ("Error trying to create file %s.\n", filename);
+			g_object_unref (msg);
+			g_object_unref (session);
 			return 1;
 		}
 
-		fwrite (msg->response_body->data,
-			1,
-			msg->response_body->length,
-			output_file);
-
+		fwrite (msg->response_body->data, 1, msg->response_body->length, output_file);
 		fclose (output_file);
-
+		g_object_unref (msg);
+		g_object_unref (session);
 		return 0;
 	}
+
+	g_object_unref (msg);
+	g_object_unref (session);
+	return 1;
 }
 
