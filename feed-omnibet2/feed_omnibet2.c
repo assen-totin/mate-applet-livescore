@@ -20,7 +20,7 @@
 
 #include "../config.h"
 #include "../src/applet.h"
-#include "feed_omnibet.h"
+#include "feed_omnibet2.h"
 
 char *omnibet_load_file(char *filename) {
 	FILE *fp_in = fopen (filename, "r");
@@ -278,54 +278,62 @@ void omnibet_walk_tree(xmlNode * a_node, omnibet_match_data *omnibet_match, matc
 				strcpy(&omnibet_match->league_name[0], cur_node->content);
 				omnibet_match->stage = OMNIBET_PARSING_SKIP;
 			}
-			else if (omnibet_match->stage == OMNIBET_PARSING_HOME) {
+			else if (omnibet_match->stage == OMNIBET_PARSING_TIME) {
+				strcpy(&omnibet_match->match_time[0], cur_node->content);
+				omnibet_match->stage = OMNIBET_PARSING_SKIP;
+				omnibet_match->expect = OMNIBET_EXPECT_TEAM_HOME;
+			}
+			else if (omnibet_match->stage == OMNIBET_PARSING_TEAM_HOME) {
 				strcpy(&omnibet_match->team_home[0], cur_node->content);
 				omnibet_match->stage = OMNIBET_PARSING_SKIP;
+				omnibet_match->expect = OMNIBET_EXPECT_SCORE_HOME;
 			}
-			else if (omnibet_match->stage == OMNIBET_PARSING_AWAY) {
+			else if (omnibet_match->stage == OMNIBET_PARSING_SCORE_HOME) {
+				omnibet_match->score_home = atoi(cur_node->content);
+				omnibet_match->stage = OMNIBET_PARSING_SKIP;
+				omnibet_match->expect = OMNIBET_EXPECT_SCORE_AWAY;
+			}
+			else if (omnibet_match->stage == OMNIBET_PARSING_SCORE_AWAY) {
+				omnibet_match->score_home = atoi(cur_node->content);
+				omnibet_match->stage = OMNIBET_PARSING_SKIP;
+				omnibet_match->expect = OMNIBET_EXPECT_TEAM_AWAY;
+			}
+			else if (omnibet_match->stage == OMNIBET_PARSING_TEAM_AWAY) {
 				strcpy(&omnibet_match->team_away[0], cur_node->content);
 				// Flush last match
 				omnibet_build_match(omnibet_match, feed_matches, feed_matches_counter);
 				omnibet_match->stage = OMNIBET_PARSING_SKIP;
-			}
-			else if (omnibet_match->stage == OMNIBET_PARSING_TIME) {
-				strcpy(&omnibet_match->match_time[0], cur_node->content);
-				omnibet_match->stage = OMNIBET_PARSING_SKIP;
-			}
-			else if (omnibet_match->stage == OMNIBET_PARSING_SCORE) {
-                                omnibet_match->score_home = 0;
-                                omnibet_match->score_away = 0;
-                                memset(&omnibet_match->score[0], '\0', 32);
-                                strcat(&omnibet_match->score[0], cur_node->content);
-                                if(strlen(&omnibet_match->score[0]) > 2)
-                                        omnibet_split_score(&omnibet_match->score[0], &omnibet_match->score_home, &omnibet_match->score_away);
-				omnibet_match->stage = OMNIBET_PARSING_SKIP;
+				omnibet_match->expect = OMNIBET_EXPECT_NONE;
 			}
 		}
 
 		for (cur_attr = cur_node->properties; cur_attr; cur_attr = cur_attr->next) {
 			if (!strcmp(cur_attr->name, "style")) {
-				if (!strcmp(cur_attr->children->content, "display:inline-block; vertical-align:middle")) {
+				if (!strcmp(cur_attr->children->content, "font-size:13px")) {
 					omnibet_match->stage = OMNIBET_PARSING_LEAGUE;
 					memset(&omnibet_match->league_name[0], '\0', 256);
 				}
 			}
 
-			else if (!strcmp(cur_attr->name, "width")) {
-				if (strstr(cur_attr->children->content, "60")) 
+			else if (!strcmp(cur_attr->name, "class")) {
+				if (strstr(cur_attr->children->content, "btn btn-default btn-xs btn-outline btn-sm")) 
 					omnibet_match->stage = OMNIBET_PARSING_TIME;
 			}
 
-			else if (!strcmp(cur_attr->name, "align")) {
-				if (strstr(cur_attr->children->content, "right"))
-					omnibet_match->stage = OMNIBET_PARSING_HOME;
-			}
-
 			else if (!strcmp(cur_attr->name, "custom")) {
-				if (strstr(cur_attr->children->content, "score")) 
-					omnibet_match->stage = OMNIBET_PARSING_SCORE;
-				else if (strstr(cur_attr->children->content, "away")) 
-					omnibet_match->stage = OMNIBET_PARSING_AWAY;
+				switch(omnibet_match->expect) {
+					case OMNIBET_EXPECT_TEAM_HOME:
+						omnibet_match->stage = OMNIBET_PARSING_TEAM_HOME;
+						break;
+					case OMNIBET_EXPECT_SCORE_HOME:
+						omnibet_match->stage = OMNIBET_PARSING_SCORE_HOME;
+						break;
+					case OMNIBET_EXPECT_SCORE_AWAY:
+						omnibet_match->stage = OMNIBET_PARSING_SCORE_AWAY;
+						break;
+					case OMNIBET_EXPECT_TEAM_AWAY:
+						omnibet_match->stage = OMNIBET_PARSING_TEAM_AWAY;
+				}
 			}
 		}
 
@@ -335,6 +343,7 @@ void omnibet_walk_tree(xmlNode * a_node, omnibet_match_data *omnibet_match, matc
 
 int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	omnibet_match_data omnibet_match;
+	GSList *cookies;
 	char tmp_file[1024];
 	char tmp_file2[1024];
 	char tmp_file3[1024];
@@ -350,58 +359,52 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	struct passwd *pw = getpwuid(getuid());
 	snprintf(&tmp_file[0], sizeof(tmp_file), "%s-%u", OMNIBET_FILENAME, pw->pw_uid);
 	snprintf(&tmp_file2[0], sizeof(tmp_file), "%s-%u-a", OMNIBET_FILENAME, pw->pw_uid);
-	//snprintf(&tmp_file3[0], sizeof(tmp_file), "%s-%u-prev", OMNIBET_FILENAME, pw->pw_uid);
 
-	//rename(&tmp_file[0], &tmp_file3[0]);
+	// Get our cookie from main page
+	if (get_url(OMNIBET_URL1, OMNIBET_USER_AGENT, &tmp_file[0], NULL, &cookies))
+		return 1;
 
-	int res = get_url(OMNIBET_URL, OMNIBET_USER_AGENT, &tmp_file[0], NULL, NULL);
-	if (!res) {
-		char *orig_xml = omnibet_load_file(&tmp_file[0]);
-		if (!orig_xml)
-			return 0;
-	
-		char *fixed_xml1 = omnibet_replace(orig_xml, "&nbsp;", "");
-		if (!fixed_xml1)
-			return 0;
-
-		char *fixed_xml2 = omnibet_replace(fixed_xml1, "&", " and ");
-		if (!fixed_xml2) 
-			return 0;
-
-		char *fixed_xml3 = omnibet_replace(fixed_xml2, "<strong>", "<strong custom=score>");
-		if (!fixed_xml3)
-			return 0;
-
-		char *fixed_xml4 = omnibet_replace(fixed_xml3, "<td>", "<td custom=away>");
-		if (!fixed_xml4)
-			return 0;
-
-		FILE *fp = fopen (&tmp_file2[0], "w");
-		if (!fp) {
-			printf("Cannot open output file!\n");
-			return 0;
-		}
-		fprintf(fp, "%s\n", fixed_xml4);
-		fclose(fp);
-
-		htmlDocPtr parser = htmlReadFile(&tmp_file2[0], OMNIBET_CHARSET, 
-			HTML_PARSE_RECOVER |
-			//HTML_PARSE_NOBLANKS | 
-			HTML_PARSE_NOERROR | 
-			HTML_PARSE_NOWARNING |
-#ifdef HAVE_MATE
-			HTML_PARSE_NOIMPLIED | 
-#endif
-			HTML_PARSE_COMPACT);
-		omnibet_walk_tree(xmlDocGetRootElement(parser), &omnibet_match, feed_matches, feed_matches_counter);
-
-		xmlFreeDoc(parser);
-		free(orig_xml);
-		free(fixed_xml1);
-		free(fixed_xml2);
-		free(fixed_xml3);
-		free(fixed_xml4);
+	// Fetch actual page
+	if (get_url(OMNIBET_URL2, OMNIBET_USER_AGENT, &tmp_file[0], cookies, NULL)) {
+		if (cookies)
+			soup_cookies_free(cookies);
+		return 1;
 	}
+
+	if (cookies)
+		soup_cookies_free(cookies);
+
+	char *orig_xml = omnibet_load_file(&tmp_file[0]);
+	if (!orig_xml)
+		return 0;
+	
+	char *fixed_xml2 = omnibet_replace(orig_xml, "<strong>", "<strong custom=livescore>");
+	if (!fixed_xml2)
+		return 0;
+
+	FILE *fp = fopen (&tmp_file2[0], "w");
+	if (!fp) {
+		printf("Cannot open output file!\n");
+		return 0;
+	}
+	fprintf(fp, "%s\n", fixed_xml2);
+	fclose(fp);
+
+	htmlDocPtr parser = htmlReadFile(&tmp_file2[0], OMNIBET_CHARSET, 
+		HTML_PARSE_RECOVER |
+		//HTML_PARSE_NOBLANKS | 
+		HTML_PARSE_NOERROR | 
+		HTML_PARSE_NOWARNING |
+#ifdef HAVE_MATE
+		HTML_PARSE_NOIMPLIED | 
+#endif
+		HTML_PARSE_COMPACT);
+
+	omnibet_walk_tree(xmlDocGetRootElement(parser), &omnibet_match, feed_matches, feed_matches_counter);
+
+	xmlFreeDoc(parser);
+	free(orig_xml);
+	free(fixed_xml2);
 
 	return 1;
 }

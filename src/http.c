@@ -22,7 +22,7 @@
 #include "applet.h"
 #include "http.h"
 
-int get_url (char *url, char *user_agent, char *filename) {
+int get_url (char *url, char *user_agent, char *filename, GSList *cookies_req, GSList **cookies_res) {
 	SoupMessage *msg;
 	const char *header;
 	FILE *output_file = NULL;
@@ -46,6 +46,11 @@ int get_url (char *url, char *user_agent, char *filename) {
 	}
 
 	msg = soup_message_new ("GET", url);
+
+	// Set cookeis, if provided
+	if (cookies_req)
+		soup_cookies_to_request (cookies_req, msg);
+
 	soup_message_set_flags (msg, SOUP_MESSAGE_NO_REDIRECT);
 //	g_object_ref (msg);
 	soup_session_send_message (session, msg);
@@ -66,7 +71,7 @@ int get_url (char *url, char *user_agent, char *filename) {
 			char *uri_string;
 			uri = soup_uri_new_with_base (soup_message_get_uri (msg), header);
 			uri_string = soup_uri_to_string (uri, FALSE);
-			get_url (uri_string, user_agent, filename);
+			get_url (uri_string, user_agent, filename, cookies_req, cookies_res);
 			g_free (uri_string);
 			soup_uri_free (uri);
 			g_object_unref (msg);
@@ -83,6 +88,10 @@ int get_url (char *url, char *user_agent, char *filename) {
 			g_object_unref (session);
 			return 1;
 		}
+
+		// Extract cookies, if any
+		if (cookies_res)
+			*cookies_res = soup_cookies_from_response (msg);
 
 		fwrite (msg->response_body->data, 1, msg->response_body->length, output_file);
 		fclose (output_file);

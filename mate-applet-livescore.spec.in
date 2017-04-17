@@ -63,6 +63,12 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.so.0
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.a
 rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet.la
 
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet2.so
+mv $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet2.so.0.0.0 $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet2.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet2.so.0
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet2.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}/lib_feed_omnibet2.la
+
 # Do not install doc files: they are handled as rpm doc files.
 rm -rf "${RPM_BUILD_ROOT}%{_docdir}"
 
@@ -85,6 +91,7 @@ rm -rf "${RPM_BUILD_ROOT}"
 %{_libdir}/%{name}/lib_feed_iddaa.so
 %{_libdir}/%{name}/lib_feed_enetpulse.so
 %{_libdir}/%{name}/lib_feed_omnibet.so
+%{_libdir}/%{name}/lib_feed_omnibet2.so
 %{pixmapdir}/applet_livescore_icon.png
 %{pixmapdir}/applet_livescore_gray.png
 %{pixmapdir}/applet_livescore_green.png
@@ -105,6 +112,9 @@ rm -rf "${RPM_BUILD_ROOT}"
 %{_libdir}/bonobo/servers/LivescoreAppletFactory.server
 
 %changelog
+* Mon Apr 17 2017 Assen Totin <assen.totin@gmail.com>
+- Release 0.4.0
+
 * Tue Aug 2 2016 Assen Totin <assen.totin@gmail.com>
 - Release 0.3.1
 

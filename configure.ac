@@ -1,5 +1,5 @@
 AC_PREREQ([2.63])
-AC_INIT([mate-applet-livescore], [0.3.1], [assen.totin@gmail.com])
+AC_INIT([mate-applet-livescore], [0.4.0], [assen.totin@gmail.com])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([m4])
 
@@ -215,7 +215,7 @@ AC_SUBST([APPLET_FLAGS])
 AC_SUBST([APPLET_LIBS])
 
 # Makefiles
-AC_CONFIG_FILES([Makefile src/Makefile feed-enetpulse/Makefile feed-iddaa/Makefile feed-omnibet/Makefile po/Makefile.in po/Makefile images/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile feed-enetpulse/Makefile feed-iddaa/Makefile feed-omnibet/Makefile feed-omnibet2/Makefile po/Makefile.in po/Makefile images/Makefile])
 
 # Service files
 AC_CONFIG_FILES([src/org.mate.applets.LivescoreApplet.mate-panel-applet src/org.mate.panel.applet.LivescoreApplet.service src/org.mate.panel.applet.LivescoreApplet.gschema.xml src/LivescoreAppletFactory.server mate-applet-livescore.spec])

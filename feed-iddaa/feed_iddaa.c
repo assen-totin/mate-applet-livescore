@@ -218,7 +218,7 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 
 	struct passwd *pw = getpwuid(getuid());
 	snprintf(&tmp_file[0], sizeof(tmp_file), "%s-%u", IDDAA_FILENAME, pw->pw_uid);
-	int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, &tmp_file[0]);
+	int res = get_url(IDDAA_URL, IDDAA_USER_AGENT, &tmp_file[0], NULL, NULL);
 	if (!res) {
 		htmlDocPtr parser = htmlReadFile(&tmp_file[0], IDDAA_CHARSET, 
 			HTML_PARSE_NOBLANKS | 

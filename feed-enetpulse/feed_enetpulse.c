@@ -329,7 +329,7 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	snprintf(&tmp_file[0], sizeof(tmp_file), "%s-%u", ENETPULSE_FILENAME, pw->pw_uid);
 	snprintf(&tmp_file2[0], sizeof(tmp_file), "%s-%u-a", ENETPULSE_FILENAME, pw->pw_uid);
 
-	int res = get_url(ENETPULSE_URL, ENETPULSE_USER_AGENT, &tmp_file[0]);
+	int res = get_url(ENETPULSE_URL, ENETPULSE_USER_AGENT, &tmp_file[0], NULL, NULL);
 	if (!res) {
 		// libxml cannot guaratnee the order of sibling parsing, hence issues when parsing score - because it is in the form of 
 		// <span style="">0</span> - <span style="">3</span>

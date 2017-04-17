@@ -268,7 +268,7 @@ int manager_timer(livescore_applet *);
 gboolean manager_populate_feed(livescore_applet *, gchar *, gboolean);
 
 // http.c
-int get_url (char *, char *, char *);
+int get_url (char *, char *, char *, GSList *, GSList **);
 
 // fifo.c
 fifo *fifo_new(void);
