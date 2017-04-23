@@ -197,8 +197,8 @@ time_t omnibet_convert_time(char *s) {
 	// mktime treats 'now' as localtime, but we have it UTC.
 	// NOTE: timegm() is not POSIX-compliant, hence not portable!
 	// See 'man timegm' for POSIX-compliant replacecement function.
-	//return mktime(&now);
-	return timegm(&now);
+	return mktime(&now);
+	//return timegm(&now);
 }
 
 void omnibet_build_match(omnibet_match_data *omnibet_match, match_data **feed_matches, int *feed_matches_counter) {
