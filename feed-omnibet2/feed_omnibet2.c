@@ -294,7 +294,7 @@ void omnibet_walk_tree(xmlNode * a_node, omnibet_match_data *omnibet_match, matc
 				omnibet_match->expect = OMNIBET_EXPECT_SCORE_AWAY;
 			}
 			else if (omnibet_match->stage == OMNIBET_PARSING_SCORE_AWAY) {
-				omnibet_match->score_home = atoi(cur_node->content);
+				omnibet_match->score_away = atoi(cur_node->content);
 				omnibet_match->stage = OMNIBET_PARSING_SKIP;
 				omnibet_match->expect = OMNIBET_EXPECT_TEAM_AWAY;
 			}
@@ -318,6 +318,9 @@ void omnibet_walk_tree(xmlNode * a_node, omnibet_match_data *omnibet_match, matc
 			else if (!strcmp(cur_attr->name, "class")) {
 				if (strstr(cur_attr->children->content, "btn btn-default btn-xs btn-outline btn-sm")) 
 					omnibet_match->stage = OMNIBET_PARSING_TIME;
+				else if (strstr(cur_attr->children->content, "btn btn-warning btn-xs btn-outline btn-sm")) 
+					omnibet_match->stage = OMNIBET_PARSING_TIME;
+
 			}
 
 			else if (!strcmp(cur_attr->name, "custom")) {

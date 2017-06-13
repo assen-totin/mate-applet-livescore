@@ -112,6 +112,9 @@ rm -rf "${RPM_BUILD_ROOT}"
 %{_libdir}/bonobo/servers/LivescoreAppletFactory.server
 
 %changelog
+* Tue Jun 13 2017 Assen Totin <assen.totin@gmail.com>
+- Release 0.4.1
+
 * Mon Apr 17 2017 Assen Totin <assen.totin@gmail.com>
 - Release 0.4.0
 
