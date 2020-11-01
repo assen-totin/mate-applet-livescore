@@ -54,6 +54,6 @@ typedef struct {
 #define OMNIBET_URL2 "https://omnibet.ro/live-scores/"
 #define OMNIBET_CHARSET "UTF-8"
 //#define OMNIBET_USER_AGENT "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)"
-#define OMNIBET_USER_AGENT "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0"
+#define OMNIBET_USER_AGENT "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36"
 #define OMNIBET_FILENAME "/tmp/omnibet.html"
 

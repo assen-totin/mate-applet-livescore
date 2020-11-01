@@ -346,7 +346,7 @@ void omnibet_walk_tree(xmlNode * a_node, omnibet_match_data *omnibet_match, matc
 
 int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	omnibet_match_data omnibet_match;
-	GSList *cookies;
+	GSList *cookies = NULL;
 	char tmp_file[1024];
 	char tmp_file2[1024];
 	char tmp_file3[1024];
@@ -364,18 +364,19 @@ int feed_main(match_data **feed_matches, int *feed_matches_counter) {
 	snprintf(&tmp_file2[0], sizeof(tmp_file), "%s-%u-a", OMNIBET_FILENAME, pw->pw_uid);
 
 	// Get our cookie from main page
-	if (get_url(OMNIBET_URL1, OMNIBET_USER_AGENT, &tmp_file[0], NULL, &cookies))
-		return 1;
+//	if (get_url(OMNIBET_URL1, OMNIBET_USER_AGENT, &tmp_file[0], NULL, &cookies))
+//		return 1;
 
 	// Fetch actual page
-	if (get_url(OMNIBET_URL2, OMNIBET_USER_AGENT, &tmp_file[0], cookies, NULL)) {
-		if (cookies)
-			soup_cookies_free(cookies);
+//	if (get_url(OMNIBET_URL2, OMNIBET_USER_AGENT, &tmp_file[0], cookies, NULL)) {
+	if (get_url(OMNIBET_URL2, OMNIBET_USER_AGENT, &tmp_file[0], NULL, NULL)) {
+//		if (cookies)
+//			soup_cookies_free(cookies);
 		return 1;
 	}
 
-	if (cookies)
-		soup_cookies_free(cookies);
+//	if (cookies)
+//		soup_cookies_free(cookies);
 
 	char *orig_xml = omnibet_load_file(&tmp_file[0]);
 	if (!orig_xml)
